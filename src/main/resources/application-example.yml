@@ -1,0 +1,37 @@
+spring:
+  datasource:
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5433/demo_db}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+  elasticsearch:
+    uris: ${ELASTICSEARCH_URIS:http://localhost:9200}
+  servlet:
+    multipart:
+      max-file-size: ${APP_MULTIPART_MAX_FILE_SIZE:100MB}
+      max-request-size: ${APP_MULTIPART_MAX_REQUEST_SIZE:100MB}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+app:
+  user:
+    default-id: ${APP_DEFAULT_USER_ID:soc-analyst-demo}
+  elasticsearch:
+    events-index: ${APP_EVENTS_INDEX:soc-events}
+  ingest:
+    batch-size: ${APP_INGEST_BATCH_SIZE:1000}
+  llm:
+    provider-order: ${APP_LLM_PROVIDER_ORDER:GEMINI,GROQ}
+    gemini:
+      model: ${GEMINI_MODEL:gemini-2.5-flash}
+      api-key: ${GEMINI_API_KEY:replace-me}
+    groq:
+      model: ${GROQ_MODEL:llama-3.3-70b-versatile}
+      api-key: ${GROQ_API_KEY:replace-me}
+      base-url: ${GROQ_BASE_URL:https://api.groq.com/openai/v1/chat/completions}
