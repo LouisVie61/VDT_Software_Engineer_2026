@@ -35,15 +35,19 @@ services:
     build: .
     ports:
       - "8080:8080"
-    env_file:
-      - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - POSTGRES_URL=jdbc:postgresql://postgres:5432/demo_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - ELASTICSEARCH_URIS=http://elasticsearch:9200
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
     depends_on:
       elasticsearch:
         condition: service_healthy
       postgres:
         condition: service_healthy
-      fluentd:
-        condition: service_started
 
 volumes:
   elasticsearch-data:
