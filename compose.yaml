@@ -1,6 +1,6 @@
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.2.8
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
@@ -13,7 +13,7 @@ services:
       timeout: 5s
       retries: 18
     volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
+      - elasticsearch-data-v9:/usr/share/elasticsearch/data
 
   postgres:
     image: postgres:16
@@ -22,7 +22,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
     ports:
-      - "5433:5432"
+      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d demo_db"]
       interval: 10s
@@ -41,8 +41,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - ELASTICSEARCH_URIS=http://elasticsearch:9200
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
-      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - GOOGLE_API_KEY
+      - GROQ_API_KEY
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -51,4 +51,5 @@ services:
 
 volumes:
   elasticsearch-data:
+  elasticsearch-data-v9:
   postgres-data:
