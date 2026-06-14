@@ -6,21 +6,28 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import vdt.se.demo.application.service.EventIngestService;
-import vdt.se.demo.domain.model.IngestResult;
+import vdt.se.demo.adapter.in.rest.dto.IngestResponse;
+import vdt.se.demo.application.dto.IngestFileCommand;
+import vdt.se.demo.application.port.inboundPort.EventIngestUseCase;
 
 @RestController
 @RequestMapping("/api/events")
 public class EventIngestController {
 
-    private final EventIngestService ingestService;
+    private final EventIngestUseCase ingestUseCase;
 
-    public EventIngestController(EventIngestService ingestService) {
-        this.ingestService = ingestService;
+    public EventIngestController(EventIngestUseCase ingestUseCase) {
+        this.ingestUseCase = ingestUseCase;
     }
 
     @PostMapping(path = "/import-file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public IngestResult importFile(@RequestPart("file") MultipartFile file) {
-        return ingestService.ingestFile(file);
+    public IngestResponse importFile(@RequestPart("file") MultipartFile file) {
+        IngestFileCommand command = new IngestFileCommand(
+                file.getOriginalFilename(),
+                file.getContentType(),
+                file.getSize(),
+                file::getInputStream
+        );
+        return IngestResponse.from(ingestUseCase.ingest(command));
     }
 }
