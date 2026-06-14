@@ -7,11 +7,11 @@ import org.springframework.web.client.RestTemplate;
 import tools.jackson.databind.ObjectMapper;
 import vdt.se.demo.application.port.outboundPort.EventIndexPort;
 import vdt.se.demo.application.service.EventIngestService;
-import vdt.se.demo.application.service.ingest.CsvEventFileReader;
-import vdt.se.demo.application.service.ingest.CsvEventParser;
-import vdt.se.demo.application.service.ingest.EventFileFormatDetector;
-import vdt.se.demo.application.service.ingest.JsonlEventFileReader;
-import vdt.se.demo.application.service.ingest.JsonlEventParser;
+import vdt.se.demo.adapter.out.ingest.CsvEventFileReader;
+import vdt.se.demo.adapter.out.ingest.CsvEventParser;
+import vdt.se.demo.adapter.out.ingest.EventFileFormatDetector;
+import vdt.se.demo.adapter.out.ingest.JsonlEventFileReader;
+import vdt.se.demo.adapter.out.ingest.JsonlEventParser;
 import vdt.se.demo.domain.service.SocEventMapper;
 
 @Configuration
