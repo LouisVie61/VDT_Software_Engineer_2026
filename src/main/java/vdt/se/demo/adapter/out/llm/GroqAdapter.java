@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import vdt.se.demo.adapter.config.AppProperties;
-import vdt.se.demo.application.port.outboundPort.LlmProviderAdapter;
+import vdt.se.demo.application.port.outboundPort.LlmProviderPort;
 import vdt.se.demo.domain.exception.LlmRetryableException;
 import vdt.se.demo.domain.valueObjects.LlmProvider;
 
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class GroqAdapter implements LlmProviderAdapter {
+public class GroqAdapter implements LlmProviderPort {
 
     private final AppProperties properties;
     private final RestTemplate restTemplate;

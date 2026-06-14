@@ -4,12 +4,12 @@ import com.google.genai.Client;
 import com.google.genai.types.GenerateContentResponse;
 import org.springframework.stereotype.Component;
 import vdt.se.demo.adapter.config.AppProperties;
-import vdt.se.demo.application.port.outboundPort.LlmProviderAdapter;
+import vdt.se.demo.application.port.outboundPort.LlmProviderPort;
 import vdt.se.demo.domain.exception.LlmRetryableException;
 import vdt.se.demo.domain.valueObjects.LlmProvider;
 
 @Component
-public class GeminiAdapter implements LlmProviderAdapter {
+public class GeminiAdapter implements LlmProviderPort {
 
     private final AppProperties properties;
 

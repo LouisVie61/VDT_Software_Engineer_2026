@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import vdt.se.demo.adapter.in.rest.dto.QueryHistoryResponse;
+import vdt.se.demo.adapter.in.rest.dto.SearchResponse;
 import vdt.se.demo.application.dto.SearchRequest;
 import vdt.se.demo.application.port.inboundPort.QueryUseCase;
-import vdt.se.demo.domain.model.QueryHistory;
-import vdt.se.demo.domain.model.QueryResult;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,16 +30,18 @@ public class QueryController {
     }
 
     @PostMapping
-    public QueryResult search(@Valid @RequestBody SearchRequest request) {
-        return queryUseCase.search(request);
+    public SearchResponse search(@Valid @RequestBody SearchRequest request) {
+        return SearchResponse.from(queryUseCase.search(request));
     }
 
     @GetMapping("/history")
-    public List<QueryHistory> history(
+    public List<QueryHistoryResponse> history(
             @RequestParam(defaultValue = "soc-analyst-demo") String userId,
             @RequestParam(defaultValue = "20") int limit
     ) {
-        return queryUseCase.history(userId, limit);
+        return queryUseCase.history(userId, limit).stream()
+                .map(QueryHistoryResponse::from)
+                .toList();
     }
 
     @GetMapping("/{queryId}/export.csv")

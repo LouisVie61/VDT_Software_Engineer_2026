@@ -1,21 +1,19 @@
 package vdt.se.demo.adapter.out.llm;
 
 import org.springframework.stereotype.Component;
-import tools.jackson.databind.JsonNode;
 import vdt.se.demo.application.dto.SearchRequest;
-import vdt.se.demo.domain.model.ExecutionResult;
 
 import java.util.Set;
 
 @Component
-public class LlmPromptBuilder {
+public class LlmDslPromptBuilder {
 
     public static final Set<String> FIELD_WHITELIST = Set.of(
             "timestamp", "source", "severity", "event_type", "user", "host", "ip",
             "message", "raw", "src_ip", "dst_ip", "action"
     );
 
-    public String buildDslPrompt(SearchRequest request) {
+    public String build(SearchRequest request) {
         return """
                 You convert SOC analyst natural language questions in Vietnamese or English into Elasticsearch Query DSL.
                 Return JSON only. Do not include markdown fences.
@@ -24,17 +22,38 @@ public class LlmPromptBuilder {
                 Use only Elasticsearch Query DSL, not SQL and not a wrapper object.
                 Include all explicit API filters below directly in the DSL.
                 Use page/from and pageSize/size from the request. Use timestamp:desc sort unless the question asks otherwise.
+                Do not treat generic UI words like show, list, find, get, log, logs, event, events, or error as required search terms.
+                Map SOC intent words to structured fields when possible:
+                - login/authentication/sign-in means event_type=auth.
+                - failed/failure means action=failed when the question is about authentication.
+                Prefer structured filters for known SOC fields over literal full-text matching.
 
                 Expected search DSL:
                 {
                   "query": {
                     "bool": {
                       "must": [
-                        {"simple_query_string": {"query": "failed login", "fields": ["message", "raw", "user", "host", "ip", "source", "event_type", "severity", "action", "src_ip", "dst_ip"], "default_operator": "and"}}
+                        {"simple_query_string": {"query": "failed login", "fields": ["message", "raw", "user", "host", "source", "event_type", "severity", "action"], "default_operator": "and"}}
                       ],
                       "filter": [
                         {"term": {"severity": "high"}},
                         {"range": {"timestamp": {"gte": "2026-01-01T00:00:00Z", "lte": "2026-01-02T00:00:00Z"}}}
+                      ]
+                    }
+                  },
+                  "from": 0,
+                  "size": 50,
+                  "sort": [{"timestamp": {"order": "desc"}}]
+                }
+
+                Expected login failure DSL:
+                {
+                  "query": {
+                    "bool": {
+                      "must": [{"match_all": {}}],
+                      "filter": [
+                        {"term": {"event_type": "auth"}},
+                        {"term": {"action": "failed"}}
                       ]
                     }
                   },
@@ -67,24 +86,6 @@ public class LlmPromptBuilder {
                 value(request.getFrom()), value(request.getTo()), value(request.getSeverity()),
                 value(request.getEventType()), value(request.getUser()), value(request.getHost()),
                 value(request.getIp())
-        );
-    }
-
-    public String buildSummaryPrompt(SearchRequest request, JsonNode generatedDsl, ExecutionResult result) {
-        return """
-                Summarize this SOC search result in 3-5 concise sentences for an analyst.
-                Mention total events, notable users/hosts/IPs if present, and one investigation direction.
-                Question: %s
-                Generated DSL: %s
-                Total count: %d
-                Aggregations: %s
-                Sample results: %s
-                """.formatted(
-                request.getQuestion(),
-                generatedDsl,
-                result.totalCount(),
-                result.aggregations(),
-                result.results().stream().limit(5).toList()
         );
     }
 
