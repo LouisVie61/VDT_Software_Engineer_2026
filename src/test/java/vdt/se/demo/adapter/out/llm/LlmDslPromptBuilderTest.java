@@ -5,14 +5,14 @@ import vdt.se.demo.application.dto.SearchRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class LlmPromptBuilderTest {
+class LlmDslPromptBuilderTest {
 
     @Test
     void promptContainsExpectedDslExamplesAndJsonOnlyInstruction() {
         SearchRequest request = new SearchRequest();
         request.setQuestion("Top 10 IP nhieu alert nhat");
 
-        String prompt = new LlmPromptBuilder().buildDslPrompt(request);
+        String prompt = new LlmDslPromptBuilder().build(request);
 
         assertThat(prompt).contains("Return JSON only");
         assertThat(prompt).contains("Expected search DSL");

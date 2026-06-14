@@ -4,9 +4,8 @@ import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
 import vdt.se.demo.adapter.config.AppProperties;
 import vdt.se.demo.application.dto.SearchRequest;
-import vdt.se.demo.application.port.outboundPort.LlmProviderAdapter;
+import vdt.se.demo.application.port.outboundPort.LlmProviderPort;
 import vdt.se.demo.application.port.outboundPort.LlmResponse;
-import vdt.se.demo.domain.exception.LlmException;
 import vdt.se.demo.domain.exception.LlmRetryableException;
 import vdt.se.demo.domain.model.ExecutionResult;
 import vdt.se.demo.domain.valueObjects.LlmProvider;
@@ -14,21 +13,13 @@ import vdt.se.demo.domain.valueObjects.LlmProvider;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class LlmFallbackChainAdapterTest {
 
     @Test
     void fallsBackFromGeminiToGroqAndReturnsGeneratedDsl() {
-        AppProperties properties = new AppProperties();
-        LlmFallbackChainAdapter chain = new LlmFallbackChainAdapter(
-                List.of(failing(LlmProvider.GEMINI), successfulGroq()),
-                new LlmPromptBuilder(),
-                new DslResponseParser(new ObjectMapper()),
-                properties
-        );
-        SearchRequest request = new SearchRequest();
-        request.setQuestion("show failed login");
+        LlmFallbackChainAdapter chain = chain(List.of(failing(LlmProvider.GEMINI), successfulGroq()));
+        SearchRequest request = request("show failed login");
 
         LlmResponse response = chain.generateDsl(request);
 
@@ -37,42 +28,50 @@ class LlmFallbackChainAdapterTest {
     }
 
     @Test
-    void throwsWhenAllProvidersFailInsteadOfUsingHeuristic() {
-        AppProperties properties = new AppProperties();
-        LlmFallbackChainAdapter chain = new LlmFallbackChainAdapter(
-                List.of(failing(LlmProvider.GEMINI), failing(LlmProvider.GROQ)),
-                new LlmPromptBuilder(),
-                new DslResponseParser(new ObjectMapper()),
-                properties
-        );
-        SearchRequest request = new SearchRequest();
-        request.setQuestion("show failed login");
+    void usesLocalFallbackDslWhenAllProvidersFail() {
+        LlmFallbackChainAdapter chain = chain(List.of(failing(LlmProvider.GEMINI), failing(LlmProvider.GROQ)));
 
-        assertThatThrownBy(() -> chain.generateDsl(request))
-                .isInstanceOf(LlmException.class)
-                .hasMessageContaining("All LLM providers failed");
+        LlmResponse response = chain.generateDsl(request("show failed login"));
+
+        assertThat(response.provider()).isEqualTo("LOCAL_FALLBACK");
+        assertThat(response.generatedDsl().get("query").get("bool").get("must").get(0)
+                .get("simple_query_string").get("query").asString()).contains("failed login auth");
+        assertThat(response.rawContent()).contains("\"default_operator\": \"or\"");
     }
 
     @Test
     void returnsDeterministicSummaryWhenProvidersFail() {
-        AppProperties properties = new AppProperties();
-        LlmFallbackChainAdapter chain = new LlmFallbackChainAdapter(
-                List.of(failing(LlmProvider.GEMINI), failing(LlmProvider.GROQ)),
-                new LlmPromptBuilder(),
-                new DslResponseParser(new ObjectMapper()),
-                properties
-        );
-        SearchRequest request = new SearchRequest();
-        request.setQuestion("show failed login");
+        LlmFallbackChainAdapter chain = chain(List.of(failing(LlmProvider.GEMINI), failing(LlmProvider.GROQ)));
 
-        String summary = chain.summarize(request, new ObjectMapper().readTree("{\"query\":{\"match_all\":{}}}"),
-                new ExecutionResult(List.of(), List.of(), 12));
+        String summary = chain.summarize(
+                request("show failed login"),
+                new ObjectMapper().readTree("{\"query\":{\"match_all\":{}}}"),
+                new ExecutionResult(List.of(), List.of(), 12)
+        );
 
         assertThat(summary).contains("Found 12 matching events");
     }
 
-    private LlmProviderAdapter failing(LlmProvider provider) {
-        return new LlmProviderAdapter() {
+    private LlmFallbackChainAdapter chain(List<LlmProviderPort> providers) {
+        return new LlmFallbackChainAdapter(
+                providers,
+                new LlmDslPromptBuilder(),
+                new LlmSummaryPromptBuilder(),
+                new LocalFallbackDslBuilder(),
+                new DeterministicSummaryBuilder(),
+                new DslResponseParser(new ObjectMapper()),
+                new AppProperties()
+        );
+    }
+
+    private SearchRequest request(String question) {
+        SearchRequest request = new SearchRequest();
+        request.setQuestion(question);
+        return request;
+    }
+
+    private LlmProviderPort failing(LlmProvider provider) {
+        return new LlmProviderPort() {
             @Override
             public LlmProvider provider() {
                 return provider;
@@ -85,8 +84,8 @@ class LlmFallbackChainAdapterTest {
         };
     }
 
-    private LlmProviderAdapter successfulGroq() {
-        return new LlmProviderAdapter() {
+    private LlmProviderPort successfulGroq() {
+        return new LlmProviderPort() {
             @Override
             public LlmProvider provider() {
                 return LlmProvider.GROQ;
