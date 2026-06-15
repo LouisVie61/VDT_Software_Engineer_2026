@@ -72,9 +72,30 @@ public class ElasticsearchSearchResponseMapper {
 
         List<Map<String, Object>> rows = new ArrayList<>();
         for (Map.Entry<String, JsonNode> entry : aggregations.properties()) {
-            rows.addAll(extractBuckets(entry.getKey(), entry.getValue()));
+            JsonNode aggregation = entry.getValue();
+            List<Map<String, Object>> buckets = extractBuckets(entry.getKey(), aggregation);
+            if (buckets.isEmpty()) {
+                extractMetric(entry.getKey(), aggregation).forEach(rows::add);
+            } else {
+                rows.addAll(buckets);
+            }
         }
         return rows;
+    }
+
+    private List<Map<String, Object>> extractMetric(String aggregationName, JsonNode aggregation) {
+        JsonNode value = aggregation == null ? null : aggregation.get("value");
+        if (value == null || value.isNull()) {
+            return List.of();
+        }
+        Map<String, Object> row = new LinkedHashMap<>();
+        row.put("aggregation", aggregationName);
+        row.put("value", value.asDouble());
+        JsonNode valueAsString = aggregation.get("value_as_string");
+        if (valueAsString != null && !valueAsString.isNull()) {
+            row.put("value_as_string", valueAsString.asString());
+        }
+        return List.of(row);
     }
 
     private List<Map<String, Object>> extractBuckets(String aggregationName, JsonNode aggregation) {

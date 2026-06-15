@@ -22,7 +22,7 @@ public class SocEventIndexDefinition {
                       "action": { "type": "keyword" },
                       "message": { "type": "text" },
                       "raw": { "type": "text" },
-                      "metadata": { "type": "object", "enabled": true }
+                      "metadata": { "type": "flattened" }
                     }
                   }
                 }
