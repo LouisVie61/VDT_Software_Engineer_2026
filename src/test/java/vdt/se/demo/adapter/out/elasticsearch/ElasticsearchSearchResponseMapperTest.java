@@ -42,4 +42,25 @@ class ElasticsearchSearchResponseMapperTest {
         assertThat(result.results()).isEmpty();
         assertThat(result.aggregations()).isEmpty();
     }
+
+    @Test
+    void mapsMetricAggregationValues() {
+        ExecutionResult result = mapper.map(objectMapper.readTree("""
+                {
+                  "hits": {"total": {"value": 0}, "hits": []},
+                  "aggregations": {
+                    "latest_timestamp": {
+                      "value": 1908566105000,
+                      "value_as_string": "2030-06-24T21:15:05.000Z"
+                    }
+                  }
+                }
+                """));
+
+        assertThat(result.aggregations()).containsExactly(Map.of(
+                "aggregation", "latest_timestamp",
+                "value", 1.908566105E12,
+                "value_as_string", "2030-06-24T21:15:05.000Z"
+        ));
+    }
 }
