@@ -2,6 +2,7 @@ package vdt.se.demo.adapter.out.ingest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.elasticsearch.BulkFailureException;
 import vdt.se.demo.application.port.outboundPort.EventIndexPort;
 import vdt.se.demo.domain.exception.BadQueryException;
 import vdt.se.demo.domain.model.SocEvent;
@@ -59,10 +60,23 @@ public class EventBatchBuffer {
     }
 
     private String rootMessage(Throwable throwable) {
+        if (throwable instanceof BulkFailureException bulkFailureException) {
+            return bulkFailureMessage(bulkFailureException);
+        }
         Throwable current = throwable;
         while (current.getCause() != null) {
             current = current.getCause();
         }
         return current.getMessage() == null ? throwable.getMessage() : current.getMessage();
+    }
+
+    private String bulkFailureMessage(BulkFailureException exception) {
+        String details = exception.getFailedDocuments().entrySet().stream()
+                .limit(5)
+                .map(entry -> entry.getKey() + ": " + entry.getValue().errorMessage())
+                .reduce((first, second) -> first + "; " + second)
+                .orElse(exception.getMessage());
+        int remaining = Math.max(0, exception.getFailedDocuments().size() - 5);
+        return remaining == 0 ? details : details + "; and " + remaining + " more failed documents";
     }
 }

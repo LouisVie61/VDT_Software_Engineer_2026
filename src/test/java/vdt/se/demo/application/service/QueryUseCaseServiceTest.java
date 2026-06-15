@@ -4,9 +4,11 @@ import org.junit.jupiter.api.Test;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import vdt.se.demo.adapter.config.AppProperties;
+import vdt.se.demo.application.dto.QueryExecution;
 import vdt.se.demo.application.dto.SearchRequest;
 import vdt.se.demo.application.port.outboundPort.LlmFallbackChain;
 import vdt.se.demo.application.port.outboundPort.LlmResponse;
+import vdt.se.demo.application.port.outboundPort.QueryExecutionRefiner;
 import vdt.se.demo.application.port.outboundPort.QueryExecutorPort;
 import vdt.se.demo.application.port.outboundPort.QueryHistoryPort;
 import vdt.se.demo.domain.model.ExecutionResult;
@@ -30,6 +32,7 @@ class QueryUseCaseServiceTest {
         QueryUseCaseService service = new QueryUseCaseService(
                 new StubLlm(),
                 new StubExecutor(),
+                new NoopRefiner(),
                 history,
                 auditLog -> {
                 },
@@ -55,7 +58,7 @@ class QueryUseCaseServiceTest {
         history.rows.add(new QueryHistory(id, "soc-analyst-demo", "q", "{}", "s",
                 vdt.se.demo.domain.valueObjects.ChartType.TABLE, 1,
                 "[{\"user\":\"alice\",\"ip\":\"10.0.0.1\"}]", java.time.LocalDateTime.now()));
-        QueryUseCaseService service = new QueryUseCaseService(new StubLlm(), new StubExecutor(), history,
+        QueryUseCaseService service = new QueryUseCaseService(new StubLlm(), new StubExecutor(), new NoopRefiner(), history,
                 auditLog -> {
                 }, new ChartTypeInferenceService(new ObjectMapper()), new ObjectMapper(), new AppProperties());
 
@@ -84,6 +87,13 @@ class QueryUseCaseServiceTest {
         @Override
         public ExecutionResult execute(JsonNode generatedDsl) {
             return new ExecutionResult(List.of(Map.of("user", "alice")), List.of(), 1);
+        }
+    }
+
+    private static class NoopRefiner implements QueryExecutionRefiner {
+        @Override
+        public QueryExecution refine(SearchRequest request, JsonNode generatedDsl, ExecutionResult executionResult) {
+            return new QueryExecution(generatedDsl, executionResult);
         }
     }
 

@@ -4,11 +4,13 @@ import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import vdt.se.demo.adapter.config.AppProperties;
+import vdt.se.demo.application.dto.QueryExecution;
 import vdt.se.demo.application.dto.SearchRequest;
 import vdt.se.demo.application.port.inboundPort.QueryUseCase;
 import vdt.se.demo.application.port.outboundPort.AuditLogPort;
 import vdt.se.demo.application.port.outboundPort.LlmFallbackChain;
 import vdt.se.demo.application.port.outboundPort.LlmResponse;
+import vdt.se.demo.application.port.outboundPort.QueryExecutionRefiner;
 import vdt.se.demo.application.port.outboundPort.QueryExecutorPort;
 import vdt.se.demo.application.port.outboundPort.QueryHistoryPort;
 import vdt.se.demo.domain.exception.BadQueryException;
@@ -33,6 +35,7 @@ public class QueryUseCaseService implements QueryUseCase {
 
     private final LlmFallbackChain llmFallbackChain;
     private final QueryExecutorPort queryExecutorPort;
+    private final QueryExecutionRefiner queryExecutionRefiner;
     private final QueryHistoryPort queryHistoryPort;
     private final AuditLogPort auditLogPort;
     private final ChartTypeInferenceService chartTypeInferenceService;
@@ -40,11 +43,13 @@ public class QueryUseCaseService implements QueryUseCase {
     private final AppProperties properties;
 
     public QueryUseCaseService(LlmFallbackChain llmFallbackChain, QueryExecutorPort queryExecutorPort,
+                               QueryExecutionRefiner queryExecutionRefiner,
                                QueryHistoryPort queryHistoryPort, AuditLogPort auditLogPort,
                                ChartTypeInferenceService chartTypeInferenceService, ObjectMapper objectMapper,
                                AppProperties properties) {
         this.llmFallbackChain = llmFallbackChain;
         this.queryExecutorPort = queryExecutorPort;
+        this.queryExecutionRefiner = queryExecutionRefiner;
         this.queryHistoryPort = queryHistoryPort;
         this.auditLogPort = auditLogPort;
         this.chartTypeInferenceService = chartTypeInferenceService;
@@ -65,6 +70,10 @@ public class QueryUseCaseService implements QueryUseCase {
             JsonNode generatedDslNode = llmResponse.generatedDsl();
             generatedDsl = objectMapper.writeValueAsString(generatedDslNode);
             ExecutionResult executionResult = queryExecutorPort.execute(generatedDslNode);
+            QueryExecution refinedExecution = queryExecutionRefiner.refine(request, generatedDslNode, executionResult);
+            generatedDslNode = refinedExecution.generatedDsl();
+            generatedDsl = objectMapper.writeValueAsString(generatedDslNode);
+            executionResult = refinedExecution.executionResult();
             String summary = llmFallbackChain.summarize(request, generatedDslNode, executionResult);
             ChartType chartType = chartTypeInferenceService.inferChartType(generatedDslNode);
 
