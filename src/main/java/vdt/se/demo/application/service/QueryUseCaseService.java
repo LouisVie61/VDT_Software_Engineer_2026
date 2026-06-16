@@ -3,6 +3,8 @@ package vdt.se.demo.application.service;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 import vdt.se.demo.adapter.config.AppProperties;
 import vdt.se.demo.application.dto.QueryExecution;
 import vdt.se.demo.application.dto.SearchRequest;
@@ -74,6 +76,7 @@ public class QueryUseCaseService implements QueryUseCase {
             generatedDslNode = refinedExecution.generatedDsl();
             generatedDsl = objectMapper.writeValueAsString(generatedDslNode);
             executionResult = refinedExecution.executionResult();
+            executionResult = withEventRowsForAggregationQuery(request, generatedDslNode, executionResult);
             String summary = llmFallbackChain.summarize(request, generatedDslNode, executionResult);
             ChartType chartType = chartTypeInferenceService.inferChartType(generatedDslNode);
 
@@ -183,5 +186,47 @@ public class QueryUseCaseService implements QueryUseCase {
 
     private String escapeCsv(String value) {
         return "\"" + value.replace("\"", "\"\"") + "\"";
+    }
+
+    private ExecutionResult withEventRowsForAggregationQuery(SearchRequest request, JsonNode generatedDsl,
+                                                            ExecutionResult executionResult) {
+        if (!executionResult.results().isEmpty() || executionResult.aggregations().isEmpty()) {
+            return executionResult;
+        }
+        try {
+            JsonNode eventsDsl = eventRowsDsl(request, generatedDsl);
+            ExecutionResult eventRowsResult = queryExecutorPort.execute(eventsDsl);
+            return new ExecutionResult(
+                    eventRowsResult.results(),
+                    executionResult.aggregations(),
+                    executionResult.totalCount()
+            );
+        } catch (Exception e) {
+            throw new BadQueryException("Cannot load event rows for aggregation query", e);
+        }
+    }
+
+    private JsonNode eventRowsDsl(SearchRequest request, JsonNode generatedDsl) {
+        JsonNode copy = generatedDsl.deepCopy();
+        ObjectNode root;
+        if (copy instanceof ObjectNode objectNode) {
+            root = objectNode;
+        } else {
+            root = objectMapper.createObjectNode();
+            root.set("query", copy);
+        }
+        root.remove("aggs");
+        root.remove("aggregations");
+        int pageSize = Math.max(1, Math.min(request.getPageSize(), 10000));
+        root.put("from", Math.max(0, request.getPage()) * pageSize);
+        root.put("size", pageSize);
+        if (!root.has("sort")) {
+            ArrayNode sort = objectMapper.createArrayNode();
+            ObjectNode timestampSort = objectMapper.createObjectNode();
+            timestampSort.putObject("timestamp").put("order", "desc");
+            sort.add(timestampSort);
+            root.set("sort", sort);
+        }
+        return root;
     }
 }

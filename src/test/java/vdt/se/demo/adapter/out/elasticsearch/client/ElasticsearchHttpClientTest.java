@@ -1,4 +1,4 @@
-package vdt.se.demo.adapter.out.elasticsearch;
+package vdt.se.demo.adapter.out.elasticsearch.client;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;

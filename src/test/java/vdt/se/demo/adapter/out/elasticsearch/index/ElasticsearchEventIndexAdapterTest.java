@@ -1,10 +1,11 @@
-package vdt.se.demo.adapter.out.elasticsearch;
+package vdt.se.demo.adapter.out.elasticsearch.index;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import vdt.se.demo.adapter.config.AppProperties;
+import vdt.se.demo.adapter.out.elasticsearch.client.ElasticsearchHttpClient;
 import vdt.se.demo.domain.model.SocEvent;
 
 import java.time.Instant;

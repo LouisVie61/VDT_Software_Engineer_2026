@@ -1,4 +1,4 @@
-package vdt.se.demo.adapter.out.elasticsearch;
+package vdt.se.demo.adapter.out.elasticsearch.query;
 
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;

@@ -1,8 +1,11 @@
-package vdt.se.demo.adapter.out.elasticsearch;
+package vdt.se.demo.adapter.out.elasticsearch.refine;
 
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import vdt.se.demo.adapter.out.elasticsearch.dsl.ElasticsearchDslTimeRangeEditor;
+import vdt.se.demo.adapter.out.elasticsearch.dsl.ElasticsearchExplicitFilterBuilder;
+import vdt.se.demo.adapter.out.elasticsearch.dsl.ElasticsearchExplicitFilterDslEditor;
 import vdt.se.demo.application.dto.QueryExecution;
 import vdt.se.demo.application.dto.SearchRequest;
 import vdt.se.demo.application.port.outboundPort.QueryExecutorPort;
@@ -65,9 +68,51 @@ class ElasticsearchRelativeTimeQueryExecutionRefinerTest {
 
         QueryExecution refined = refiner.refine(request, originalDsl, emptyResult);
 
-        assertThat(refined.generatedDsl()).isSameAs(originalDsl);
-        assertThat(refined.executionResult()).isSameAs(emptyResult);
-        assertThat(executor.executedDsl).isEmpty();
+        assertThat(refined.generatedDsl()).isNotSameAs(originalDsl);
+        assertThat(refined.generatedDsl().toString()).contains("2026-06-08T00:00:00Z");
+        assertThat(refined.generatedDsl().toString()).contains("2026-06-15T00:00:00Z");
+        assertThat(refined.generatedDsl().toString()).doesNotContain("now-7d");
+        assertThat(refined.executionResult().totalCount()).isEqualTo(emptyResult.totalCount());
+        assertThat(executor.executedDsl).singleElement().satisfies(executed ->
+                assertThat(executed.toString()).isEqualTo(refined.generatedDsl().toString()));
+    }
+
+    @Test
+    void appliesExplicitApiFiltersBeforeReturningExecution() throws Exception {
+        RelativeWindowExecutor executor = new RelativeWindowExecutor();
+        ElasticsearchRelativeTimeQueryExecutionRefiner refiner = refiner(executor);
+        SearchRequest request = new SearchRequest();
+        request.setQuestion("show events");
+        request.setFrom("2026-06-01T00:00:00Z");
+        request.setTo("2026-06-15T00:00:00Z");
+        request.setSeverity("high");
+        request.setEventType("auth");
+        request.setUser("alice");
+        request.setHost("host-1");
+        request.setIp("10.0.0.1");
+        JsonNode generatedDsl = objectMapper.readTree("""
+                {
+                  "query": {"match_all": {}},
+                  "size": 50
+                }
+                """);
+
+        QueryExecution refined = refiner.refine(request, generatedDsl,
+                new ExecutionResult(List.of(Map.of("unfiltered", true)), List.of(), 100));
+
+        String dsl = refined.generatedDsl().toString();
+        assertThat(refined.executionResult().totalCount()).isEqualTo(7);
+        assertThat(dsl).contains("\"term\":{\"severity\":\"high\"}");
+        assertThat(dsl).contains("\"term\":{\"event_type\":\"auth\"}");
+        assertThat(dsl).contains("\"term\":{\"user\":\"alice\"}");
+        assertThat(dsl).contains("\"term\":{\"host\":\"host-1\"}");
+        assertThat(dsl).contains("\"term\":{\"ip\":\"10.0.0.1\"}");
+        assertThat(dsl).contains("\"term\":{\"src_ip\":\"10.0.0.1\"}");
+        assertThat(dsl).contains("\"term\":{\"dst_ip\":\"10.0.0.1\"}");
+        assertThat(dsl).contains("\"gte\":\"2026-06-01T00:00:00Z\"");
+        assertThat(dsl).contains("\"lte\":\"2026-06-15T00:00:00Z\"");
+        assertThat(executor.executedDsl).singleElement().satisfies(executed ->
+                assertThat(executed.toString()).isEqualTo(dsl));
     }
 
     private JsonNode relativeWindowDsl() {
@@ -91,6 +136,7 @@ class ElasticsearchRelativeTimeQueryExecutionRefinerTest {
     private ElasticsearchRelativeTimeQueryExecutionRefiner refiner(RelativeWindowExecutor executor) {
         return new ElasticsearchRelativeTimeQueryExecutionRefiner(
                 executor,
+                new ElasticsearchExplicitFilterDslEditor(objectMapper, new ElasticsearchExplicitFilterBuilder(objectMapper)),
                 new RelativeTimeWindowParser(),
                 new ElasticsearchDslTimeRangeEditor(),
                 new ElasticsearchLatestTimestampResolver(executor, objectMapper)
@@ -113,6 +159,9 @@ class ElasticsearchRelativeTimeQueryExecutionRefinerTest {
             String dsl = generatedDsl.toString();
             if (dsl.contains("2030-06-17T21:15:05Z") || dsl.contains("2030-06-23T21:15:05Z")) {
                 return new ExecutionResult(List.of(Map.of("user", "alice")), List.of(), 1);
+            }
+            if (dsl.contains("2026-06-01T00:00:00Z") && dsl.contains("10.0.0.1")) {
+                return new ExecutionResult(List.of(Map.of("user", "alice")), List.of(), 7);
             }
             return new ExecutionResult(List.of(), List.of(), 0);
         }
