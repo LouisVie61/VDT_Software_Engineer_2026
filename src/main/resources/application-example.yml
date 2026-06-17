@@ -24,8 +24,13 @@ app:
     default-id: ${APP_DEFAULT_USER_ID:soc-analyst-demo}
   elasticsearch:
     events-index: ${APP_EVENTS_INDEX:soc-events}
+    initialize-index: ${APP_ELASTICSEARCH_INITIALIZE_INDEX:true}
   ingest:
-    batch-size: ${APP_INGEST_BATCH_SIZE:1000}
+    spool-root: ${APP_INGEST_SPOOL_ROOT:data/ingest}
+    rate-limit:
+      enabled: ${APP_INGEST_RATE_LIMIT_ENABLED:true}
+      max-requests: ${APP_INGEST_RATE_LIMIT_MAX_REQUESTS:10}
+      window-seconds: ${APP_INGEST_RATE_LIMIT_WINDOW_SECONDS:60}
   llm:
     provider-order: ${APP_LLM_PROVIDER_ORDER:GEMINI,GROQ}
     gemini:

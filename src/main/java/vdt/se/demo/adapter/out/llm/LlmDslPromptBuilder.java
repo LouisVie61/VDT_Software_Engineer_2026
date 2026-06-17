@@ -10,7 +10,7 @@ public class LlmDslPromptBuilder {
 
     public static final Set<String> FIELD_WHITELIST = Set.of(
             "timestamp", "source", "severity", "event_type", "user", "host", "ip",
-            "message", "raw", "src_ip", "dst_ip", "action"
+            "message", "raw"
     );
 
     public String build(SearchRequest request) {
@@ -18,14 +18,14 @@ public class LlmDslPromptBuilder {
                 You convert SOC analyst natural language questions in Vietnamese or English into Elasticsearch Query DSL.
                 Return JSON only. Do not include markdown fences.
 
-                Allowed fields only: timestamp, source, severity, event_type, user, host, ip, message, raw, src_ip, dst_ip, action.
+                Allowed fields only: timestamp, source, severity, event_type, user, host, ip, message, raw.
                 Use only Elasticsearch Query DSL, not SQL and not a wrapper object.
                 Include all explicit API filters below directly in the DSL.
                 Use page/from and pageSize/size from the request. Use timestamp:desc sort unless the question asks otherwise.
                 Do not treat generic UI words like show, list, find, get, log, logs, event, events, or error as required search terms.
                 Map SOC intent words to structured fields when possible:
                 - login/authentication/sign-in means event_type=auth.
-                - failed/failure means action=failed when the question is about authentication.
+                - failed/failure should be searched in message/raw when the question is about authentication.
                 Prefer structured filters for known SOC fields over literal full-text matching.
 
                 Expected search DSL:
@@ -33,7 +33,7 @@ public class LlmDslPromptBuilder {
                   "query": {
                     "bool": {
                       "must": [
-                        {"simple_query_string": {"query": "failed login", "fields": ["message", "raw", "user", "host", "source", "event_type", "severity", "action"], "default_operator": "and"}}
+                        {"simple_query_string": {"query": "failed login", "fields": ["message", "raw", "user", "host", "source", "event_type", "severity"], "default_operator": "and"}}
                       ],
                       "filter": [
                         {"term": {"severity": "high"}},
@@ -52,8 +52,7 @@ public class LlmDslPromptBuilder {
                     "bool": {
                       "must": [{"match_all": {}}],
                       "filter": [
-                        {"term": {"event_type": "auth"}},
-                        {"term": {"action": "failed"}}
+                        {"term": {"event_type": "auth"}}
                       ]
                     }
                   },
