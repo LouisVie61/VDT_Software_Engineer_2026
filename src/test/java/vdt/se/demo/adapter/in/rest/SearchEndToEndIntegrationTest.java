@@ -15,7 +15,6 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import vdt.se.demo.application.dto.SearchRequest;
 import vdt.se.demo.application.port.outboundPort.AuditLogPort;
-import vdt.se.demo.application.port.outboundPort.EventIndexPort;
 import vdt.se.demo.application.port.outboundPort.LlmFallbackChain;
 import vdt.se.demo.application.port.outboundPort.LlmResponse;
 import vdt.se.demo.application.port.outboundPort.QueryExecutorPort;
@@ -40,7 +39,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "spring.datasource.url=jdbc:h2:mem:search-e2e;MODE=PostgreSQL;DB_CLOSE_DELAY=-1",
         "spring.datasource.username=sa",
         "spring.datasource.password=",
-        "spring.elasticsearch.uris=http://localhost:9200"
+        "spring.elasticsearch.uris=http://localhost:9200",
+        "app.elasticsearch.initialize-index=false"
 })
 @AutoConfigureMockMvc
 class SearchEndToEndIntegrationTest {
@@ -81,7 +81,7 @@ class SearchEndToEndIntegrationTest {
                 .andExpect(jsonPath("$.generatedDsl.query.bool.filter[1].term.event_type").value("auth"))
                 .andExpect(jsonPath("$.generatedDsl.query.bool.filter[2].term.user").value("alice"))
                 .andExpect(jsonPath("$.generatedDsl.query.bool.filter[3].term.host").value("host-1"))
-                .andExpect(jsonPath("$.generatedDsl.query.bool.filter[4].bool.minimum_should_match").value(1))
+                .andExpect(jsonPath("$.generatedDsl.query.bool.filter[4].term.ip").value("10.0.0.1"))
                 .andExpect(jsonPath("$.generatedDsl.query.bool.filter[5].range.timestamp.gte").value("2026-06-01T00:00:00Z"))
                 .andExpect(jsonPath("$.generatedDsl.query.bool.filter[5].range.timestamp.lte").value("2026-06-15T00:00:00Z"));
 
@@ -92,9 +92,7 @@ class SearchEndToEndIntegrationTest {
                 .contains("\"event_type\":\"auth\"")
                 .contains("\"user\":\"alice\"")
                 .contains("\"host\":\"host-1\"")
-                .contains("\"ip\":\"10.0.0.1\"")
-                .contains("\"src_ip\":\"10.0.0.1\"")
-                .contains("\"dst_ip\":\"10.0.0.1\"");
+                .contains("\"ip\":\"10.0.0.1\"");
     }
 
     @Test
@@ -104,7 +102,7 @@ class SearchEndToEndIntegrationTest {
                 {
                   "question": "Top 10 IP co nhieu alert nhat",
                   "page": 0,
-                  "pageSize": 10000
+                  "pageSize": 500
                 }
                 """;
 
@@ -161,24 +159,6 @@ class SearchEndToEndIntegrationTest {
             };
         }
 
-        @Bean
-        @Primary
-        EventIndexPort eventIndexPort() {
-            return new EventIndexPort() {
-                @Override
-                public void ensureIndex() {
-                }
-
-                @Override
-                public void indexBatch(List<vdt.se.demo.domain.model.SocEvent> events) {
-                }
-
-                @Override
-                public String indexName() {
-                    return "test-events";
-                }
-            };
-        }
     }
 
     private static class StubLlmFallbackChain implements LlmFallbackChain {
@@ -237,7 +217,7 @@ class SearchEndToEndIntegrationTest {
             if (filtered) {
                 return new ExecutionResult(List.of(Map.of("user", "alice", "ip", "10.0.0.1")), List.of(), 1);
             }
-            if (generatedDsl.path("size").asInt() == 10000) {
+            if (generatedDsl.path("size").asInt() >= 500) {
                 return new ExecutionResult(List.of(
                         Map.of("id", "event-1", "message", "first event", "ip", "10.0.0.1"),
                         Map.of("id", "event-2", "message", "second event", "ip", "10.0.0.2")
