@@ -41,15 +41,37 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - ELASTICSEARCH_URIS=http://elasticsearch:9200
+      - APP_INGEST_SPOOL_ROOT=/app/data/ingest
       - GOOGLE_API_KEY
       - GROQ_API_KEY
+    volumes:
+      - ./data/ingest:/app/data/ingest
     depends_on:
       elasticsearch:
         condition: service_healthy
       postgres:
         condition: service_healthy
 
+  fluentd:
+    build: ./fluentd
+    environment:
+      - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST:-elasticsearch}
+      - ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT:-9200}
+      - ELASTICSEARCH_SCHEME=${ELASTICSEARCH_SCHEME:-http}
+      - APP_EVENTS_INDEX=${APP_EVENTS_INDEX:-soc-events}
+    volumes:
+      - ./data/ingest/incoming:/fluentd/incoming
+      - fluentd-buffer:/fluentd/buffer
+      - fluentd-pos:/fluentd/pos
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      spring-boot-app:
+        condition: service_started
+
 volumes:
   elasticsearch-data:
   elasticsearch-data-v9:
   postgres-data:
+  fluentd-buffer:
+  fluentd-pos:

@@ -1,9 +1,8 @@
-package vdt.se.demo.adapter.out.elasticsearch.dsl;
+                                                                                                                        package vdt.se.demo.adapter.out.elasticsearch.dsl;
 
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 import vdt.se.demo.application.dto.SearchRequest;
 
@@ -52,17 +51,7 @@ public class ElasticsearchExplicitFilterBuilder {
             return;
         }
         managedFields.add("ip");
-        managedFields.add("src_ip");
-        managedFields.add("dst_ip");
-
-        String ip = value.trim();
-        ObjectNode bool = objectMapper.createObjectNode();
-        ArrayNode should = bool.putObject("bool").putArray("should");
-        should.add(term("ip", ip));
-        should.add(term("src_ip", ip));
-        should.add(term("dst_ip", ip));
-        ((ObjectNode) bool.get("bool")).put("minimum_should_match", 1);
-        filters.add(bool);
+        filters.add(term("ip", value.trim()));
     }
 
     private ObjectNode timeRangeFilter(String from, String to) {

@@ -44,9 +44,6 @@ public class ElasticsearchSearchResponseMapper {
         row.put("user", text(source, "user", null));
         row.put("host", text(source, "host", null));
         row.put("ip", text(source, "ip", null));
-        row.put("src_ip", text(source, "src_ip", null));
-        row.put("dst_ip", text(source, "dst_ip", null));
-        row.put("action", text(source, "action", null));
         row.put("message", text(source, "message", null));
         row.put("raw", text(source, "raw", null));
         return row;

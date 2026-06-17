@@ -2,6 +2,8 @@ package vdt.se.demo.adapter.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.nio.file.Path;
+
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
 
@@ -40,6 +42,7 @@ public class AppProperties {
 
     public static class Elasticsearch {
         private String eventsIndex = "soc-events";
+        private boolean initializeIndex = true;
 
         public String getEventsIndex() {
             return eventsIndex;
@@ -48,17 +51,60 @@ public class AppProperties {
         public void setEventsIndex(String eventsIndex) {
             this.eventsIndex = eventsIndex;
         }
+
+        public boolean isInitializeIndex() {
+            return initializeIndex;
+        }
+
+        public void setInitializeIndex(boolean initializeIndex) {
+            this.initializeIndex = initializeIndex;
+        }
     }
 
     public static class Ingest {
-        private int batchSize = 1000;
+        private Path spoolRoot = Path.of("data", "ingest");
+        private final RateLimit rateLimit = new RateLimit();
 
-        public int getBatchSize() {
-            return batchSize;
+        public Path getSpoolRoot() {
+            return spoolRoot;
         }
 
-        public void setBatchSize(int batchSize) {
-            this.batchSize = batchSize;
+        public void setSpoolRoot(Path spoolRoot) {
+            this.spoolRoot = spoolRoot;
+        }
+
+        public RateLimit getRateLimit() {
+            return rateLimit;
+        }
+    }
+
+    public static class RateLimit {
+        private boolean enabled = true;
+        private int maxRequests = 10;
+        private int windowSeconds = 60;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public int getMaxRequests() {
+            return maxRequests;
+        }
+
+        public void setMaxRequests(int maxRequests) {
+            this.maxRequests = maxRequests;
+        }
+
+        public int getWindowSeconds() {
+            return windowSeconds;
+        }
+
+        public void setWindowSeconds(int windowSeconds) {
+            this.windowSeconds = windowSeconds;
         }
     }
 
