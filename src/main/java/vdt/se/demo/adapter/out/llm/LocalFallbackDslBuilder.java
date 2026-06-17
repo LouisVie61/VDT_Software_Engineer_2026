@@ -11,7 +11,7 @@ import java.util.Locale;
 public class LocalFallbackDslBuilder {
 
     private static final String FULL_TEXT_SEARCH_FIELDS = """
-            ["message","raw","user","host","source","event_type","severity","action"]
+            ["message","raw","user","host","source","event_type","severity"]
             """.trim();
 
     public String build(SearchRequest request) {
@@ -21,7 +21,7 @@ public class LocalFallbackDslBuilder {
         addTermFilter(filters, "event_type", request.getEventType());
         addTermFilter(filters, "user", request.getUser());
         addTermFilter(filters, "host", request.getHost());
-        addIpFilter(filters, request.getIp());
+        addTermFilter(filters, "ip", request.getIp());
         addTimeRangeFilter(filters, request.getFrom(), request.getTo());
 
         int pageSize = Math.max(1, request.getPageSize());
@@ -65,16 +65,6 @@ public class LocalFallbackDslBuilder {
         if (value != null && !value.isBlank()) {
             filters.add("{\"term\":{\"%s\":\"%s\"}}".formatted(field, escapeJson(value.trim())));
         }
-    }
-
-    private void addIpFilter(List<String> filters, String value) {
-        if (value == null || value.isBlank()) {
-            return;
-        }
-        String escaped = escapeJson(value.trim());
-        filters.add("""
-                {"bool":{"should":[{"term":{"ip":"%s"}},{"term":{"src_ip":"%s"}},{"term":{"dst_ip":"%s"}}],"minimum_should_match":1}}
-                """.formatted(escaped, escaped, escaped).trim());
     }
 
     private void addTimeRangeFilter(List<String> filters, String from, String to) {

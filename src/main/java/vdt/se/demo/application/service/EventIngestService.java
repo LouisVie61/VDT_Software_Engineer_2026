@@ -4,68 +4,45 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vdt.se.demo.application.dto.IngestFileCommand;
 import vdt.se.demo.application.port.inboundPort.EventIngestUseCase;
-import vdt.se.demo.application.port.outboundPort.EventIndexPort;
-import vdt.se.demo.adapter.out.ingest.CsvEventFileReader;
-import vdt.se.demo.adapter.out.ingest.EventBatchBuffer;
-import vdt.se.demo.adapter.out.ingest.EventFileFormat;
-import vdt.se.demo.adapter.out.ingest.EventFileFormatDetector;
-import vdt.se.demo.adapter.out.ingest.EventFileReader;
-import vdt.se.demo.adapter.out.ingest.EventParseResult;
-import vdt.se.demo.adapter.out.ingest.JsonlEventFileReader;
+import vdt.se.demo.application.port.outboundPort.EventSpoolPort;
 import vdt.se.demo.domain.exception.BadQueryException;
 import vdt.se.demo.domain.model.IngestResult;
+import vdt.se.demo.domain.valueObjects.EventFileFormat;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
 public class EventIngestService implements EventIngestUseCase {
 
     private static final Logger log = LoggerFactory.getLogger(EventIngestService.class);
+    private static final String CANONICAL_CSV_HEADER = String.join(",",
+            List.of("timestamp", "source", "severity", "event_type", "user", "host", "ip", "message", "raw"));
 
-    private final EventFileFormatDetector formatDetector;
-    private final JsonlEventFileReader jsonlReader;
-    private final CsvEventFileReader csvReader;
-    private final EventIndexPort eventIndexPort;
-    private final int batchSize;
+    private final EventSpoolPort eventSpoolPort;
 
-    public EventIngestService(EventFileFormatDetector formatDetector, JsonlEventFileReader jsonlReader,
-                              CsvEventFileReader csvReader, EventIndexPort eventIndexPort, int batchSize) {
-        this.formatDetector = formatDetector;
-        this.jsonlReader = jsonlReader;
-        this.csvReader = csvReader;
-        this.eventIndexPort = eventIndexPort;
-        this.batchSize = Math.max(1, batchSize);
+    public EventIngestService(EventSpoolPort eventSpoolPort) {
+        this.eventSpoolPort = eventSpoolPort;
     }
 
     @Override
     public IngestResult ingest(IngestFileCommand command) {
         validate(command);
-        EventFileFormat format = formatDetector.detect(command);
-        Instant started = Instant.now();
-        log.info("Starting event ingest: filename={}, format={}, sizeBytes={}, batchSize={}, index={}",
-                command.filename(), format, command.size(), batchSize, eventIndexPort.indexName());
-
-        ensureIndex();
-        EventBatchBuffer batch = new EventBatchBuffer(eventIndexPort, batchSize);
-        EventParseResult parsed = read(command, reader(format), batch);
-        batch.finish();
-        if (parsed.totalRows() == 0) {
-            throw new BadQueryException("Uploaded event file has no event rows");
+        EventFileFormat format = detectFormat(command);
+        if (format == EventFileFormat.CSV) {
+            validateCanonicalCsvHeader(command);
         }
 
-        long durationMs = Duration.between(started, Instant.now()).toMillis();
-        log.info("Completed event ingest: totalRows={}, indexedRows={}, failedRows={}, durationMs={}, index={}",
-                parsed.totalRows(), batch.indexedRows(), parsed.failedRows(), durationMs, eventIndexPort.indexName());
-        return new IngestResult(
-                parsed.totalRows(),
-                batch.indexedRows(),
-                parsed.failedRows(),
-                eventIndexPort.indexName(),
-                durationMs
-        );
+        UUID requestId = UUID.randomUUID();
+        Instant submittedAt = Instant.now();
+        eventSpoolPort.spool(command, format, requestId);
+        log.info("Accepted event ingest for Fluentd: requestId={}, filename={}, format={}, sizeBytes={}",
+                requestId, command.filename(), format, command.size());
+        return new IngestResult(requestId, command.filename(), format, command.size(), "ACCEPTED", submittedAt);
     }
 
     private void validate(IngestFileCommand command) {
@@ -74,29 +51,38 @@ public class EventIngestService implements EventIngestUseCase {
         }
     }
 
-    private EventFileReader reader(EventFileFormat format) {
-        return switch (format) {
-            case JSONL -> jsonlReader;
-            case CSV -> csvReader;
-        };
+    private EventFileFormat detectFormat(IngestFileCommand command) {
+        String filename = lower(command.filename());
+        String contentType = lower(command.contentType());
+        if (filename.endsWith(".jsonl") || "application/x-ndjson".equals(contentType)
+                || "application/jsonl".equals(contentType)) {
+            return EventFileFormat.JSONL;
+        }
+        if (filename.endsWith(".csv") || "text/csv".equals(contentType)) {
+            return EventFileFormat.CSV;
+        }
+        throw new BadQueryException("Unsupported event file format. Upload JSONL or canonical CSV only.");
     }
 
-    private EventParseResult read(IngestFileCommand command, EventFileReader fileReader, EventBatchBuffer batch) {
+    private void validateCanonicalCsvHeader(IngestFileCommand command) {
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(command.openStream(), StandardCharsets.UTF_8))) {
-            return fileReader.read(reader, batch::add);
+            String header = reader.readLine();
+            if (header == null || header.isBlank()) {
+                throw new BadQueryException("Uploaded CSV file is empty");
+            }
+            String normalized = header.strip().replace("\uFEFF", "");
+            if (!CANONICAL_CSV_HEADER.equals(normalized)) {
+                throw new BadQueryException("CSV header must be: " + CANONICAL_CSV_HEADER);
+            }
         } catch (BadQueryException e) {
             throw e;
         } catch (Exception e) {
-            throw new BadQueryException("Cannot read uploaded event file", e);
+            throw new BadQueryException("Cannot read uploaded CSV header", e);
         }
     }
 
-    private void ensureIndex() {
-        try {
-            eventIndexPort.ensureIndex();
-        } catch (Exception e) {
-            throw new BadQueryException("Cannot prepare Elasticsearch index: " + eventIndexPort.indexName(), e);
-        }
+    private String lower(String value) {
+        return value == null ? "" : value.toLowerCase(Locale.ROOT);
     }
 }

@@ -185,7 +185,7 @@ public class QueryUseCaseService implements QueryUseCase {
     }
 
     private String escapeCsv(String value) {
-        return "\"" + value.replace("\"", "\"\"") + "\"";
+            return "\"" + value.replace("\"", "\"\"") + "\"";
     }
 
     private ExecutionResult withEventRowsForAggregationQuery(SearchRequest request, JsonNode generatedDsl,

@@ -107,8 +107,6 @@ class ElasticsearchRelativeTimeQueryExecutionRefinerTest {
         assertThat(dsl).contains("\"term\":{\"user\":\"alice\"}");
         assertThat(dsl).contains("\"term\":{\"host\":\"host-1\"}");
         assertThat(dsl).contains("\"term\":{\"ip\":\"10.0.0.1\"}");
-        assertThat(dsl).contains("\"term\":{\"src_ip\":\"10.0.0.1\"}");
-        assertThat(dsl).contains("\"term\":{\"dst_ip\":\"10.0.0.1\"}");
         assertThat(dsl).contains("\"gte\":\"2026-06-01T00:00:00Z\"");
         assertThat(dsl).contains("\"lte\":\"2026-06-15T00:00:00Z\"");
         assertThat(executor.executedDsl).singleElement().satisfies(executed ->
@@ -123,7 +121,7 @@ class ElasticsearchRelativeTimeQueryExecutionRefinerTest {
                       "must": [{"match_all": {}}],
                       "filter": [
                         {"term": {"event_type": "auth"}},
-                        {"term": {"action": "failed"}},
+                        {"simple_query_string": {"query": "failed", "fields": ["message", "raw"]}},
                         {"range": {"timestamp": {"gte": "now-7d", "lte": "now"}}}
                       ]
                     }

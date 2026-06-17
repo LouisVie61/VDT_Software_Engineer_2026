@@ -26,7 +26,7 @@ class ConfigFilesTest {
         String example = Files.readString(Path.of("src/main/resources/application-example.yml"));
         String properties = Files.readString(Path.of("src/main/resources/application.properties"));
 
-        for (String key : List.of("datasource", "elasticsearch", "provider-order", "batch-size", "multipart")) {
+        for (String key : List.of("datasource", "elasticsearch", "provider-order", "spool-root", "rate-limit", "multipart")) {
             assertThat(dev).contains(key);
             assertThat(example).contains(key);
         }

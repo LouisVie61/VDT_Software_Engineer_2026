@@ -16,10 +16,7 @@ public class SocEventIndexDefinition {
                       "event_type": { "type": "keyword" },
                       "user": { "type": "keyword" },
                       "host": { "type": "keyword" },
-                      "ip": { "type": "ip" },
-                      "src_ip": { "type": "ip" },
-                      "dst_ip": { "type": "ip" },
-                      "action": { "type": "keyword" },
+                      "ip": { "type": "ip", "ignore_malformed": true },
                       "message": { "type": "text" },
                       "raw": { "type": "text" },
                       "metadata": { "type": "flattened" }
