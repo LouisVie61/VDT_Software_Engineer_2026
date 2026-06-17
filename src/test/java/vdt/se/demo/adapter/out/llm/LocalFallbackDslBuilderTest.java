@@ -30,7 +30,7 @@ class LocalFallbackDslBuilderTest {
         assertThat(dsl).contains("\"term\":{\"event_type\":\"auth\"}");
         assertThat(dsl).contains("\"term\":{\"user\":\"alice\"}");
         assertThat(dsl).contains("\"term\":{\"host\":\"host-1\"}");
-        assertThat(dsl).contains("\"src_ip\":\"10.0.0.1\"");
+        assertThat(dsl).contains("\"term\":{\"ip\":\"10.0.0.1\"}");
         assertThat(dsl).contains("\"from\": 50");
         assertThat(dsl).contains("\"size\": 25");
     }
