@@ -26,6 +26,7 @@ import vdt.se.demo.application.service.query.SearchCacheContextService;
 import vdt.se.demo.application.service.query.SearchDslCacheLookupService;
 import vdt.se.demo.application.service.query.SearchPlanPreparationService;
 import vdt.se.demo.application.service.routing.QueryRoutingService;
+import vdt.se.demo.application.service.routing.RoutingHintPolicy;
 import vdt.se.demo.application.service.template.CanonicalPlanBuilder;
 import vdt.se.demo.application.service.cache.QueryHashService;
 
@@ -55,6 +56,7 @@ public class QueryApplicationConfig {
 
     @Bean
     SearchPlanPreparationService searchPlanPreparationService(QueryRoutingService routingService,
+                                                              RoutingHintPolicy routingHintPolicy,
                                                               ContextRetrievalService contextRetrievalService,
                                                               IntentExtractionPort intentExtractionPort,
                                                               MitreEnrichmentPort mitreEnrichmentPort,
@@ -62,7 +64,7 @@ public class QueryApplicationConfig {
                                                               SearchIntentNormalizer searchIntentNormalizer,
                                                               CanonicalPlanBuilder canonicalPlanBuilder,
                                                               SearchCacheContextService cacheContextService) {
-        return new SearchPlanPreparationService(routingService, contextRetrievalService, intentExtractionPort,
+        return new SearchPlanPreparationService(routingService, routingHintPolicy, contextRetrievalService, intentExtractionPort,
                 mitreEnrichmentPort, intentMergeService, searchIntentNormalizer, canonicalPlanBuilder, cacheContextService);
     }
 

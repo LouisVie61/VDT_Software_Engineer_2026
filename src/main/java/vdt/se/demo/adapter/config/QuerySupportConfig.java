@@ -28,6 +28,7 @@ import vdt.se.demo.application.service.query.QuerySummaryService;
 import vdt.se.demo.application.service.query.SearchCacheContextService;
 import vdt.se.demo.application.service.query.ZeroResultDiagnosticClassifier;
 import vdt.se.demo.application.service.routing.QueryRoutingService;
+import vdt.se.demo.application.service.routing.RoutingHintPolicy;
 import vdt.se.demo.domain.service.ChartTypeInferenceService;
 
 import java.util.concurrent.Executor;
@@ -100,6 +101,11 @@ public class QuerySupportConfig {
     @Bean
     QueryRoutingService queryRoutingService(EmbeddingPort embeddingPort) {
         return new QueryRoutingService(embeddingPort);
+    }
+
+    @Bean
+    RoutingHintPolicy routingHintPolicy() {
+        return new RoutingHintPolicy();
     }
 
     @Bean

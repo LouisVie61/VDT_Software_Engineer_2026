@@ -11,7 +11,11 @@ public class LlmIntentPromptBuilder {
                 Extract SOC search intent fields from the analyst question. Return JSON only.
                 Do not generate Elasticsearch DSL.
                 Do not decide the final template. Extract field-level parameters only.
-                Use overrideIntent only when extracted fields clearly contradict the routing hint.
+                Treat routing as perception metadata, not a hard gate.
+                The original question is authoritative; do not rewrite it from routing hints.
+                Use overrideIntent only when extracted fields clearly contradict a non-neutral routing hint.
+                When routingHint.neutral=true or lowConfidencePerception=true, ignore template bias and infer directly from the original question.
+                If the original question is still too ambiguous, return low confidence scores instead of forcing the nearest template.
 
                 Allowed overrideIntent values: SIMPLE_SEARCH, TERMS_AGGREGATION, TIME_AGGREGATION.
                 Allowed fields: timestamp, source, severity, event_type, action, user, host, ip, message, raw.
@@ -47,7 +51,9 @@ public class LlmIntentPromptBuilder {
                 }
 
                 Question: %s
-                Routing hint: %s confidence=%s reason=%s
+                Routing hint: %s confidence=%s reason=%s neutral=%s lowConfidencePerception=%s
+                Heuristic signal: %s confidence=%s ambiguous=%s reason=%s
+                Semantic signal: %s confidence=%s ambiguous=%s reason=%s
                 Previous intent for merge: %s
                 MITRE enrichment: %s
                 Explicit API filters:
@@ -57,6 +63,16 @@ public class LlmIntentPromptBuilder {
                 request.routingHint() == null ? null : request.routingHint().templateType(),
                 request.routingHint() == null ? null : request.routingHint().confidence(),
                 request.routingHint() == null ? null : request.routingHint().reason(),
+                request.routingHint() != null && request.routingHint().neutral(),
+                request.routingHint() != null && request.routingHint().lowConfidencePerception(),
+                request.heuristicHint() == null ? null : request.heuristicHint().templateType(),
+                request.heuristicHint() == null ? null : request.heuristicHint().confidence(),
+                request.heuristicHint() != null && request.heuristicHint().ambiguous(),
+                request.heuristicHint() == null ? null : request.heuristicHint().reason(),
+                request.semanticHint() == null ? null : request.semanticHint().templateType(),
+                request.semanticHint() == null ? null : request.semanticHint().confidence(),
+                request.semanticHint() != null && request.semanticHint().ambiguous(),
+                request.semanticHint() == null ? null : request.semanticHint().reason(),
                 previous,
                 request.enrichments(),
                 value(request.request().getFrom()),

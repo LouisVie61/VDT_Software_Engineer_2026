@@ -18,15 +18,8 @@ public class QueryRoutingService {
 
     public RoutingDecision route(String question) {
         RoutingHint heuristic = heuristic(question);
-        RoutingHint semantic = heuristic.ambiguous()
-                ? semantic(question)
-                : RoutingHint.builder()
-                .confidence(0.0d)
-                .reason("semantic skipped")
-                .semantic(true)
-                .build();
-        RoutingHint effective = heuristic.ambiguous() && semantic.confidence() > heuristic.confidence() ? semantic : heuristic;
-        return new RoutingDecision(heuristic, semantic, effective);
+        RoutingHint semantic = semantic(question);
+        return new RoutingDecision(heuristic, semantic);
     }
 
     private RoutingHint heuristic(String question) {
@@ -135,6 +128,19 @@ public class QueryRoutingService {
         return normalized.replaceAll("\\p{M}+", "").toLowerCase(java.util.Locale.ROOT);
     }
 
-    public record RoutingDecision(RoutingHint heuristic, RoutingHint semantic, RoutingHint effective) {
+    public record RoutingDecision(RoutingHint heuristic, RoutingHint semantic) {
+        public boolean bothLowConfidence() {
+            return heuristic != null && semantic != null && heuristic.lowConfidence() && semantic.lowConfidence();
+        }
+
+        public RoutingHint strongestSignal() {
+            if (semantic == null) {
+                return heuristic;
+            }
+            if (heuristic == null) {
+                return semantic;
+            }
+            return semantic.confidence() > heuristic.confidence() ? semantic : heuristic;
+        }
     }
 }

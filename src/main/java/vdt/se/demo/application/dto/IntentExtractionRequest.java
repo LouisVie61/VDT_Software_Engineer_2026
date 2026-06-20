@@ -10,6 +10,8 @@ import java.util.List;
 public record IntentExtractionRequest(
         SearchRequest request,
         RoutingHint routingHint,
+        RoutingHint heuristicHint,
+        RoutingHint semanticHint,
         SearchIntent previousIntent,
         List<String> enrichments
 ) {

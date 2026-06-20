@@ -8,25 +8,23 @@ import java.util.Locale;
 
 public class TemplateIntentSelector {
     public TemplateType select(RoutingHint routingHint, SearchIntent intent) {
-        TemplateType routed = routingHint == null || routingHint.templateType() == null
-                ? TemplateType.SIMPLE_SEARCH
-                : routingHint.templateType();
         if (intent == null) {
-            return routed;
+            return TemplateType.SIMPLE_SEARCH;
         }
         if (hasText(intent.getOverrideIntent())) {
-            return override(intent.getOverrideIntent(), routed);
+            return override(intent.getOverrideIntent(), TemplateType.SIMPLE_SEARCH);
         }
-        if (routed == TemplateType.TIME_AGGREGATION && (hasText(intent.getTimeBucket()) || hasText(intent.getTimeFrom()))) {
+        if (intent.getIntent() == TemplateType.TIME_AGGREGATION
+                && (hasText(intent.getTimeBucket()) || hasText(intent.getTimeFrom()) || hasText(intent.getTimeTo()))) {
             return TemplateType.TIME_AGGREGATION;
         }
         if (hasText(intent.getGroupBy())) {
             return TemplateType.TERMS_AGGREGATION;
         }
-        if (routed == TemplateType.TERMS_AGGREGATION) {
+        if (intent.getIntent() == TemplateType.TERMS_AGGREGATION) {
             return TemplateType.TERMS_AGGREGATION;
         }
-        return routed;
+        return TemplateType.SIMPLE_SEARCH;
     }
 
     private TemplateType override(String overrideIntent, TemplateType fallback) {

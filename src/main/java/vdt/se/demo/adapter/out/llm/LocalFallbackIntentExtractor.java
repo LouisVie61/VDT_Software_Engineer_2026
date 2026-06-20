@@ -17,7 +17,7 @@ public class LocalFallbackIntentExtractor {
 
     public SearchIntent extract(SearchRequest request, RoutingHint hint) {
         SearchIntent intent = SearchIntent.builder()
-                .intent(hint == null || hint.templateType() == null ? infer(request.getQuestion()) : hint.templateType())
+                .intent(infer(request.getQuestion()))
                 .textQuery(normalizeQuestion(request.getQuestion()))
                 .filters(explicitFilters(request))
                 .groupBy(inferGroupBy(request.getQuestion()))
