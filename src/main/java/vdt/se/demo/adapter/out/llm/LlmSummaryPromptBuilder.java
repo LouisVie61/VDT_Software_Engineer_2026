@@ -11,18 +11,17 @@ public class LlmSummaryPromptBuilder {
     public String build(SearchRequest request, JsonNode generatedDsl, ExecutionResult result) {
         return """
                 Summarize this SOC search result in 3-5 concise sentences for an analyst.
-                Mention total events, notable users/hosts/IPs if present, and one investigation direction.
+                Confirm the chart type when aggregation buckets are present.
+                Use only aggregation buckets and metadata. Do not infer from raw event rows.
                 Question: %s
                 Generated DSL: %s
                 Total count: %d
                 Aggregations: %s
-                Sample results: %s
                 """.formatted(
                 request.getQuestion(),
                 generatedDsl,
                 result.totalCount(),
-                result.aggregations(),
-                result.results().stream().limit(5).toList()
+                result.aggregations()
         );
     }
 }

@@ -5,46 +5,50 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.JsonNode;
 import vdt.se.demo.adapter.config.AppProperties;
+import vdt.se.demo.application.dto.IntentExtractionRequest;
 import vdt.se.demo.application.dto.SearchRequest;
-import vdt.se.demo.application.port.outboundPort.LlmFallbackChain;
-import vdt.se.demo.application.port.outboundPort.LlmProviderPort;
-import vdt.se.demo.application.port.outboundPort.LlmResponse;
+import vdt.se.demo.application.port.outboundPort.llm.IntentExtractionPort;
+import vdt.se.demo.application.port.outboundPort.llm.LlmProviderPort;
+import vdt.se.demo.application.port.outboundPort.llm.SummaryPort;
+import vdt.se.demo.domain.model.ExtractedIntent;
 import vdt.se.demo.domain.model.ExecutionResult;
+import vdt.se.demo.domain.model.SearchIntent;
+import vdt.se.demo.domain.exception.LlmRetryableException;
 import vdt.se.demo.domain.valueObjects.LlmProvider;
 
 import java.util.List;
 import java.util.Locale;
 
 @Component
-public class LlmFallbackChainAdapter implements LlmFallbackChain {
+public class LlmFallbackChainAdapter implements IntentExtractionPort, SummaryPort {
 
     private static final Logger log = LoggerFactory.getLogger(LlmFallbackChainAdapter.class);
 
     private final List<LlmProviderPort> providers;
-    private final LlmDslPromptBuilder dslPromptBuilder;
+    private final LlmIntentPromptBuilder intentPromptBuilder;
     private final LlmSummaryPromptBuilder summaryPromptBuilder;
-    private final LocalFallbackDslBuilder localFallbackDslBuilder;
+    private final LocalFallbackIntentExtractor localFallbackIntentExtractor;
     private final DeterministicSummaryBuilder deterministicSummaryBuilder;
-    private final DslResponseParser parser;
+    private final IntentResponseParser intentResponseParser;
     private final AppProperties properties;
 
-    public LlmFallbackChainAdapter(List<LlmProviderPort> providers, LlmDslPromptBuilder dslPromptBuilder,
+    public LlmFallbackChainAdapter(List<LlmProviderPort> providers, LlmIntentPromptBuilder intentPromptBuilder,
                                    LlmSummaryPromptBuilder summaryPromptBuilder,
-                                   LocalFallbackDslBuilder localFallbackDslBuilder,
+                                   LocalFallbackIntentExtractor localFallbackIntentExtractor,
                                    DeterministicSummaryBuilder deterministicSummaryBuilder,
-                                   DslResponseParser parser, AppProperties properties) {
+                                   IntentResponseParser intentResponseParser, AppProperties properties) {
         this.providers = providers;
-        this.dslPromptBuilder = dslPromptBuilder;
+        this.intentPromptBuilder = intentPromptBuilder;
         this.summaryPromptBuilder = summaryPromptBuilder;
-        this.localFallbackDslBuilder = localFallbackDslBuilder;
+        this.localFallbackIntentExtractor = localFallbackIntentExtractor;
         this.deterministicSummaryBuilder = deterministicSummaryBuilder;
-        this.parser = parser;
+        this.intentResponseParser = intentResponseParser;
         this.properties = properties;
     }
 
     @Override
-    public LlmResponse generateDsl(SearchRequest request) {
-        String prompt = dslPromptBuilder.build(request);
+    public ExtractedIntent extract(IntentExtractionRequest request) {
+        String prompt = intentPromptBuilder.build(request);
         RuntimeException lastFailure = null;
         for (LlmProvider provider : providerOrder()) {
             LlmProviderPort providerPort = find(provider);
@@ -53,22 +57,33 @@ public class LlmFallbackChainAdapter implements LlmFallbackChain {
             }
             try {
                 String raw = providerPort.complete(prompt);
-                JsonNode generatedDsl = parser.parse(raw);
-                log.info("LLM provider {} generated valid Elasticsearch DSL", provider);
-                return new LlmResponse(provider.name(), generatedDsl, raw);
-            } catch (RuntimeException e) {
+                SearchIntent intent = intentResponseParser.parse(raw);
+                log.debug("LLM provider {} extracted valid search intent fields", provider);
+                return ExtractedIntent.builder()
+                        .intent(intent)
+                        .provider(provider.name())
+                        .rawContent(raw)
+                        .build();
+            } catch (LlmRetryableException e) {
                 lastFailure = e;
-                log.warn("LLM provider {} failed to generate valid Elasticsearch DSL: {}", provider, e.getMessage());
+                log.debug("LLM provider {} failed to extract valid intent: {}", provider, e.getMessage());
             }
         }
-        log.warn("All LLM providers failed to generate DSL. Falling back to local keyword DSL. Last error: {}",
+        log.debug("All LLM providers failed to extract intent. Falling back to local deterministic extraction. Last error: {}",
                 lastFailure == null ? "none" : lastFailure.getMessage());
-        String raw = localFallbackDslBuilder.build(request);
-        return new LlmResponse("LOCAL_FALLBACK", parser.parse(raw), raw);
+        SearchIntent fallback = localFallbackIntentExtractor.extract(request.request(), request.routingHint());
+        return ExtractedIntent.builder()
+                .intent(fallback)
+                .provider("LOCAL_FALLBACK")
+                .rawContent(fallback.toString())
+                .build();
     }
 
     @Override
     public String summarize(SearchRequest request, JsonNode generatedDsl, ExecutionResult executionResult) {
+        if (!properties.getLlm().isSummaryEnabled()) {
+            return deterministicSummaryBuilder.build(executionResult);
+        }
         String prompt = summaryPromptBuilder.build(request, generatedDsl, executionResult);
         for (LlmProvider provider : providerOrder()) {
             LlmProviderPort providerPort = find(provider);
@@ -80,7 +95,7 @@ public class LlmFallbackChainAdapter implements LlmFallbackChain {
                 if (summary != null && !summary.isBlank()) {
                     return summary.strip();
                 }
-            } catch (RuntimeException ignored) {
+            } catch (LlmRetryableException ignored) {
                 // Deterministic summary is acceptable when providers are unavailable.
             }
         }
