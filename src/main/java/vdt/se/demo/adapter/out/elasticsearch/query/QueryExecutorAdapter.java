@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.JsonNode;
 import vdt.se.demo.adapter.out.elasticsearch.client.ElasticsearchHttpClient;
-import vdt.se.demo.application.port.outboundPort.QueryExecutorPort;
+import vdt.se.demo.application.port.outboundPort.execution.QueryExecutorPort;
 import vdt.se.demo.domain.exception.BadQueryException;
 import vdt.se.demo.domain.model.ExecutionResult;
 

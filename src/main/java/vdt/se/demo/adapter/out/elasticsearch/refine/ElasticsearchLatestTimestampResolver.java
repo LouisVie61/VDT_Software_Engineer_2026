@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ObjectNode;
-import vdt.se.demo.application.port.outboundPort.QueryExecutorPort;
+import vdt.se.demo.application.port.outboundPort.execution.QueryExecutorPort;
 import vdt.se.demo.domain.model.ExecutionResult;
 
 import java.time.Instant;
