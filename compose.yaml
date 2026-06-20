@@ -22,7 +22,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
     ports:
-      - "5432:5432"
+      - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d demo_db"]
       interval: 10s
@@ -31,16 +31,28 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
   spring-boot-app:
     build: .
     ports:
       - "8080:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_PROFILES_ACTIVE=postgres
       - POSTGRES_URL=jdbc:postgresql://postgres:5432/demo_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - ELASTICSEARCH_URIS=http://elasticsearch:9200
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
       - APP_INGEST_SPOOL_ROOT=/app/data/ingest
       - GOOGLE_API_KEY
       - GROQ_API_KEY
@@ -50,6 +62,8 @@ services:
       elasticsearch:
         condition: service_healthy
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   fluentd:
@@ -73,5 +87,6 @@ volumes:
   elasticsearch-data:
   elasticsearch-data-v9:
   postgres-data:
+  redis-data:
   fluentd-buffer:
   fluentd-pos:

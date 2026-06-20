@@ -46,6 +46,5 @@ ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS selected_template VARCHAR(60);
 ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS confidence_scores TEXT;
 ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS cache_hit BOOLEAN NOT NULL DEFAULT FALSE;
 
-INSERT INTO app_users (id, display_name, role_name)
-VALUES ('soc-analyst-demo', 'SOC Analyst Demo', 'SOC_ANALYST')
-ON CONFLICT (id) DO NOTHING;
+MERGE INTO app_users KEY(id)
+VALUES ('soc-analyst-demo', 'SOC Analyst Demo', 'SOC_ANALYST', CURRENT_TIMESTAMP);

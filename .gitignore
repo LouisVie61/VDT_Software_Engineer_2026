@@ -34,6 +34,7 @@ build/
 
 src/main/resources/application.properties
 src/main/resources/application-dev.yml
+src/main/resources/application-postgres.yml
 .claude/
 docs/
 
