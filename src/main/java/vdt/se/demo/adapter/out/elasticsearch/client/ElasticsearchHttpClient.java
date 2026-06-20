@@ -24,7 +24,7 @@ public class ElasticsearchHttpClient {
     private final String elasticsearchUris;
 
     public ElasticsearchHttpClient(ObjectMapper objectMapper, RestTemplate restTemplate, AppProperties properties,
-                                   @Value("${spring.elasticsearch.uris}") String elasticsearchUris) {
+                                   @Value("${spring.elasticsearch.uris:http://localhost:9200}") String elasticsearchUris) {
         this.objectMapper = objectMapper;
         this.restTemplate = restTemplate;
         this.properties = properties;
@@ -41,13 +41,23 @@ public class ElasticsearchHttpClient {
         return objectMapper.readTree(response);
     }
 
+    public JsonNode count(JsonNode dsl) throws Exception {
+        HttpHeaders headers = jsonHeaders();
+        String response = restTemplate.postForObject(
+                indexUrl(properties.getElasticsearch().getEventsIndex()) + "/_count",
+                new HttpEntity<>(objectMapper.writeValueAsString(dsl), headers),
+                String.class
+        );
+        return objectMapper.readTree(response);
+    }
+
     public void ensureIndex(String indexName, String definition) {
         String url = indexUrl(indexName);
         try {
             restTemplate.getForEntity(url, String.class);
             return;
         } catch (HttpClientErrorException.NotFound ignored) {
-            log.info("Creating Elasticsearch index: {}", indexName);
+            log.debug("Creating Elasticsearch index: {}", indexName);
         }
         restTemplate.put(url, new HttpEntity<>(definition, jsonHeaders()));
     }
