@@ -14,7 +14,8 @@ class QueryRoutingServiceTest {
         QueryRoutingService.RoutingDecision decision =
                 service.route("Statistic event trong nam 2024; Dau la loi nhieu nhat?");
 
-        assertThat(decision.effective().templateType()).isEqualTo(TemplateType.TERMS_AGGREGATION);
+        assertThat(decision.heuristic().templateType()).isEqualTo(TemplateType.TERMS_AGGREGATION);
+        assertThat(decision.strongestSignal().templateType()).isEqualTo(TemplateType.TERMS_AGGREGATION);
     }
 
     @Test
@@ -24,6 +25,16 @@ class QueryRoutingServiceTest {
         QueryRoutingService.RoutingDecision decision =
                 service.route("Statistic cac loi trong nam 2026");
 
-        assertThat(decision.effective().templateType()).isEqualTo(TemplateType.TERMS_AGGREGATION);
+        assertThat(decision.heuristic().templateType()).isEqualTo(TemplateType.TERMS_AGGREGATION);
+    }
+
+    @Test
+    void runsSemanticExtractorEvenWhenHeuristicIsConfident() {
+        QueryRoutingService service = new QueryRoutingService((left, right) -> 0.31d);
+
+        QueryRoutingService.RoutingDecision decision = service.route("top errors");
+
+        assertThat(decision.semantic().semantic()).isTrue();
+        assertThat(decision.semantic().confidence()).isGreaterThan(0.0d);
     }
 }

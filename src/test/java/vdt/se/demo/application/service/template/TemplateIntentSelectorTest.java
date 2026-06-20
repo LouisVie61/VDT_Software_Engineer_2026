@@ -24,4 +24,27 @@ class TemplateIntentSelectorTest {
 
         assertThat(selector.select(routingHint, intent)).isEqualTo(TemplateType.SIMPLE_SEARCH);
     }
+
+    @Test
+    void routingHintAloneDoesNotSelectAggregation() {
+        SearchIntent intent = SearchIntent.builder()
+                .intent(TemplateType.SIMPLE_SEARCH)
+                .build();
+        RoutingHint routingHint = RoutingHint.builder()
+                .templateType(TemplateType.TERMS_AGGREGATION)
+                .confidence(0.95d)
+                .build();
+
+        assertThat(selector.select(routingHint, intent)).isEqualTo(TemplateType.SIMPLE_SEARCH);
+    }
+
+    @Test
+    void extractedAggregationIntentCanSelectAggregationForValidation() {
+        SearchIntent intent = SearchIntent.builder()
+                .intent(TemplateType.TERMS_AGGREGATION)
+                .build();
+        RoutingHint routingHint = RoutingHint.neutralLowConfidence("test");
+
+        assertThat(selector.select(routingHint, intent)).isEqualTo(TemplateType.TERMS_AGGREGATION);
+    }
 }
