@@ -1,14 +1,17 @@
 package vdt.se.demo.adapter.out.llm;
 
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import vdt.se.demo.adapter.config.AppProperties;
-import vdt.se.demo.application.port.outboundPort.LlmProviderPort;
+import vdt.se.demo.application.port.outboundPort.llm.LlmProviderPort;
+import vdt.se.demo.domain.exception.LlmException;
 import vdt.se.demo.domain.exception.LlmRetryableException;
 import vdt.se.demo.domain.valueObjects.LlmProvider;
 
@@ -19,12 +22,12 @@ import java.util.Map;
 public class GroqAdapter implements LlmProviderPort {
 
     private final AppProperties properties;
-    private final RestTemplate restTemplate;
+    private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public GroqAdapter(AppProperties properties, RestTemplate restTemplate, ObjectMapper objectMapper) {
+    public GroqAdapter(AppProperties properties, RestClient restClient, ObjectMapper objectMapper) {
         this.properties = properties;
-        this.restTemplate = restTemplate;
+        this.restClient = restClient;
         this.objectMapper = objectMapper;
     }
 
@@ -39,25 +42,51 @@ public class GroqAdapter implements LlmProviderPort {
         if (apiKey == null || apiKey.isBlank()) {
             throw new LlmRetryableException("Groq API key is not configured");
         }
-
         try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setBearerAuth(apiKey);
-            Map<String, Object> body = Map.of(
-                    "model", properties.getLlm().getGroq().getModel(),
-                    "temperature", 0,
-                    "messages", List.of(Map.of("role", "user", "content", prompt))
-            );
-            String response = restTemplate.postForObject(
-                    properties.getLlm().getGroq().getBaseUrl(),
-                    new HttpEntity<>(body, headers),
-                    String.class
-            );
+            String response = restClient.post()
+                    .uri(properties.getLlm().getGroq().getBaseUrl())
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(body(prompt))
+                    .retrieve()
+                    .onStatus(this::retryableStatus, (request, clientResponse) -> {
+                        throw new LlmRetryableException("Groq retryable status: " + clientResponse.getStatusCode());
+                    })
+                    .body(String.class);
             JsonNode root = objectMapper.readTree(response);
-            return root.get("choices").get(0).get("message").get("content").asString();
+            JsonNode text = root.path("choices").path(0).path("message").path("content");
+            if (text.isMissingNode() || text.asString().isBlank()) {
+                throw new LlmException("Groq response did not contain text content");
+            }
+            return text.asString();
+        } catch (LlmException e) {
+            throw e;
+        } catch (ResourceAccessException e) {
+            throw new LlmRetryableException("Groq request timed out or was unavailable", e);
+        } catch (RestClientResponseException e) {
+            if (isRetryableStatus(e.getStatusCode())) {
+                throw new LlmRetryableException("Groq retryable status: " + e.getStatusCode(), e);
+            }
+            throw new LlmException("Groq request failed with non-retryable status: " + e.getStatusCode(), e);
         } catch (Exception e) {
-            throw new LlmRetryableException("Groq request failed", e);
+            throw new LlmException("Groq response parsing failed", e);
         }
+    }
+
+    private Map<String, Object> body(String prompt) {
+        return Map.of(
+                "model", properties.getLlm().getGroq().getModel(),
+                "temperature", 0.1d,
+                "response_format", Map.of("type", "json_object"),
+                "messages", List.of(Map.of("role", "user", "content", prompt))
+        );
+    }
+
+    private boolean retryableStatus(HttpStatusCode status) {
+        return isRetryableStatus(status);
+    }
+
+    private boolean isRetryableStatus(HttpStatusCode status) {
+        return status.value() == 429 || status.value() == 503;
     }
 }
