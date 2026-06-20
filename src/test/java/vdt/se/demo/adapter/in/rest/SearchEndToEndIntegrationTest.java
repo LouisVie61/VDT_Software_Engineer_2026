@@ -13,23 +13,31 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
-import vdt.se.demo.application.dto.SearchRequest;
-import vdt.se.demo.application.port.outboundPort.AuditLogPort;
-import vdt.se.demo.application.port.outboundPort.LlmFallbackChain;
-import vdt.se.demo.application.port.outboundPort.LlmResponse;
-import vdt.se.demo.application.port.outboundPort.QueryExecutorPort;
-import vdt.se.demo.application.port.outboundPort.QueryHistoryPort;
+import vdt.se.demo.application.dto.IntentExtractionRequest;
+import vdt.se.demo.application.port.outboundPort.audit.AuditLogPort;
+import vdt.se.demo.application.port.outboundPort.cache.DslCachePort;
+import vdt.se.demo.application.port.outboundPort.cache.IntentCachePort;
+import vdt.se.demo.application.port.outboundPort.llm.IntentExtractionPort;
+import vdt.se.demo.application.port.outboundPort.llm.SummaryPort;
+import vdt.se.demo.application.port.outboundPort.execution.QueryExecutorPort;
+import vdt.se.demo.application.port.outboundPort.history.QueryHistoryPort;
+import vdt.se.demo.domain.model.CachedIntent;
+import vdt.se.demo.domain.model.ExtractedIntent;
 import vdt.se.demo.domain.model.ExecutionResult;
+import vdt.se.demo.domain.model.PendingConfirmation;
 import vdt.se.demo.domain.model.QueryHistory;
+import vdt.se.demo.domain.model.SearchIntent;
+import vdt.se.demo.domain.valueObjects.TemplateType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.lang.reflect.Proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -85,14 +93,38 @@ class SearchEndToEndIntegrationTest {
                 .andExpect(jsonPath("$.generatedDsl.query.bool.filter[5].range.timestamp.gte").value("2026-06-01T00:00:00Z"))
                 .andExpect(jsonPath("$.generatedDsl.query.bool.filter[5].range.timestamp.lte").value("2026-06-15T00:00:00Z"));
 
-        assertThat(queryExecutor.executedDsl).hasSize(2);
-        assertThat(queryExecutor.executedDsl.getFirst().toString()).contains("\"match_all\"");
-        assertThat(queryExecutor.executedDsl.getLast().toString())
+        assertThat(queryExecutor.executedDsl).hasSize(1);
+        assertThat(queryExecutor.executedDsl.getFirst().toString())
+                .contains("\"match_all\"")
                 .contains("\"severity\":\"high\"")
                 .contains("\"event_type\":\"auth\"")
                 .contains("\"user\":\"alice\"")
                 .contains("\"host\":\"host-1\"")
                 .contains("\"ip\":\"10.0.0.1\"");
+    }
+
+    @Test
+    void searchEndpointTreatsNullPaginationAsDefaults() throws Exception {
+        queryExecutor.executedDsl.clear();
+        String payload = """
+                {
+                  "question": "show events",
+                  "page": null,
+                  "pageSize": null
+                }
+                """;
+
+        mockMvc.perform(post("/api/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page").value(0))
+                .andExpect(jsonPath("$.pageSize").value(50));
+
+        assertThat(queryExecutor.executedDsl).hasSize(1);
+        assertThat(queryExecutor.executedDsl.getFirst().toString())
+                .contains("\"size\":50")
+                .doesNotContain("\"from\"");
     }
 
     @Test
@@ -110,6 +142,7 @@ class SearchEndToEndIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.needsConfirmation").value(false))
                 .andExpect(jsonPath("$.totalCount").value(10000))
                 .andExpect(jsonPath("$.aggregations.length()").value(10))
                 .andExpect(jsonPath("$.results.length()").value(2))
@@ -131,13 +164,22 @@ class SearchEndToEndIntegrationTest {
 
         @Bean
         ElasticsearchOperations elasticsearchOperations() {
-            return mock(ElasticsearchOperations.class);
+            return (ElasticsearchOperations) Proxy.newProxyInstance(
+                    ElasticsearchOperations.class.getClassLoader(),
+                    new Class<?>[]{ElasticsearchOperations.class},
+                    (proxy, method, args) -> defaultValue(method.getReturnType()));
         }
 
         @Bean
         @Primary
-        LlmFallbackChain llmFallbackChain(ObjectMapper objectMapper) {
-            return new StubLlmFallbackChain(objectMapper);
+        IntentExtractionPort intentExtractionPort() {
+            return new StubIntentExtractionPort();
+        }
+
+        @Bean
+        @Primary
+        SummaryPort summaryPort() {
+            return (request, generatedDsl, executionResult) -> "summary";
         }
 
         @Bean
@@ -159,44 +201,66 @@ class SearchEndToEndIntegrationTest {
             };
         }
 
+        @Bean
+        @Primary
+        DslCachePort dslCachePort() {
+            return new MemoryDslCachePort();
+        }
+
+        @Bean
+        @Primary
+        IntentCachePort intentCachePort() {
+            return new MemoryIntentCachePort();
+        }
+
     }
 
-    private static class StubLlmFallbackChain implements LlmFallbackChain {
-        private final ObjectMapper objectMapper;
-
-        private StubLlmFallbackChain(ObjectMapper objectMapper) {
-            this.objectMapper = objectMapper;
+    private static Object defaultValue(Class<?> returnType) {
+        if (!returnType.isPrimitive()) {
+            return null;
         }
-
-        @Override
-        public LlmResponse generateDsl(SearchRequest request) {
-            if (request.getQuestion().contains("Top 10 IP")) {
-                JsonNode dsl = objectMapper.readTree("""
-                        {
-                          "query": {"match_all": {}},
-                          "size": 0,
-                          "aggs": {
-                            "top_values": {
-                              "terms": {"field": "ip", "size": 10}
-                            }
-                          }
-                        }
-                        """);
-                return new LlmResponse("TEST", dsl, dsl.toString());
-            }
-            JsonNode dsl = objectMapper.readTree("""
-                    {
-                      "query": {"match_all": {}},
-                      "from": 0,
-                      "size": 25
-                    }
-                    """);
-            return new LlmResponse("TEST", dsl, dsl.toString());
+        if (returnType == boolean.class) {
+            return false;
         }
+        if (returnType == char.class) {
+            return '\0';
+        }
+        if (returnType == byte.class) {
+            return (byte) 0;
+        }
+        if (returnType == short.class) {
+            return (short) 0;
+        }
+        if (returnType == int.class) {
+            return 0;
+        }
+        if (returnType == long.class) {
+            return 0L;
+        }
+        if (returnType == float.class) {
+            return 0f;
+        }
+        if (returnType == double.class) {
+            return 0d;
+        }
+        return null;
+    }
 
+    private static class StubIntentExtractionPort implements IntentExtractionPort {
         @Override
-        public String summarize(SearchRequest request, JsonNode generatedDsl, ExecutionResult executionResult) {
-            return "summary";
+        public ExtractedIntent extract(IntentExtractionRequest request) {
+            SearchIntent intent = SearchIntent.builder()
+                    .intent(request.routingHint().templateType() == null
+                            ? TemplateType.SIMPLE_SEARCH
+                            : request.routingHint().templateType())
+                    .metric("COUNT")
+                    .topN(request.request().getQuestion().contains("Top 10") ? 10 : null)
+                    .build();
+            return ExtractedIntent.builder()
+                    .intent(intent)
+                    .provider("TEST")
+                    .rawContent("{}")
+                    .build();
         }
     }
 
@@ -211,19 +275,38 @@ class SearchEndToEndIntegrationTest {
                 for (int i = 1; i <= 10; i++) {
                     buckets.add(Map.of("aggregation", "top_values", "key", "10.0.0." + i, "count", i));
                 }
-                return new ExecutionResult(List.of(), buckets, 10000);
+                return ExecutionResult.builder()
+                        .results(List.of(
+                                Map.of("id", "event-1", "message", "first event", "ip", "10.0.0.1"),
+                                Map.of("id", "event-2", "message", "second event", "ip", "10.0.0.2")
+                        ))
+                        .aggregations(buckets)
+                        .totalCount(10000)
+                        .build();
             }
             boolean filtered = generatedDsl.toString().contains("\"severity\":\"high\"");
             if (filtered) {
-                return new ExecutionResult(List.of(Map.of("user", "alice", "ip", "10.0.0.1")), List.of(), 1);
+                return ExecutionResult.builder()
+                        .results(List.of(Map.of("user", "alice", "ip", "10.0.0.1")))
+                        .aggregations(List.of())
+                        .totalCount(1)
+                        .build();
             }
             if (generatedDsl.path("size").asInt() >= 500) {
-                return new ExecutionResult(List.of(
+                return ExecutionResult.builder()
+                        .results(List.of(
                         Map.of("id", "event-1", "message", "first event", "ip", "10.0.0.1"),
                         Map.of("id", "event-2", "message", "second event", "ip", "10.0.0.2")
-                ), List.of(), 10000);
+                        ))
+                        .aggregations(List.of())
+                        .totalCount(10000)
+                        .build();
             }
-            return new ExecutionResult(List.of(Map.of("unfiltered", true)), List.of(), 99);
+            return ExecutionResult.builder()
+                    .results(List.of(Map.of("unfiltered", true)))
+                    .aggregations(List.of())
+                    .totalCount(99)
+                    .build();
         }
     }
 
@@ -241,8 +324,54 @@ class SearchEndToEndIntegrationTest {
         }
 
         @Override
+        public List<QueryHistory> findRecent(String userIdentity, String sessionId, int limit) {
+            return rows;
+        }
+
+        @Override
         public Optional<QueryHistory> findById(UUID id) {
             return rows.stream().filter(row -> row.id().equals(id)).findFirst();
+        }
+    }
+
+    private static class MemoryDslCachePort implements DslCachePort {
+        private final Map<String, String> values = new HashMap<>();
+
+        @Override
+        public Optional<String> findFinalizedDsl(String schemaVersion, String sessionId, String queryHash) {
+            return Optional.ofNullable(values.get(key(schemaVersion, sessionId, queryHash)));
+        }
+
+        @Override
+        public void saveFinalizedDsl(String schemaVersion, String sessionId, String queryHash, String dsl) {
+            values.put(key(schemaVersion, sessionId, queryHash), dsl);
+        }
+
+        private String key(String schemaVersion, String sessionId, String queryHash) {
+            return schemaVersion + ":" + sessionId + ":" + queryHash;
+        }
+    }
+
+    private static class MemoryIntentCachePort implements IntentCachePort {
+        private final Map<String, PendingConfirmation> confirmations = new HashMap<>();
+
+        @Override
+        public Optional<CachedIntent> findLastClassifiedIntent(String sessionId) {
+            return Optional.empty();
+        }
+
+        @Override
+        public void saveLastClassifiedIntent(String sessionId, String schemaVersion, SearchIntent intent) {
+        }
+
+        @Override
+        public void savePendingConfirmation(PendingConfirmation confirmation) {
+            confirmations.put(confirmation.confirmationId(), confirmation);
+        }
+
+        @Override
+        public Optional<PendingConfirmation> findPendingConfirmation(String confirmationId) {
+            return Optional.ofNullable(confirmations.get(confirmationId));
         }
     }
 }

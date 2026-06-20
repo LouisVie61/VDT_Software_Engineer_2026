@@ -21,7 +21,11 @@ class QueryExecutorAdapterTest {
         ElasticsearchSearchResponseMapper mapper = mock(ElasticsearchSearchResponseMapper.class);
         JsonNode dsl = new ObjectMapper().readTree("{\"query\":{\"match_all\":{}}}");
         JsonNode response = new ObjectMapper().readTree("{\"hits\":{\"hits\":[]}}");
-        ExecutionResult expected = new ExecutionResult(List.of(Map.of("user", "alice")), List.of(), 1);
+        ExecutionResult expected = ExecutionResult.builder()
+                .results(List.of(Map.of("user", "alice")))
+                .aggregations(List.of())
+                .totalCount(1)
+                .build();
         when(client.search(dsl)).thenReturn(response);
         when(mapper.map(response)).thenReturn(expected);
 

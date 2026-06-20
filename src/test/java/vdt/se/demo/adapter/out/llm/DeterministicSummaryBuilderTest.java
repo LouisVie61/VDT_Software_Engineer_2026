@@ -11,7 +11,11 @@ class DeterministicSummaryBuilderTest {
 
     @Test
     void includesTotalCount() {
-        String summary = new DeterministicSummaryBuilder().build(new ExecutionResult(List.of(), List.of(), 7));
+        String summary = new DeterministicSummaryBuilder().build(ExecutionResult.builder()
+                .results(List.of())
+                .aggregations(List.of())
+                .totalCount(7)
+                .build());
 
         assertThat(summary).contains("Found 7 matching events");
     }

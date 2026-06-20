@@ -9,17 +9,18 @@ class LocalFallbackDslBuilderTest {
 
     @Test
     void buildsKeywordDslWithExplicitFiltersAndPagination() {
-        SearchRequest request = new SearchRequest();
-        request.setQuestion("show failed login");
-        request.setFrom("2026-06-01T00:00:00Z");
-        request.setTo("2026-06-15T00:00:00Z");
-        request.setSeverity("high");
-        request.setEventType("auth");
-        request.setUser("alice");
-        request.setHost("host-1");
-        request.setIp("10.0.0.1");
-        request.setPage(2);
-        request.setPageSize(25);
+        SearchRequest request = SearchRequest.builder()
+                .question("show failed login")
+                .from("2026-06-01T00:00:00Z")
+                .to("2026-06-15T00:00:00Z")
+                .severity("high")
+                .eventType("auth")
+                .user("alice")
+                .host("host-1")
+                .ip("10.0.0.1")
+                .page(2)
+                .pageSize(25)
+                .build();
 
         String dsl = new LocalFallbackDslBuilder().build(request);
 

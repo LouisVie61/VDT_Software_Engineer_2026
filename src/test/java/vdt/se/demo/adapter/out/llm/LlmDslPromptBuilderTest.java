@@ -9,8 +9,9 @@ class LlmDslPromptBuilderTest {
 
     @Test
     void promptContainsExpectedDslExamplesAndJsonOnlyInstruction() {
-        SearchRequest request = new SearchRequest();
-        request.setQuestion("Top 10 IP nhieu alert nhat");
+        SearchRequest request = SearchRequest.builder()
+                .question("Top 10 IP nhieu alert nhat")
+                .build();
 
         String prompt = new LlmDslPromptBuilder().build(request);
 
