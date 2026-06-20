@@ -2,6 +2,8 @@ package vdt.se.demo.domain.model;
 
 import vdt.se.demo.domain.valueObjects.AuditStatus;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
@@ -12,6 +14,8 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class AuditLog {
     private UUID id;
     private String userIdentity;
@@ -23,4 +27,10 @@ public class AuditLog {
     private AuditStatus status;
     private String llmProvider;
     private String errorMessage;
+    private String sessionId;
+    private String predictedIntent;
+    private String overrideIntent;
+    private String selectedTemplate;
+    private String confidenceScores;
+    private Boolean cacheHit;
 }
