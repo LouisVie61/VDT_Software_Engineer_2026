@@ -9,6 +9,7 @@ import java.util.UUID;
 public record QueryHistoryResponse(
         UUID id,
         String userIdentity,
+        String sessionId,
         String nlQuery,
         String generatedDsl,
         String summary,
@@ -20,6 +21,7 @@ public record QueryHistoryResponse(
         return new QueryHistoryResponse(
                 history.id(),
                 history.userIdentity(),
+                history.sessionId(),
                 history.nlQuery(),
                 history.generatedDsl(),
                 history.summary(),
