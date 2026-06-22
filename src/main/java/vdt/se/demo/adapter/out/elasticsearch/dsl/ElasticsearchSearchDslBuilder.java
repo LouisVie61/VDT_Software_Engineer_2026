@@ -13,11 +13,12 @@ import vdt.se.demo.domain.model.TemplateSelection;
 import vdt.se.demo.domain.valueObjects.TemplateType;
 
 import java.util.Map;
+import java.util.Locale;
 
 @Component
 public class ElasticsearchSearchDslBuilder implements SearchDslBuilderPort {
     private static final String[] FULL_TEXT_FIELDS = {
-            "message", "raw", "action", "user", "host", "source", "event_type", "severity"
+            "message"
     };
 
     private final ObjectMapper objectMapper;
@@ -35,32 +36,46 @@ public class ElasticsearchSearchDslBuilder implements SearchDslBuilderPort {
         root.set("query", boolQuery(request, intent));
         int pageSize = Math.max(1, Math.min(request.getPageSize(), 500));
         if (selection.type() == TemplateType.TIME_AGGREGATION) {
-            root.put("size", pageSize);
-            root.set("sort", timestampSort());
-            addSearchAfter(root, request);
+            addHitsPage(root, request, pageSize);
             ObjectNode histogram = root.putObject("aggs").putObject("events_over_time").putObject("date_histogram");
             histogram.put("field", "timestamp");
-            histogram.put("fixed_interval", hasText(intent.getTimeBucket()) ? intent.getTimeBucket() : "1h");
+            addHistogramInterval(histogram, intent);
             return root;
         }
         if (selection.type() == TemplateType.TERMS_AGGREGATION) {
-            root.put("size", pageSize);
-            root.set("sort", timestampSort());
-            addSearchAfter(root, request);
-            ObjectNode terms = root.putObject("aggs").putObject("top_values").putObject("terms");
+            addHitsPage(root, request, pageSize);
+            String aggregationName = intent != null && intent.getTopN() != null ? "top_values" : "grouped_values";
+            ObjectNode terms = root.putObject("aggs").putObject(aggregationName).putObject("terms");
             terms.put("field", selection.groupBy());
             terms.put("size", selection.size());
             return root;
         }
+        addHitsPage(root, request, pageSize);
+        return root;
+    }
+
+    private void addHitsPage(ObjectNode root, SearchRequest request, int pageSize) {
         root.put("size", pageSize);
-        root.put("track_total_hits", Math.min(pageSize * 20, 10000));
+        root.put("track_total_hits", true);
         if (hasText(request.getSearchAfter())) {
             addSearchAfter(root, request);
         } else if (request.getPage() > 0) {
             root.put("from", Math.max(0, request.getPage()) * pageSize);
         }
         root.set("sort", timestampSort());
-        return root;
+    }
+
+    private void addHistogramInterval(ObjectNode histogram, SearchIntent intent) {
+        String bucket = intent == null || intent.getTimeBucket() == null ? null : intent.getTimeBucket().trim().toLowerCase(Locale.ROOT);
+        if ("quarter".equals(bucket) || "1q".equals(bucket)) {
+            histogram.put("calendar_interval", "quarter");
+            return;
+        }
+        if ("1w".equals(bucket) || "week".equals(bucket) || "weekly".equals(bucket)) {
+            histogram.put("calendar_interval", "week");
+            return;
+        }
+        histogram.put("fixed_interval", hasText(bucket) ? bucket : "1h");
     }
 
     private void addSearchAfter(ObjectNode root, SearchRequest request) {
@@ -75,9 +90,22 @@ public class ElasticsearchSearchDslBuilder implements SearchDslBuilderPort {
     private ObjectNode boolQuery(SearchRequest request, SearchIntent intent) {
         ObjectNode query = objectMapper.createObjectNode();
         ObjectNode bool = query.putObject("bool");
-        ArrayNode must = bool.putArray("must");
+        ArrayNode filter = bool.putArray("filter");
+        if (intent != null && intent.getFilters() != null) {
+            for (Map.Entry<String, String> entry : intent.getFilters().entrySet()) {
+                addTermFilter(filter, entry.getKey(), entry.getValue());
+            }
+        }
+        addTermFilter(filter, "severity", lowercase(request.getSeverity()));
+        addTermFilter(filter, "event_type", lowercase(request.getEventType()));
+        addTermFilter(filter, "user", request.getUser());
+        addTermFilter(filter, "host", request.getHost());
+        addTermFilter(filter, "ip", request.getIp());
+        addTimeRangeFilter(filter, request, intent);
+
         String textQuery = intent == null ? null : intent.getTextQuery();
         if (hasText(textQuery)) {
+            ArrayNode must = bool.putArray("must");
             ObjectNode sqs = objectMapper.createObjectNode();
             ObjectNode body = sqs.putObject("simple_query_string");
             body.put("query", textQuery.trim());
@@ -87,24 +115,12 @@ public class ElasticsearchSearchDslBuilder implements SearchDslBuilderPort {
             }
             body.put("default_operator", "and");
             must.add(sqs);
-        } else {
+        } else if (filter.isEmpty()) {
+            ArrayNode must = bool.putArray("must");
             ObjectNode matchAll = objectMapper.createObjectNode();
             matchAll.putObject("match_all");
             must.add(matchAll);
         }
-
-        ArrayNode filter = bool.putArray("filter");
-        if (intent != null && intent.getFilters() != null) {
-            for (Map.Entry<String, String> entry : intent.getFilters().entrySet()) {
-                addTermFilter(filter, entry.getKey(), entry.getValue());
-            }
-        }
-        addTermFilter(filter, "severity", request.getSeverity());
-        addTermFilter(filter, "event_type", request.getEventType());
-        addTermFilter(filter, "user", request.getUser());
-        addTermFilter(filter, "host", request.getHost());
-        addTermFilter(filter, "ip", request.getIp());
-        addTimeRangeFilter(filter, request, intent);
         return query;
     }
 
@@ -150,5 +166,9 @@ public class ElasticsearchSearchDslBuilder implements SearchDslBuilderPort {
 
     private boolean hasText(String value) {
         return value != null && !value.isBlank();
+    }
+
+    private String lowercase(String value) {
+        return hasText(value) ? value.trim().toLowerCase(Locale.ROOT) : value;
     }
 }
