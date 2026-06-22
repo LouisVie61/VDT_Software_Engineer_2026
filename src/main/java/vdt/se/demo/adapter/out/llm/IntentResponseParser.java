@@ -5,10 +5,13 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import vdt.se.demo.domain.exception.BadQueryException;
 import vdt.se.demo.domain.model.SearchIntent;
+import vdt.se.demo.domain.model.SemanticSpan;
 import vdt.se.demo.domain.valueObjects.TemplateType;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -35,6 +38,7 @@ public class IntentResponseParser {
                     .timeTo(text(root.get("timeRange"), "to"))
                     .overrideIntent(text(root, "overrideIntent"))
                     .overrideReason(text(root, "overrideReason"))
+                    .semanticSpans(semanticSpans(root.get("semanticSpans")))
                     .confidenceScores(confidenceScores(root.get("confidenceScores")))
                     .build();
         } catch (Exception e) {
@@ -47,6 +51,40 @@ public class IntentResponseParser {
             return TemplateType.SIMPLE_SEARCH;
         }
         return TemplateType.valueOf(node.asString().trim().toUpperCase(Locale.ROOT));
+    }
+
+    private List<SemanticSpan> semanticSpans(JsonNode node) {
+        if (node == null || !node.isArray()) {
+            return List.of();
+        }
+        List<SemanticSpan> spans = new ArrayList<>();
+        for (JsonNode item : node) {
+            SemanticSpan.Kind kind = enumValue(SemanticSpan.Kind.class, text(item, "kind"), null);
+            SemanticSpan.Status status = enumValue(SemanticSpan.Status.class, text(item, "status"), SemanticSpan.Status.AMBIGUOUS);
+            String text = text(item, "text");
+            if (kind != null && text != null) {
+                spans.add(SemanticSpan.builder()
+                        .kind(kind)
+                        .status(status)
+                        .text(text)
+                        .canonical(text(item, "canonical"))
+                        .start(number(item, "start"))
+                        .end(number(item, "end"))
+                        .build());
+            }
+        }
+        return spans;
+    }
+
+    private <T extends Enum<T>> T enumValue(Class<T> type, String value, T fallback) {
+        if (value == null) {
+            return fallback;
+        }
+        try {
+            return Enum.valueOf(type, value.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException ignored) {
+            return fallback;
+        }
     }
 
     private Map<String, String> filters(JsonNode node) {
@@ -94,6 +132,11 @@ public class IntentResponseParser {
         }
         String value = node.asString();
         return value == null || value.isBlank() ? null : value.trim();
+    }
+
+    private int number(JsonNode root, String field) {
+        JsonNode node = root == null ? null : root.get(field);
+        return node != null && node.isNumber() ? node.asInt() : -1;
     }
 
     private String value(String value, String fallback) {

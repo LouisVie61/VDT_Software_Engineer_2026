@@ -3,90 +3,455 @@ package vdt.se.demo.adapter.out.llm;
 import org.springframework.stereotype.Component;
 import vdt.se.demo.application.dto.IntentExtractionRequest;
 
+import java.time.Instant;
+
 @Component
 public class LlmIntentPromptBuilder {
-    public String build(IntentExtractionRequest request) {
-        String previous = request.previousIntent() == null ? "null" : request.previousIntent().toString();
+
+    public String systemPrompt() {
         return """
-                Extract SOC search intent fields from the analyst question. Return JSON only.
-                Do not generate Elasticsearch DSL.
-                Do not decide the final template. Extract field-level parameters only.
-                Treat routing as perception metadata, not a hard gate.
-                The original question is authoritative; do not rewrite it from routing hints.
+                You are a SOC intent extraction engine.
+
+                Your job is to interpret the analyst's natural-language question
+                and extract a normalized field-level intent JSON object.
+
+                You handle linguistic interpretation:
+                - Vietnamese, English, and mixed-language phrasing
+                - typos and informal analyst wording
+                - temporal expressions
+                - ambiguous SOC descriptions
+                - follow-up questions when context is relevant
+
+                You must NOT generate Elasticsearch DSL.
+                You must NOT execute queries.
+                You must NOT act as an authoritative router.
+
+                Perception/routing signals are soft priors only.
+                Explicit API filters and the analyst's current question are stronger evidence.
+
+                Return exactly one valid JSON object.
+                No markdown.
+                No explanation.
+                No wrapper object.
+                """;
+    }
+
+    public String build(IntentExtractionRequest request) {
+        String previous = request.previousIntent() == null
+                ? "null"
+                : request.previousIntent().toString();
+
+        return """
+                Task:
+                Extract normalized SOC search intent fields from the analyst question.
+
+                The application layer will:
+                - decide whether previous context should be merged
+                - validate fields and values
+                - select the final template
+                - build the canonical Elasticsearch query plan
+                - build Elasticsearch DSL
+                - enforce safety constraints
+
+                Your output is only a candidate intent extraction.
+
+                === CORE CONTRACT ===
+                Linguistic interpretation happens in this LLM call.
+                Deterministic validation and execution guarantees happen outside this call.
+
+                Do not rely on downstream rule-based preprocessing to:
+                - remove command words
+                - infer natural-language filters
+                - infer authentication/login meaning
+                - infer top N
+                - infer time expressions
+                - disambiguate Vietnamese or English wording
+
+                Use the injected context to resolve ambiguity.
+                If ambiguity remains, expose it through:
+                - confidenceScores
+                - semanticSpans
+                - unresolvedAmbiguities
+
+                Do not force a template when the question is underspecified.
+
+                === CURRENT DATETIME ===
+                Now: %s
+
+                Resolve relative and calendar time expressions to absolute ISO 8601 timestamps when possible.
+                Never output relative time strings such as "now-7d", "last week", or "today".
+
+                Calendar rules:
+                - Quarter 1 = Jan 01 to Mar 31
+                - Quarter 2 = Apr 01 to Jun 30
+                - Quarter 3 = Jul 01 to Sep 30
+                - Quarter 4 = Oct 01 to Dec 31
+                - "tuan truoc" means past 7 days from now
+                - "hom nay" means start of today UTC to now
+                - "thang nay" means first day of current month to now
+                - "dau nam" means January 1 of current year to now
+                - "hom qua" means start of yesterday UTC to end of yesterday UTC
+
+                === ALLOWED INTENTS ===
+                intent must be one of:
+                - SIMPLE_SEARCH
+                - TERMS_AGGREGATION
+                - TIME_AGGREGATION
+
+                Use SIMPLE_SEARCH when the analyst asks to find, show, list, retrieve, or inspect events.
+                Use TERMS_AGGREGATION when the analyst asks for top, count, group by, statistics by field.
+                Use TIME_AGGREGATION when the analyst asks for trend, over time, per hour, per day,
+                per week, by quarter, theo quy, moi quy, or timeline.
+
+                allowed overrideIntent values:
+                - SIMPLE_SEARCH
+                - TERMS_AGGREGATION
+                - TIME_AGGREGATION
+                - null
+
                 Use overrideIntent only when extracted fields clearly contradict a non-neutral routing hint.
-                When routingHint.neutral=true or lowConfidencePerception=true, ignore template bias and infer directly from the original question.
-                If the original question is still too ambiguous, return low confidence scores instead of forcing the nearest template.
+                Do not explain the override outside JSON.
 
-                Allowed overrideIntent values: SIMPLE_SEARCH, TERMS_AGGREGATION, TIME_AGGREGATION.
-                Allowed fields: timestamp, source, severity, event_type, action, user, host, ip, message, raw.
-                Prefer structured filters for severity, event_type, action, user, host, ip.
-                Convert time expressions into timeRange.from/timeRange.to.
-                Do not put years, dates, "last 24h", "7 days", "7 ngay qua", "nam 2024" into textQuery.
-                Do not put command words into textQuery: show, list, find, statistic, statistics, count, top, group, event, alert.
-                If no real searchable keyword remains after extracting filters/time/aggregation, set textQuery to null.
-                Interpret login/logon/sign-in/authentication as event_type=auth.
-                For failed login/auth questions, use textQuery "failed" and filter event_type=auth.
-                For successful login/auth questions, use textQuery "success" and filter event_type=auth.
-                Use groupBy only when analyst asks for grouping/top/count by a field.
-                If extracted fields contradict the routing hint, include overrideIntent and overrideReason.
+                === ALLOWED FIELDS ===
+                timestamp: date
+                source: keyword
+                severity: keyword
+                event_type: keyword
+                action: keyword
+                user: keyword
+                host: keyword
+                ip: ip
+                message: text, free-text search only
+                raw: not indexed, never query, never filter, never aggregate
 
-                Response shape:
+                Structured filters may only use:
+                - source
+                - severity
+                - event_type
+                - action
+                - user
+                - host
+                - ip
+
+                textQuery may only represent searchable free text for the message field.
+                Never use raw.
+
+                === KNOWN FIELD VALUES ===
+                severity values:
+                - critical
+                - high
+                - medium
+                - low
+                - info
+
+                event_type examples:
+                - auth
+                - failed_login
+                - malware
+                - network
+                - process
+                - file
+                - alert
+
+                Use exact known values for structured filters only when semantically justified.
+                If a user description maps clearly to a known event_type, use that event_type filter.
+                If no known value clearly matches, use textQuery instead of inventing a field value.
+
+                === EXPLICIT API FILTERS ===
+                Explicit API filters have highest priority for the same field.
+                If an explicit API filter is present and not null/blank/"null":
+                - include it in filters or timeRange
+                - do not emit a conflicting extracted value for that same field
+
+                Omit null, blank, and literal "null" values.
+
+                Explicit API filters:
+                from=%s
+                to=%s
+                severity=%s
+                event_type=%s
+                user=%s
+                host=%s
+                ip=%s
+
+                === LINGUISTIC MAPPING GUIDANCE ===
+                Prefer structured filters for:
+                - severity
+                - event_type
+                - action
+                - user
+                - host
+                - ip
+
+                Valid IP addresses should become ip filters.
+                Do not put IP addresses into textQuery unless the analyst explicitly says the message contains that IP.
+
+                Do not put time expressions into textQuery.
+                Examples to exclude from textQuery:
+                - last 24h
+                - 7 days
+                - 7 ngay qua
+                - hom nay
+                - tuan truoc
+                - dau nam
+                - Q1
+                - nam 2024
+                - yesterday
+
+                Do not put command/UI words into textQuery.
+                Examples:
+                - show
+                - list
+                - find
+                - get
+                - log
+                - logs
+                - event
+                - events
+                - alert
+                - alerts
+                - display
+                - give
+                - tell
+                - cho toi
+                - hien thi
+                - tim
+                - lay
+
+                Do not keep generic single-word error terms as textQuery.
+                If the only remaining searchable text is "loi", "lỗi", "error", or "errors", set textQuery to null.
+                Do not remove "error" or "errors" when they are part of a meaningful technical phrase.
+                Examples:
+                - timeout error
+                - authentication error
+                - connection error
+                - permission error
+
+                If no meaningful searchable text remains after extracting filters, time, and aggregation fields:
+                set textQuery to null.
+
+                Authentication/login mapping:
+                - login, logon, sign-in, authentication, dang nhap generally indicate authentication-related events.
+                - If known event_type contains failed_login and the analyst asks failed login/login failed/dang nhap that bai:
+                  use filters.event_type = "failed_login" and textQuery = null unless extra failure details remain.
+                - Otherwise, if only auth is available:
+                  use filters.event_type = "auth" and textQuery = "failed" for failed login/auth questions.
+                - For successful login/auth questions:
+                  use filters.event_type = "auth" when applicable and textQuery = "success" only if no more specific event_type exists.
+
+                Attack/intrusion mapping:
+                - attack, tan cong, xam nhap, intrusion may be textQuery if no exact event_type exists.
+                - If a known event_type clearly matches the concept, use event_type instead.
+
+                === AGGREGATION RULES ===
+                Use groupBy only when the analyst explicitly asks for grouping, top, count by field, statistics by field, or distribution.
+
+                groupBy may only be one of:
+                - source
+                - severity
+                - event_type
+                - action
+                - user
+                - host
+                - ip
+
+                Infer groupBy only when explicit:
+                - top IPs -> ip
+                - top users -> user
+                - top hosts -> host
+                - by source -> source
+                - by severity -> severity
+                - by event type -> event_type
+                - by action -> action
+
+                If intent is TERMS_AGGREGATION but groupBy cannot be determined:
+                keep intent = "TERMS_AGGREGATION", set groupBy = null, and use low confidence for groupBy.
+                The application layer will request confirmation instead of executing an unsafe aggregation.
+
+                If top N is requested, set topN to that number.
+                If count/grouping is requested but N is not specified, set topN to null.
+                If the query is not a terms aggregation, set topN to null unless explicitly meaningful.
+
+                Use metric = "COUNT" for count/statistics/top/group-by queries.
+                Otherwise metric should be null.
+
+                Time aggregation:
+                - Use TIME_AGGREGATION when analyst asks trend, timeline, over time, per hour, per day, per week, by quarter, or theo quy.
+                - "thong ke loi theo quy cua nam 2023" means date_histogram over timestamp by quarter for 2023.
+                - timeBucket may only be "1h", "1d", "1w", or "quarter".
+                - Use "1h" for ranges <= 2 days or when user asks per hour.
+                - Use "1d" for ranges > 2 days and <= 90 days or when user asks per day.
+                - Use "1w" for ranges > 90 days or when user asks per week.
+                - Use "quarter" only when the user explicitly asks theo quy / by quarter / per quarter.
+                - Do not infer "quarter" merely because the time range is a year or because the question asks statistics.
+                - Default to "1d" when unclear.
+                - For TIME_AGGREGATION, groupBy should be null unless the analyst explicitly asks for both time trend and grouping.
+
+                === PREVIOUS CONTEXT RULE ===
+                Previous intent is provided only as context.
+                Do not blindly merge it.
+
+                Use previous context only when the current question is a follow-up, elliptical, or incomplete.
+                Examples:
+                - "filter to last week"
+                - "only critical"
+                - "group by source"
+                - "show top IPs instead"
+                - "what about today?"
+
+                If the current question contains a complete new subject, do not inherit unrelated previous filters.
+
+                Output contextUsage:
+                - "USED" when previous context is needed to understand the current question
+                - "IGNORED" when current question is standalone
+                - "NOT_AVAILABLE" when previous context is null
+
+                === PERCEPTION LAYER CONTRACT ===
+                Routing hints are:
+                - soft priors
+                - observability signals
+                - optimization metadata
+
+                Routing hints are never authoritative.
+                The original question and explicit API filters are stronger evidence.
+
+                When routingHint.neutral=true or lowConfidencePerception=true:
+                - ignore template bias
+                - infer directly from the original question
+
+                If extracted fields contradict the routing hint:
+                - include overrideIntent
+                - include a brief overrideReason
+
+                If no contradiction exists:
+                - overrideIntent = null
+                - overrideReason = null
+
+                Routing hint:
+                template=%s
+                confidence=%s
+                reason=%s
+                neutral=%s
+                lowConfidencePerception=%s
+
+                Heuristic signal:
+                template=%s
+                confidence=%s
+                ambiguous=%s
+                reason=%s
+
+                Semantic signal:
+                template=%s
+                confidence=%s
+                ambiguous=%s
+                reason=%s
+
+                Previous intent:
+                %s
+
+                MITRE enrichment:
+                %s
+
+                Use MITRE enrichment only when:
+                - the field is allowed
+                - the value is valid for known-value keyword fields
+                - it does not conflict with explicit API filters
+
+                === REQUIRED RESPONSE SHAPE ===
+                Return exactly this JSON shape.
+                Omit no top-level keys.
+                Use null for unknown values.
+
                 {
                   "intent": "SIMPLE_SEARCH",
-                  "textQuery": "failed",
-                  "filters": {"event_type": "auth"},
-                  "groupBy": "user",
-                  "metric": "COUNT",
-                  "topN": 10,
-                  "timeBucket": "1h",
-                  "timeRange": {"from": null, "to": null},
+                  "reason": null,
+                  "textQuery": null,
+                  "filters": {
+                    "source": null,
+                    "severity": null,
+                    "event_type": null,
+                    "action": null,
+                    "user": null,
+                    "host": null,
+                    "ip": null
+                  },
+                  "groupBy": null,
+                  "metric": null,
+                  "topN": null,
+                  "timeBucket": null,
+                  "timeRange": {
+                    "from": null,
+                    "to": null
+                  },
+                  "contextUsage": "NOT_AVAILABLE",
                   "overrideIntent": null,
                   "overrideReason": null,
+                  "semanticSpans": [
+                    {
+                      "kind": "TEMPORAL",
+                      "status": "RESOLVED",
+                      "text": "last 24h",
+                      "canonical": "2026-06-19T00:00:00Z/2026-06-20T00:00:00Z",
+                      "start": 10,
+                      "end": 18
+                    }
+                  ],
+                  "unresolvedAmbiguities": [],
                   "confidenceScores": {
-                    "textQuery": 0.9,
-                    "event_type": 0.9,
-                    "groupBy": 0.8,
-                    "timeRange": 0.8
+                    "intent": 0.0,
+                    "textQuery": 0.0,
+                    "filters": 0.0,
+                    "groupBy": 0.0,
+                    "timeRange": 0.0
                   }
                 }
 
-                Question: %s
-                Routing hint: %s confidence=%s reason=%s neutral=%s lowConfidencePerception=%s
-                Heuristic signal: %s confidence=%s ambiguous=%s reason=%s
-                Semantic signal: %s confidence=%s ambiguous=%s reason=%s
-                Previous intent for merge: %s
-                MITRE enrichment: %s
-                Explicit API filters:
-                from=%s, to=%s, severity=%s, event_type=%s, user=%s, host=%s, ip=%s
+                Confidence scores must be numbers from 0.0 to 1.0.
+
+                === ANALYST QUESTION ===
+                %s
                 """.formatted(
-                request.request().getQuestion(),
-                request.routingHint() == null ? null : request.routingHint().templateType(),
-                request.routingHint() == null ? null : request.routingHint().confidence(),
-                request.routingHint() == null ? null : request.routingHint().reason(),
-                request.routingHint() != null && request.routingHint().neutral(),
-                request.routingHint() != null && request.routingHint().lowConfidencePerception(),
-                request.heuristicHint() == null ? null : request.heuristicHint().templateType(),
-                request.heuristicHint() == null ? null : request.heuristicHint().confidence(),
-                request.heuristicHint() != null && request.heuristicHint().ambiguous(),
-                request.heuristicHint() == null ? null : request.heuristicHint().reason(),
-                request.semanticHint() == null ? null : request.semanticHint().templateType(),
-                request.semanticHint() == null ? null : request.semanticHint().confidence(),
-                request.semanticHint() != null && request.semanticHint().ambiguous(),
-                request.semanticHint() == null ? null : request.semanticHint().reason(),
-                previous,
-                request.enrichments(),
+                Instant.now().toString(),
+
                 value(request.request().getFrom()),
                 value(request.request().getTo()),
                 value(request.request().getSeverity()),
                 value(request.request().getEventType()),
                 value(request.request().getUser()),
                 value(request.request().getHost()),
-                value(request.request().getIp())
+                value(request.request().getIp()),
+
+                request.routingHint() == null ? "null" : value(request.routingHint().templateType()),
+                request.routingHint() == null ? "null" : request.routingHint().confidence(),
+                request.routingHint() == null ? "null" : value(request.routingHint().reason()),
+                request.routingHint() != null && request.routingHint().neutral(),
+                request.routingHint() != null && request.routingHint().lowConfidencePerception(),
+
+                request.heuristicHint() == null ? "null" : value(request.heuristicHint().templateType()),
+                request.heuristicHint() == null ? "null" : request.heuristicHint().confidence(),
+                request.heuristicHint() != null && request.heuristicHint().ambiguous(),
+                request.heuristicHint() == null ? "null" : value(request.heuristicHint().reason()),
+
+                request.semanticHint() == null ? "null" : value(request.semanticHint().templateType()),
+                request.semanticHint() == null ? "null" : request.semanticHint().confidence(),
+                request.semanticHint() != null && request.semanticHint().ambiguous(),
+                request.semanticHint() == null ? "null" : value(request.semanticHint().reason()),
+
+                previous,
+                request.enrichments() == null ? "null" : request.enrichments().toString(),
+
+                value(request.request().getQuestion())
         );
     }
 
-    private String value(String value) {
-        return value == null || value.isBlank() ? "null" : value;
+    private String value(Object value) {
+        if (value == null) {
+            return "null";
+        }
+        String text = value.toString();
+        if (text.isBlank() || "null".equalsIgnoreCase(text.trim())) {
+            return "null";
+        }
+        return text.trim();
     }
 }
-

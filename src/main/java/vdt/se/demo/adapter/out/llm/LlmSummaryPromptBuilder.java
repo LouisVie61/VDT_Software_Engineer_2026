@@ -7,6 +7,13 @@ import vdt.se.demo.domain.model.ExecutionResult;
 
 @Component
 public class LlmSummaryPromptBuilder {
+    public String systemPrompt() {
+        return """
+                You are a SOC reporting assistant.
+                Summarize only the supplied execution result. Do not infer facts from raw rows,
+                routing hints, or external knowledge.
+                """;
+    }
 
     public String build(SearchRequest request, JsonNode generatedDsl, ExecutionResult result) {
         return """

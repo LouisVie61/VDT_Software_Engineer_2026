@@ -13,6 +13,9 @@ import vdt.se.demo.domain.exception.LlmException;
 import vdt.se.demo.domain.exception.LlmRetryableException;
 import vdt.se.demo.domain.valueObjects.LlmProvider;
 
+import java.io.InterruptedIOException;
+import java.net.SocketTimeoutException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +41,11 @@ public class GeminiAdapter implements LlmProviderPort {
 
     @Override
     public String complete(String prompt) {
+        return complete(null, prompt);
+    }
+
+    @Override
+    public String complete(String systemPrompt, String userPrompt) {
         String apiKey = properties.getLlm().getGemini().getApiKey();
         if (apiKey == null || apiKey.isBlank()) {
             throw new LlmRetryableException("Gemini API key is not configured");
@@ -46,7 +54,7 @@ public class GeminiAdapter implements LlmProviderPort {
             String response = restClient.post()
                     .uri(GEMINI_BASE_URL + properties.getLlm().getGemini().getModel()
                             + ":generateContent?key=" + apiKey)
-                    .body(body(prompt))
+                    .body(body(systemPrompt, userPrompt))
                     .retrieve()
                     .onStatus(this::retryableStatus, (request, clientResponse) -> {
                         throw new LlmRetryableException("Gemini retryable status: " + clientResponse.getStatusCode());
@@ -68,18 +76,27 @@ public class GeminiAdapter implements LlmProviderPort {
             }
             throw new LlmException("Gemini request failed with non-retryable status: " + e.getStatusCode(), e);
         } catch (Exception e) {
+            if (isTimeout(e)) {
+                throw new LlmRetryableException("Gemini request timed out or was unavailable", e);
+            }
             throw new LlmException("Gemini response parsing failed", e);
         }
     }
 
-    private Map<String, Object> body(String prompt) {
-        return Map.of(
-                "contents", List.of(Map.of("parts", List.of(Map.of("text", prompt)))),
-                "generationConfig", Map.of(
+    private Map<String, Object> body(String systemPrompt, String userPrompt) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        if (systemPrompt != null && !systemPrompt.isBlank()) {
+            body.put("systemInstruction", Map.of("parts", List.of(Map.of("text", systemPrompt))));
+        }
+        body.put("contents", List.of(Map.of(
+                "role", "user",
+                "parts", List.of(Map.of("text", userPrompt))
+        )));
+        body.put("generationConfig", Map.of(
                         "responseMimeType", "application/json",
                         "temperature", 0.1d
-                )
-        );
+        ));
+        return body;
     }
 
     private boolean retryableStatus(HttpStatusCode status) {
@@ -88,5 +105,20 @@ public class GeminiAdapter implements LlmProviderPort {
 
     private boolean isRetryableStatus(HttpStatusCode status) {
         return status.value() == 429 || status.value() == 503;
+    }
+
+    private boolean isTimeout(Throwable throwable) {
+        Throwable current = throwable;
+        while (current != null) {
+            if (current instanceof SocketTimeoutException || current instanceof InterruptedIOException) {
+                return true;
+            }
+            String message = current.getMessage();
+            if (message != null && message.toLowerCase(java.util.Locale.ROOT).contains("timed out")) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 }

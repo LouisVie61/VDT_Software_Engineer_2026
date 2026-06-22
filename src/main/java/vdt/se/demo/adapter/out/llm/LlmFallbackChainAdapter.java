@@ -13,6 +13,7 @@ import vdt.se.demo.application.port.outboundPort.llm.SummaryPort;
 import vdt.se.demo.domain.model.ExtractedIntent;
 import vdt.se.demo.domain.model.ExecutionResult;
 import vdt.se.demo.domain.model.SearchIntent;
+import vdt.se.demo.domain.exception.LlmException;
 import vdt.se.demo.domain.exception.LlmRetryableException;
 import vdt.se.demo.domain.valueObjects.LlmProvider;
 
@@ -48,17 +49,24 @@ public class LlmFallbackChainAdapter implements IntentExtractionPort, SummaryPor
 
     @Override
     public ExtractedIntent extract(IntentExtractionRequest request) {
+        String systemPrompt = intentPromptBuilder.systemPrompt();
         String prompt = intentPromptBuilder.build(request);
-        RuntimeException lastFailure = null;
+        log.info("[INTENT_EXTRACTION] Processing question: {}", request.request().getQuestion());
+        log.debug("[INTENT_EXTRACTION] System prompt length: {}", systemPrompt.length());
+        log.debug("[INTENT_EXTRACTION] User prompt length: {}", prompt.length());
+        Exception lastFailure = null;
         for (LlmProvider provider : providerOrder()) {
             LlmProviderPort providerPort = find(provider);
             if (providerPort == null) {
                 continue;
             }
             try {
-                String raw = providerPort.complete(prompt);
+                log.info("[INTENT_EXTRACTION] Invoking LLM provider: {}", provider);
+                String raw = providerPort.complete(systemPrompt, prompt);
+                log.info("[INTENT_EXTRACTION] LLM raw response from {}: {}", provider, raw);
                 SearchIntent intent = intentResponseParser.parse(raw);
-                log.debug("LLM provider {} extracted valid search intent fields", provider);
+                log.info("[INTENT_EXTRACTION] Successfully parsed intent from {}: intent={}, groupBy={}, topN={}, textQuery={}",
+                        provider, intent.getIntent(), intent.getGroupBy(), intent.getTopN(), intent.getTextQuery());
                 return ExtractedIntent.builder()
                         .intent(intent)
                         .provider(provider.name())
@@ -66,12 +74,20 @@ public class LlmFallbackChainAdapter implements IntentExtractionPort, SummaryPor
                         .build();
             } catch (LlmRetryableException e) {
                 lastFailure = e;
-                log.debug("LLM provider {} failed to extract valid intent: {}", provider, e.getMessage());
+                log.warn("[INTENT_EXTRACTION] LLM provider {} unavailable or timed out: {}", provider, e.getMessage());
+            } catch (LlmException e) {
+                lastFailure = e;
+                log.warn("[INTENT_EXTRACTION] LLM provider {} returned an unusable response: {}", provider, e.getMessage(), e);
+            } catch (Exception e) {
+                lastFailure = e;
+                log.warn("[INTENT_EXTRACTION] Unexpected error from LLM provider {}: {}", provider, e.getMessage(), e);
             }
         }
-        log.debug("All LLM providers failed to extract intent. Falling back to local deterministic extraction. Last error: {}",
+        log.warn("[INTENT_EXTRACTION] All LLM providers failed. Using local deterministic fallback. Last error: {}",
                 lastFailure == null ? "none" : lastFailure.getMessage());
         SearchIntent fallback = localFallbackIntentExtractor.extract(request.request(), request.routingHint());
+        log.info("[INTENT_EXTRACTION] Fallback intent generated: intent={}, groupBy={}, topN={}",
+                fallback.getIntent(), fallback.getGroupBy(), fallback.getTopN());
         return ExtractedIntent.builder()
                 .intent(fallback)
                 .provider("LOCAL_FALLBACK")
@@ -84,6 +100,7 @@ public class LlmFallbackChainAdapter implements IntentExtractionPort, SummaryPor
         if (!properties.getLlm().isSummaryEnabled()) {
             return deterministicSummaryBuilder.build(executionResult);
         }
+        String systemPrompt = summaryPromptBuilder.systemPrompt();
         String prompt = summaryPromptBuilder.build(request, generatedDsl, executionResult);
         for (LlmProvider provider : providerOrder()) {
             LlmProviderPort providerPort = find(provider);
@@ -91,7 +108,7 @@ public class LlmFallbackChainAdapter implements IntentExtractionPort, SummaryPor
                 continue;
             }
             try {
-                String summary = providerPort.complete(prompt);
+                String summary = providerPort.complete(systemPrompt, prompt);
                 if (summary != null && !summary.isBlank()) {
                     return summary.strip();
                 }
