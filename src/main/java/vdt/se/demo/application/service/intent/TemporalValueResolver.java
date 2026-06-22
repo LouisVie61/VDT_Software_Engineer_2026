@@ -17,8 +17,30 @@ public class TemporalValueResolver {
     private static final DateTimeFormatter VI_DATE = DateTimeFormatter.ofPattern("d/M/yyyy");
 
     public boolean apply(String text, SearchIntent intent) {
-        return applyExactDate(text, intent) || applyYear(text, intent) || applyRelative(text, intent)
+        return applyVietnameseLongDate(text, intent) || applyExactDate(text, intent) || applyYear(text, intent) || applyRelative(text, intent)
                 || applyToday(text, intent);
+    }
+
+    private boolean applyVietnameseLongDate(String text, SearchIntent intent) {
+        List<String> tokens = tokens(text);
+        for (int i = 0; i < tokens.size(); i++) {
+            int dayIndex = "ngay".equals(tokens.get(i)) ? i + 1 : i;
+            if (dayIndex + 4 < tokens.size()
+                    && isInteger(tokens.get(dayIndex))
+                    && "thang".equals(tokens.get(dayIndex + 1))
+                    && isInteger(tokens.get(dayIndex + 2))
+                    && "nam".equals(tokens.get(dayIndex + 3))
+                    && isYear(tokens.get(dayIndex + 4))) {
+                LocalDate date = LocalDate.of(
+                        Integer.parseInt(tokens.get(dayIndex + 4)),
+                        Integer.parseInt(tokens.get(dayIndex + 2)),
+                        Integer.parseInt(tokens.get(dayIndex))
+                );
+                applyDay(date, intent);
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean applyExactDate(String text, SearchIntent intent) {
@@ -67,10 +89,12 @@ public class TemporalValueResolver {
     private boolean applyToday(String text, SearchIntent intent) {
         String value = value(text);
         if (!value.equals("today") && !value.equals("hom nay") && !value.equals("ngay hom nay")
-                && !value.equals("yesterday")) {
+                && !value.equals("yesterday") && !value.equals("hom qua") && !value.equals("ngay hom qua")) {
             return false;
         }
-        LocalDate date = value.equals("yesterday") ? LocalDate.now(ZoneOffset.UTC).minusDays(1) : LocalDate.now(ZoneOffset.UTC);
+        LocalDate date = value.equals("yesterday") || value.equals("hom qua") || value.equals("ngay hom qua")
+                ? LocalDate.now(ZoneOffset.UTC).minusDays(1)
+                : LocalDate.now(ZoneOffset.UTC);
         applyDay(date, intent);
         return true;
     }
@@ -110,7 +134,7 @@ public class TemporalValueResolver {
     }
 
     private boolean isRelativePrefix(String value) {
-        return "last".equals(value) || "past".equals(value) || "previous".equals(value);
+        return "last".equals(value) || "past".equals(value) || "previous".equals(value) || "trong".equals(value);
     }
 
     private boolean isRelativeUnit(String value) {

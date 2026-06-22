@@ -2,12 +2,12 @@ package vdt.se.demo.application.service.intent;
 
 public record SemanticToken(String text, int start, int end) {
     boolean is(String value) {
-        return text.equals(value);
+    return text.equalsIgnoreCase(value);
     }
 
     boolean isAny(String... values) {
         for (String value : values) {
-            if (text.equals(value)) {
+            if (text.equalsIgnoreCase(value)) {
                 return true;
             }
         }

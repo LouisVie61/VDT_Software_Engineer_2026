@@ -31,6 +31,18 @@ public class IntentMergeService {
         if (hasText(extracted.getTimeBucket())) {
             merged.setTimeBucket(extracted.getTimeBucket());
         }
+        if (hasText(extracted.getTimeFrom())) {
+            merged.setTimeFrom(extracted.getTimeFrom());
+        }
+        if (hasText(extracted.getTimeTo())) {
+            merged.setTimeTo(extracted.getTimeTo());
+        }
+        if (extracted.getSemanticSpans() != null && !extracted.getSemanticSpans().isEmpty()) {
+            merged.setSemanticSpans(extracted.getSemanticSpans());
+        }
+        if (extracted.getConfidenceScores() != null && !extracted.getConfidenceScores().isEmpty()) {
+            merged.setConfidenceScores(extracted.getConfidenceScores());
+        }
         merged.setOverrideIntent(extracted.getOverrideIntent());
         merged.setOverrideReason(extracted.getOverrideReason());
         return merged;

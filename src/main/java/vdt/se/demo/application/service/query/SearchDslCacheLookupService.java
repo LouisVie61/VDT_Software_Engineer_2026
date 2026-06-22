@@ -45,7 +45,7 @@ public class SearchDslCacheLookupService {
             return Optional.empty();
         }
 
-        log.debug("Search DSL cache hit: queryId={}, sessionId={}, schemaVersion={}, queryHash={}",
+        log.info("Search DSL cache hit: queryId={}, sessionId={}, schemaVersion={}, queryHash={}",
                 queryId, cache.sessionId(), cache.schemaVersion(), cache.queryHash());
         JsonNode dsl = objectMapper.readTree(cachedDsl.get());
         CanonicalQueryPlan cachedPlan = cachedPlan(plan);

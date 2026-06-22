@@ -1,5 +1,7 @@
 package vdt.se.demo.application.service.context;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vdt.se.demo.application.port.outboundPort.cache.IntentCachePort;
 import vdt.se.demo.domain.model.CachedIntent;
 import vdt.se.demo.domain.model.RoutingHint;
@@ -8,6 +10,8 @@ import vdt.se.demo.domain.model.SearchIntent;
 import java.util.Optional;
 
 public class ContextRetrievalService {
+    private static final Logger log = LoggerFactory.getLogger(ContextRetrievalService.class);
+
     private final IntentCachePort intentCachePort;
 
     public ContextRetrievalService(IntentCachePort intentCachePort) {
@@ -20,9 +24,12 @@ public class ContextRetrievalService {
                 || !heuristic.lowConfidence() || !semantic.lowConfidence()) {
             return Optional.empty();
         }
-        return intentCachePort.findLastClassifiedIntent(sessionId)
-                .filter(cached -> schemaVersion.equals(cached.schemaVersion()))
-                .map(CachedIntent::intent);
+        Optional<CachedIntent> cachedIntent = intentCachePort.findLastClassifiedIntent(sessionId)
+                .filter(cached -> schemaVersion.equals(cached.schemaVersion()));
+        cachedIntent.ifPresent(cached -> log.info(
+                "Last classified intent cache hit: sessionId={}, schemaVersion={}, intent={}",
+                sessionId, schemaVersion, cached.intent().getIntent()));
+        return cachedIntent.map(CachedIntent::intent);
     }
 
     private boolean isShort(String question) {

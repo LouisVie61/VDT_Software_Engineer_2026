@@ -45,9 +45,19 @@ public class SearchExecutionService {
 
     public ExecutedSearch executeDsl(UUID queryId, SearchRequest request, JsonNode generatedDsl,
                                      CanonicalQueryPlan plan) throws Exception {
+        log.info("[SEARCH_EXECUTION] Starting DSL execution: queryId={}, question={}", queryId, request.getQuestion());
+        log.info("[SEARCH_EXECUTION] Generated DSL: {}", generatedDsl.toPrettyString());
+        
         long startedAt = System.nanoTime();
         ExecutionResult executionResult = queryExecutorPort.execute(generatedDsl);
+        long elapsedMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt);
         logStage(queryId, "elasticsearch.primary", startedAt);
+        log.info("[SEARCH_EXECUTION] Elasticsearch response: totalCount={}, resultsSize={}, agsSize={}, warningsCount={}, elapsedMs={}",
+                executionResult.totalCount(), executionResult.results().size(), 
+                executionResult.aggregations().size(), executionResult.warnings().size(), elapsedMs);
+        if (executionResult.totalCount() == 0) {
+            log.warn("[SEARCH_EXECUTION] Zero results returned for query: {}", request.getQuestion());
+        }
 
         startedAt = System.nanoTime();
         QueryExecution refinedExecution = queryExecutionRefiner.refine(request, generatedDsl, executionResult);
@@ -55,8 +65,11 @@ public class SearchExecutionService {
 
         generatedDsl = refinedExecution.generatedDsl();
         executionResult = refinedExecution.executionResult();
+        log.info("[SEARCH_EXECUTION] After refinement: totalCount={}, resultsSize={}, agsSize={}",
+                executionResult.totalCount(), executionResult.results().size(), executionResult.aggregations().size());
 
         ChartType chartType = plan.chartHint() == null ? chartTypeInferenceService.inferChartType(generatedDsl) : plan.chartHint();
+        log.info("[SEARCH_EXECUTION] Inferred chart type: {}", chartType);
         List<SearchWarning> warnings = new ArrayList<>();
         warnings.addAll(plan.warnings());
         warnings.addAll(executionResult.warnings());
@@ -79,6 +92,8 @@ public class SearchExecutionService {
                 .build();
         result.setWarnings(warnings);
         result.setSelectedTemplate(plan.templateSelection().type().name());
+        log.info("[SEARCH_EXECUTION] Query completed: queryId={}, totalCount={}, chartType={}, hasWarnings={}",
+                queryId, result.getTotalCount(), chartType, !warnings.isEmpty());
         return new ExecutedSearch(result, generatedDsl, executionResult);
     }
 

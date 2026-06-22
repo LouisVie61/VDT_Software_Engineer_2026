@@ -8,17 +8,24 @@ import java.util.List;
 
 public class SearchTimeExpressionResolver {
     private final TemporalValueResolver temporalValueResolver;
+    private final SemanticSpanResolver semanticSpanResolver;
 
     public SearchTimeExpressionResolver() {
-        this(new TemporalValueResolver());
+        this(new TemporalValueResolver(), new SemanticSpanResolver());
     }
 
     public SearchTimeExpressionResolver(TemporalValueResolver temporalValueResolver) {
+        this(temporalValueResolver, new SemanticSpanResolver());
+    }
+
+    public SearchTimeExpressionResolver(TemporalValueResolver temporalValueResolver,
+                                        SemanticSpanResolver semanticSpanResolver) {
         this.temporalValueResolver = temporalValueResolver;
+        this.semanticSpanResolver = semanticSpanResolver;
     }
 
     public void apply(SearchRequest request, SearchIntent intent) {
-        intent.setSemanticSpans(resolveTemporalStatuses(intent.getSemanticSpans()));
+        intent.setSemanticSpans(resolveTemporalStatuses(temporalSpans(request, intent)));
         if (hasText(request.getFrom()) || hasText(request.getTo())
                 || hasText(intent.getTimeFrom()) || hasText(intent.getTimeTo())) {
             return;
@@ -49,6 +56,18 @@ public class SearchTimeExpressionResolver {
                 .map(span -> span.kind() == SemanticSpan.Kind.TEMPORAL && temporalValueResolver.apply(span.text(), SearchIntent.builder().build())
                         ? withStatus(span, SemanticSpan.Status.RESOLVED)
                         : span)
+                .toList();
+    }
+
+    private List<SemanticSpan> temporalSpans(SearchRequest request, SearchIntent intent) {
+        List<SemanticSpan> spans = new java.util.ArrayList<>(safe(intent.getSemanticSpans()));
+        if (request != null && hasText(request.getQuestion())) {
+            semanticSpanResolver.resolve(request.getQuestion()).spans().stream()
+                    .filter(span -> span.kind() == SemanticSpan.Kind.TEMPORAL)
+                    .forEach(spans::add);
+        }
+        return spans.stream()
+                .distinct()
                 .toList();
     }
 

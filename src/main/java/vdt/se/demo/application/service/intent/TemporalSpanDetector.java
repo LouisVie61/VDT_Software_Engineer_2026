@@ -45,8 +45,14 @@ public class TemporalSpanDetector {
             return span(tokens, i, end, SemanticSpan.Status.RESOLVED);
         }
         if (isDayMonth(tokens, i)) {
+            int dayIndex = tokens.get(i).is("ngay") ? i + 1 : i;
             int end = i + (tokens.get(i).is("ngay") ? 3 : 2);
             SemanticSpan.Status status = SemanticSpan.Status.AMBIGUOUS;
+            if (nextIs(tokens, dayIndex + 2, "nam") && inRange(tokens, dayIndex + 4)
+                    && tokens.get(dayIndex + 4).isYear()) {
+                end = dayIndex + 4;
+                status = SemanticSpan.Status.RESOLVED;
+            }
             if (nextIs(tokens, end, "hang") && nextIs(tokens, end + 1, "nam")) {
                 end += 2;
                 status = SemanticSpan.Status.UNSUPPORTED;

@@ -7,51 +7,38 @@ import vdt.se.demo.domain.valueObjects.TemplateType;
 import java.text.Normalizer;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class SearchIntentNormalizer {
-    private static final Set<String> ALLOWED_FILTERS = Set.of(
-            "severity", "event_type", "action", "user", "host", "ip", "source"
-    );
-    private static final Set<String> SEVERITIES = Set.of("critical", "high", "medium", "low", "info");
-    private static final Set<String> AGGREGATION_NOISE_TOKENS = Set.of(
-            "cac", "cua", "va", "la", "nhung", "mot", "nhieu", "loi", "error", "errors",
-            "event", "events", "alert", "alerts", "log", "logs", "record", "records",
-            "statistic", "statistics", "stats", "thong", "ke", "dem", "count", "top",
-            "trong", "nam", "thang", "ngay", "gio", "qua"
-    );
-
-    private final SemanticResidualTextResolver residualTextResolver;
-    private final SemanticSpanResolver spanResolver;
     private final SearchTimeExpressionResolver timeExpressionResolver;
+    private final SearchFilterValidator filterValidator;
 
     public SearchIntentNormalizer() {
-        this(new SemanticResidualTextResolver(), new SemanticSpanResolver(), new SearchTimeExpressionResolver());
+        this(new SearchTimeExpressionResolver(), new SearchFilterValidator());
     }
 
-    public SearchIntentNormalizer(SemanticResidualTextResolver residualTextResolver) {
-        this(residualTextResolver, new SemanticSpanResolver(), new SearchTimeExpressionResolver());
+    public SearchIntentNormalizer(SearchTimeExpressionResolver timeExpressionResolver) {
+        this(timeExpressionResolver, new SearchFilterValidator());
     }
 
-    public SearchIntentNormalizer(SemanticResidualTextResolver residualTextResolver,
-                                  SemanticSpanResolver spanResolver,
-                                  SearchTimeExpressionResolver timeExpressionResolver) {
-        this.residualTextResolver = residualTextResolver;
-        this.spanResolver = spanResolver;
+    public SearchIntentNormalizer(SearchTimeExpressionResolver timeExpressionResolver,
+                                  SearchFilterValidator filterValidator) {
         this.timeExpressionResolver = timeExpressionResolver;
+        this.filterValidator = filterValidator;
     }
 
     public SearchIntent normalize(SearchRequest request, SearchIntent input) {
         SearchIntent intent = input == null ? new SearchIntent() : input.copy();
-        intent.setSemanticSpans(spanResolver.resolve(request.getQuestion()).spans());
         intent.setFilters(normalizedFilters(intent.getFilters()));
+        filterValidator.validateAndNormalize(intent);
         removeFiltersOverriddenByRequest(request, intent);
 
-        inferFilters(request, intent);
         timeExpressionResolver.apply(request, intent);
-        intent.setTextQuery(normalizedTextQuery(request, intent));
+        intent.setTextQuery(cleanTextQuery(intent.getTextQuery()));
+        intent.setGroupBy(cleanField(intent.getGroupBy()));
+        intent.setTimeBucket(cleanText(intent.getTimeBucket()));
+        if ("quarter".equalsIgnoreCase(intent.getTimeBucket()) && !asksForQuarter(request.getQuestion())) {
+            intent.setTimeBucket(null);
+        }
 
         if (intent.getIntent() == null) {
             intent.setIntent(TemplateType.SIMPLE_SEARCH);
@@ -59,9 +46,6 @@ public class SearchIntentNormalizer {
         if (intent.getIntent() == TemplateType.TIME_AGGREGATION && !hasText(intent.getTimeBucket())) {
             boolean broadRange = hasText(intent.getTimeFrom());
             intent.setTimeBucket(timeExpressionResolver.inferBucket(intent.getSemanticSpans(), broadRange));
-        }
-        if (intent.getIntent() == TemplateType.TERMS_AGGREGATION && intent.getTopN() == null) {
-            intent.setTopN(inferTopN(request.getQuestion()));
         }
         return intent;
     }
@@ -73,7 +57,7 @@ public class SearchIntentNormalizer {
         }
         rawFilters.forEach((field, value) -> {
             String normalizedField = canonicalize(field).replace(' ', '_');
-            if (ALLOWED_FILTERS.contains(normalizedField) && hasText(value)) {
+            if (hasText(value)) {
                 filters.put(normalizedField, value.trim());
             }
         });
@@ -94,74 +78,42 @@ public class SearchIntentNormalizer {
         }
     }
 
-    private void inferFilters(SearchRequest request, SearchIntent intent) {
-        String text = canonicalize(value(request.getQuestion()) + " " + value(intent.getTextQuery()));
-        if (!hasText(request.getSeverity()) && !intent.getFilters().containsKey("severity")) {
-            inferSeverity(text, intent);
-        }
-        if (!hasText(request.getEventType()) && !intent.getFilters().containsKey("event_type")
-                && residualTextResolver.looksLikeAuthSearch(text)) {
-            intent.getFilters().put("event_type", "auth");
-        }
-    }
-
-    private void inferSeverity(String text, SearchIntent intent) {
-        for (String token : text.split("\\s+")) {
-            if (SEVERITIES.contains(token)) {
-                intent.getFilters().put("severity", token);
-                return;
-            }
-        }
-    }
-
-    private String normalizedTextQuery(SearchRequest request, SearchIntent intent) {
-        SemanticResidualTextResolver.Resolution resolution = residualTextResolver.resolve(
-                request.getQuestion(), intent.getTextQuery());
-        resolution.inferredFilters().forEach((field, value) -> {
-            if (!intent.getFilters().containsKey(field)) {
-                intent.getFilters().put(field, value);
-            }
-        });
-        return residualTextForIntent(intent, resolution.textQuery());
-    }
-
-    private String residualTextForIntent(SearchIntent intent, String textQuery) {
-        if (!hasText(textQuery) || intent == null || intent.getIntent() == TemplateType.SIMPLE_SEARCH) {
-            return textQuery;
-        }
-
-        StringBuilder kept = new StringBuilder();
-        for (String token : canonicalize(textQuery).split("\\s+")) {
-            if (!hasText(token) || AGGREGATION_NOISE_TOKENS.contains(token) || !isInformativeAggregationToken(token)) {
-                continue;
-            }
-            if (!kept.isEmpty()) {
-                kept.append(' ');
-            }
-            kept.append(token);
-        }
-        return kept.isEmpty() ? null : kept.toString();
-    }
-
-    private boolean isInformativeAggregationToken(String token) {
-        if (token.matches("\\d{1,3}(?:\\.\\d{1,3}){3}")) {
-            return true;
-        }
-        if (token.matches(".*[._:/-].*") || token.matches(".*\\d.*")) {
-            return true;
-        }
-        return token.length() >= 4;
-    }
-
-    private Integer inferTopN(String question) {
-        Matcher matcher = Pattern.compile("\\btop\\s+(\\d+)\\b").matcher(canonicalize(question));
-        return matcher.find() ? Integer.parseInt(matcher.group(1)) : 10;
-    }
-
     private String canonicalize(String value) {
         String asciiD = value(value).replace('\u0111', 'd').replace('\u0110', 'D');
         String normalized = Normalizer.normalize(asciiD, Normalizer.Form.NFD);
         return normalized.replaceAll("\\p{M}+", "").toLowerCase(java.util.Locale.ROOT);
+    }
+
+    private String cleanField(String value) {
+        if (!hasText(value)) {
+            return null;
+        }
+        return canonicalize(value).replace(' ', '_');
+    }
+
+    private String cleanText(String value) {
+        return hasText(value) ? value.trim() : null;
+    }
+
+    private String cleanTextQuery(String value) {
+        String cleaned = cleanText(value);
+        if (cleaned == null) {
+            return null;
+        }
+        String normalized = canonicalize(cleaned);
+        if ("loi".equals(normalized) || "error".equals(normalized) || "errors".equals(normalized)) {
+            return null;
+        }
+        return cleaned;
+    }
+
+    private boolean asksForQuarter(String question) {
+        String normalized = canonicalize(question);
+        return normalized.contains("theo quy")
+                || normalized.contains("moi quy")
+                || normalized.contains("by quarter")
+                || normalized.contains("per quarter")
+                || normalized.contains("quarterly");
     }
 
     private String value(String value) {
