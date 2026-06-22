@@ -15,10 +15,12 @@ class LlmDslPromptBuilderTest {
 
         String prompt = new LlmDslPromptBuilder().build(request);
 
-        assertThat(prompt).contains("Return JSON only");
+        assertThat(prompt).contains("Return raw JSON only");
         assertThat(prompt).contains("Expected search DSL");
         assertThat(prompt).contains("Expected terms aggregation DSL");
-        assertThat(prompt).contains("timestamp, source, severity, event_type, user, host, ip");
+        assertThat(prompt).contains("Perception/routing output is only a soft prior");
+        assertThat(prompt).contains("timestamp: date");
+        assertThat(prompt).contains("event_type: keyword");
         assertThat(prompt).contains("Top 10 IP nhieu alert nhat");
     }
 }

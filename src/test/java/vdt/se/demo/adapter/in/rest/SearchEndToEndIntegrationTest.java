@@ -95,7 +95,7 @@ class SearchEndToEndIntegrationTest {
 
         assertThat(queryExecutor.executedDsl).hasSize(1);
         assertThat(queryExecutor.executedDsl.getFirst().toString())
-                .contains("\"match_all\"")
+                .doesNotContain("\"match_all\"")
                 .contains("\"severity\":\"high\"")
                 .contains("\"event_type\":\"auth\"")
                 .contains("\"user\":\"alice\"")
@@ -157,6 +157,32 @@ class SearchEndToEndIntegrationTest {
                         .contains("message")
                         .contains("\"first event\"")
                         .doesNotContain("aggregation"));
+    }
+
+    @Test
+    void aggregationWithoutExplicitTopNRequiresConfirmationBeforeCacheOrExecution() throws Exception {
+        queryExecutor.executedDsl.clear();
+        String payload = """
+                {
+                  "question": "Search ip duoc nhieu nhat nam 2021",
+                  "page": 0,
+                  "pageSize": 50
+                }
+                """;
+
+        mockMvc.perform(post("/api/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.needsConfirmation").value(true))
+                .andExpect(jsonPath("$.selectedTemplate").value("TERMS_AGGREGATION"))
+                .andExpect(jsonPath("$.confirmation.confirmationId").isNotEmpty())
+                .andExpect(jsonPath("$.confirmation.intent.topN").doesNotExist())
+                .andExpect(jsonPath("$.confirmation.templateSelection.size").value(100))
+                .andExpect(content -> assertThat(content.getResponse().getContentAsString())
+                        .contains("TOP_N_REQUIRED"));
+
+        assertThat(queryExecutor.executedDsl).isEmpty();
     }
 
     @TestConfiguration

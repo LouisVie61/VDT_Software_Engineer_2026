@@ -36,6 +36,7 @@ import vdt.se.demo.application.service.query.SearchCacheContextService;
 import vdt.se.demo.application.service.query.SearchDslCacheLookupService;
 import vdt.se.demo.application.service.query.SearchPlanPreparationService;
 import vdt.se.demo.application.service.query.ZeroResultDiagnosticClassifier;
+import vdt.se.demo.application.service.routing.PerceptionPrefilterService;
 import vdt.se.demo.application.service.routing.QueryRoutingService;
 import vdt.se.demo.application.service.routing.RoutingHintPolicy;
 import vdt.se.demo.application.service.template.CanonicalPlanBuilder;
@@ -134,9 +135,11 @@ class QueryUseCaseServiceTest {
                 new TemplateIntentSelector(),
                 new GroupByResolver()
         );
+        GroupByResolver groupByResolver = new GroupByResolver();
         SearchPlanPreparationService planPreparationService = new SearchPlanPreparationService(
                 new QueryRoutingService((left, right) -> 0.0d),
                 new RoutingHintPolicy(),
+                new PerceptionPrefilterService(groupByResolver),
                 new ContextRetrievalService(intentCache),
                 new StubIntentExtraction(),
                 question -> List.of(),

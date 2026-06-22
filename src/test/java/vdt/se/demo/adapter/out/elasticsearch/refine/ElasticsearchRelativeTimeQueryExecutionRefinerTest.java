@@ -88,8 +88,8 @@ class ElasticsearchRelativeTimeQueryExecutionRefinerTest {
                 .question("show events")
                 .from("2026-06-01T00:00:00Z")
                 .to("2026-06-15T00:00:00Z")
-                .severity("high")
-                .eventType("auth")
+                .severity("High")
+                .eventType("AUTH")
                 .user("alice")
                 .host("host-1")
                 .ip("10.0.0.1")
@@ -107,7 +107,9 @@ class ElasticsearchRelativeTimeQueryExecutionRefinerTest {
         String dsl = refined.generatedDsl().toString();
         assertThat(refined.executionResult().totalCount()).isEqualTo(7);
         assertThat(dsl).contains("\"term\":{\"severity\":\"high\"}");
+        assertThat(dsl).doesNotContain("\"severity\":\"High\"");
         assertThat(dsl).contains("\"term\":{\"event_type\":\"auth\"}");
+        assertThat(dsl).doesNotContain("\"event_type\":\"AUTH\"");
         assertThat(dsl).contains("\"term\":{\"user\":\"alice\"}");
         assertThat(dsl).contains("\"term\":{\"host\":\"host-1\"}");
         assertThat(dsl).contains("\"term\":{\"ip\":\"10.0.0.1\"}");
