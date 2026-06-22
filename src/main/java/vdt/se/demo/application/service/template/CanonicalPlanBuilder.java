@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Optional;
 
 public class CanonicalPlanBuilder {
+    private static final int DEFAULT_GROUPING_SIZE = 100;
+
     private final TemplateSelectionService templateSelectionService;
     private final TemplateIntentSelector templateIntentSelector;
     private final GroupByResolver groupByResolver;
@@ -43,6 +45,14 @@ public class CanonicalPlanBuilder {
             if (pending.isPresent()) {
                 return pending.get();
             }
+        }
+        if (selectedType == TemplateType.TERMS_AGGREGATION && intent.getTopN() == null) {
+            warnings.add(warning("TOP_N_REQUIRED", "Aggregation requires Top N confirmation before execution."));
+            return basePlan(normalizedQuery, schemaVersion, sessionId, routingHint, extractedFields, intent,
+                    provider, rawLlmContent, warnings)
+                    .templateSelection(confirmationSelection(intent))
+                    .chartHint(chartHint(TemplateType.TERMS_AGGREGATION, intent))
+                    .build();
         }
         return validatedPlan(normalizedQuery, schemaVersion, sessionId, routingHint, extractedFields, intent,
                 provider, rawLlmContent, warnings, selectedType);
@@ -145,7 +155,7 @@ public class CanonicalPlanBuilder {
     }
 
     private int boundedSize(Integer topN) {
-        return topN == null ? 10 : Math.max(1, Math.min(topN, 100));
+        return topN == null ? DEFAULT_GROUPING_SIZE : Math.max(1, Math.min(topN, 100));
     }
 
     private Map<String, Double> confidenceScores(SearchIntent intent) {

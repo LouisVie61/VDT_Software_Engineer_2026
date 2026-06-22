@@ -14,8 +14,7 @@ public class TemplateIntentSelector {
         if (hasText(intent.getOverrideIntent())) {
             return override(intent.getOverrideIntent(), TemplateType.SIMPLE_SEARCH);
         }
-        if (intent.getIntent() == TemplateType.TIME_AGGREGATION
-                && (hasText(intent.getTimeBucket()) || hasText(intent.getTimeFrom()) || hasText(intent.getTimeTo()))) {
+        if (intent.getIntent() == TemplateType.TIME_AGGREGATION) {
             return TemplateType.TIME_AGGREGATION;
         }
         if (hasText(intent.getGroupBy())) {

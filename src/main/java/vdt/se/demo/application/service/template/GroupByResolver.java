@@ -8,7 +8,7 @@ import java.util.Optional;
 public class GroupByResolver {
     public Optional<String> resolve(String query) {
         String text = normalizeAscii(query);
-        if (containsAny(text, "event type", "event_type", "loai event", "loi", "error", "failure", "auth", "login")) {
+        if (containsAny(text, "event type", "event_type", "loai event")) {
             return Optional.of("event_type");
         }
         for (String field : List.of("ip", "user", "host", "action", "source", "severity")) {

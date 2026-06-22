@@ -1,5 +1,6 @@
 package vdt.se.demo.application.service.template;
 
+import vdt.se.demo.application.service.intent.SearchSchemaRegistry;
 import vdt.se.demo.domain.model.IntentValidationResult;
 import vdt.se.demo.domain.model.SearchIntent;
 import vdt.se.demo.domain.model.SearchWarning;
@@ -9,12 +10,19 @@ import vdt.se.demo.domain.valueObjects.TemplateType;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 public class TemplateSelectionService {
-    private static final Set<String> GROUPABLE_FIELDS = Set.of(
-            "timestamp", "source", "severity", "event_type", "action", "user", "host", "ip"
-    );
+    private static final int DEFAULT_GROUPING_SIZE = 100;
+
+    private final SearchSchemaRegistry schemaRegistry;
+
+    public TemplateSelectionService() {
+        this(new SearchSchemaRegistry());
+    }
+
+    public TemplateSelectionService(SearchSchemaRegistry schemaRegistry) {
+        this.schemaRegistry = schemaRegistry;
+    }
 
     public IntentValidationResult validate(SearchIntent intent) {
         TemplateType type = intent == null || intent.getIntent() == null ? TemplateType.SIMPLE_SEARCH : intent.getIntent();
@@ -37,7 +45,7 @@ public class TemplateSelectionService {
             if (groupBy.isBlank()) {
                 return IntentValidationResult.invalid("Aggregation requires a grouping field before execution.");
             }
-            if (!GROUPABLE_FIELDS.contains(groupBy) || "timestamp".equals(groupBy)) {
+            if (!schemaRegistry.isGroupable(groupBy)) {
                 return IntentValidationResult.invalid("Field '" + groupBy + "' is not groupable for aggregation.");
             }
             return IntentValidationResult.valid(TemplateSelection.builder()
@@ -61,7 +69,7 @@ public class TemplateSelectionService {
 
     private int boundedSize(Integer topN) {
         if (topN == null) {
-            return 10;
+            return DEFAULT_GROUPING_SIZE;
         }
         return Math.max(1, Math.min(topN, 100));
     }
