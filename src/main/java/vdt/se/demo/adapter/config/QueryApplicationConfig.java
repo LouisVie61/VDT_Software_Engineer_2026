@@ -25,6 +25,7 @@ import vdt.se.demo.application.service.query.QueryUseCaseService;
 import vdt.se.demo.application.service.query.SearchCacheContextService;
 import vdt.se.demo.application.service.query.SearchDslCacheLookupService;
 import vdt.se.demo.application.service.query.SearchPlanPreparationService;
+import vdt.se.demo.application.service.routing.PerceptionPrefilterService;
 import vdt.se.demo.application.service.routing.QueryRoutingService;
 import vdt.se.demo.application.service.routing.RoutingHintPolicy;
 import vdt.se.demo.application.service.template.CanonicalPlanBuilder;
@@ -57,6 +58,7 @@ public class QueryApplicationConfig {
     @Bean
     SearchPlanPreparationService searchPlanPreparationService(QueryRoutingService routingService,
                                                               RoutingHintPolicy routingHintPolicy,
+                                                              PerceptionPrefilterService perceptionPrefilterService,
                                                               ContextRetrievalService contextRetrievalService,
                                                               IntentExtractionPort intentExtractionPort,
                                                               MitreEnrichmentPort mitreEnrichmentPort,
@@ -64,8 +66,9 @@ public class QueryApplicationConfig {
                                                               SearchIntentNormalizer searchIntentNormalizer,
                                                               CanonicalPlanBuilder canonicalPlanBuilder,
                                                               SearchCacheContextService cacheContextService) {
-        return new SearchPlanPreparationService(routingService, routingHintPolicy, contextRetrievalService, intentExtractionPort,
-                mitreEnrichmentPort, intentMergeService, searchIntentNormalizer, canonicalPlanBuilder, cacheContextService);
+        return new SearchPlanPreparationService(routingService, routingHintPolicy, perceptionPrefilterService,
+                contextRetrievalService, intentExtractionPort, mitreEnrichmentPort, intentMergeService, searchIntentNormalizer,
+                canonicalPlanBuilder, cacheContextService);
     }
 
     @Bean

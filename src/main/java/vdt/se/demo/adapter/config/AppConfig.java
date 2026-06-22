@@ -15,6 +15,12 @@ import java.time.Duration;
 @Configuration
 @EnableConfigurationProperties(AppProperties.class)
 public class AppConfig {
+    private final AppProperties properties;
+
+    public AppConfig(AppProperties properties) {
+        this.properties = properties;
+    }
+
     @Bean
     RestTemplate restTemplate() {
         SimpleClientHttpRequestFactory requestFactory = requestFactory();
@@ -38,8 +44,8 @@ public class AppConfig {
 
     private SimpleClientHttpRequestFactory requestFactory() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(Duration.ofSeconds(2));
-        requestFactory.setReadTimeout(Duration.ofSeconds(7));
+        requestFactory.setConnectTimeout(Duration.ofSeconds(Math.max(1, properties.getLlm().getConnectTimeoutSeconds())));
+        requestFactory.setReadTimeout(Duration.ofSeconds(Math.max(1, properties.getLlm().getReadTimeoutSeconds())));
         return requestFactory;
     }
 }

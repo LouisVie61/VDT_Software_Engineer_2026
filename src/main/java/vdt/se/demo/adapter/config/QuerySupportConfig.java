@@ -27,8 +27,10 @@ import vdt.se.demo.application.service.query.QueryResultPersistenceService;
 import vdt.se.demo.application.service.query.QuerySummaryService;
 import vdt.se.demo.application.service.query.SearchCacheContextService;
 import vdt.se.demo.application.service.query.ZeroResultDiagnosticClassifier;
+import vdt.se.demo.application.service.routing.PerceptionPrefilterService;
 import vdt.se.demo.application.service.routing.QueryRoutingService;
 import vdt.se.demo.application.service.routing.RoutingHintPolicy;
+import vdt.se.demo.application.service.template.GroupByResolver;
 import vdt.se.demo.domain.service.ChartTypeInferenceService;
 
 import java.util.concurrent.Executor;
@@ -106,6 +108,11 @@ public class QuerySupportConfig {
     @Bean
     RoutingHintPolicy routingHintPolicy() {
         return new RoutingHintPolicy();
+    }
+
+    @Bean
+    PerceptionPrefilterService perceptionPrefilterService(GroupByResolver groupByResolver) {
+        return new PerceptionPrefilterService(groupByResolver);
     }
 
     @Bean

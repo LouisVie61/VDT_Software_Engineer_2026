@@ -2,14 +2,11 @@ package vdt.se.demo.adapter.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import vdt.se.demo.application.service.intent.FieldValueRegistry;
+import vdt.se.demo.application.service.intent.SearchFilterValidator;
 import vdt.se.demo.application.service.intent.SearchIntentNormalizer;
+import vdt.se.demo.application.service.intent.SearchSchemaRegistry;
 import vdt.se.demo.application.service.intent.SearchTimeExpressionResolver;
-import vdt.se.demo.application.service.intent.SemanticAliasLexicon;
-import vdt.se.demo.application.service.intent.SemanticResidualTextResolver;
-import vdt.se.demo.application.service.intent.SemanticSpanResolver;
-import vdt.se.demo.application.service.intent.SemanticTokenizer;
-import vdt.se.demo.application.service.intent.TemporalSpanDetector;
-import vdt.se.demo.application.service.intent.PhraseSpanDetector;
 import vdt.se.demo.application.service.intent.TemporalValueResolver;
 import vdt.se.demo.application.service.template.CanonicalPlanBuilder;
 import vdt.se.demo.application.service.template.GroupByResolver;
@@ -19,44 +16,25 @@ import vdt.se.demo.application.service.template.TemplateSelectionService;
 @Configuration
 public class IntentTemplateConfig {
     @Bean
-    SearchIntentNormalizer searchIntentNormalizer(SemanticResidualTextResolver residualTextResolver,
-                                                  SemanticSpanResolver spanResolver,
-                                                  SearchTimeExpressionResolver timeExpressionResolver) {
-        return new SearchIntentNormalizer(residualTextResolver, spanResolver, timeExpressionResolver);
+    SearchIntentNormalizer searchIntentNormalizer(SearchTimeExpressionResolver timeExpressionResolver,
+                                                  SearchFilterValidator searchFilterValidator) {
+        return new SearchIntentNormalizer(timeExpressionResolver, searchFilterValidator);
     }
 
     @Bean
-    SemanticResidualTextResolver semanticResidualTextResolver(SemanticAliasLexicon lexicon,
-                                                             SemanticSpanResolver spanResolver) {
-        return new SemanticResidualTextResolver(lexicon, spanResolver);
+    SearchFilterValidator searchFilterValidator(SearchSchemaRegistry searchSchemaRegistry,
+                                                FieldValueRegistry fieldValueRegistry) {
+        return new SearchFilterValidator(searchSchemaRegistry, fieldValueRegistry);
     }
 
     @Bean
-    SemanticAliasLexicon semanticAliasLexicon() {
-        return new SemanticAliasLexicon();
+    SearchSchemaRegistry searchSchemaRegistry() {
+        return new SearchSchemaRegistry();
     }
 
     @Bean
-    SemanticSpanResolver semanticSpanResolver(SemanticAliasLexicon lexicon,
-                                              SemanticTokenizer tokenizer,
-                                              TemporalSpanDetector temporalSpanDetector,
-                                              PhraseSpanDetector phraseSpanDetector) {
-        return new SemanticSpanResolver(lexicon, tokenizer, temporalSpanDetector, phraseSpanDetector);
-    }
-
-    @Bean
-    SemanticTokenizer semanticTokenizer() {
-        return new SemanticTokenizer();
-    }
-
-    @Bean
-    TemporalSpanDetector temporalSpanDetector() {
-        return new TemporalSpanDetector();
-    }
-
-    @Bean
-    PhraseSpanDetector phraseSpanDetector() {
-        return new PhraseSpanDetector();
+    FieldValueRegistry fieldValueRegistry() {
+        return new FieldValueRegistry();
     }
 
     @Bean
@@ -70,8 +48,8 @@ public class IntentTemplateConfig {
     }
 
     @Bean
-    TemplateSelectionService templateSelectionService() {
-        return new TemplateSelectionService();
+    TemplateSelectionService templateSelectionService(SearchSchemaRegistry searchSchemaRegistry) {
+        return new TemplateSelectionService(searchSchemaRegistry);
     }
 
     @Bean
