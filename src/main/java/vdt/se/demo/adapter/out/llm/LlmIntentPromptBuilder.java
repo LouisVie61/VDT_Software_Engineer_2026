@@ -97,11 +97,11 @@ public class LlmIntentPromptBuilder {
                 - SIMPLE_SEARCH
                 - TERMS_AGGREGATION
                 - TIME_AGGREGATION
+                - UNRESOLVABLE
 
                 Use SIMPLE_SEARCH when the analyst asks to find, show, list, retrieve, or inspect events.
                 Use TERMS_AGGREGATION when the analyst asks for top, count, group by, statistics by field.
-                Use TIME_AGGREGATION when the analyst asks for trend, over time, per hour, per day,
-                per week, by quarter, theo quy, moi quy, or timeline.
+                Use TIME_AGGREGATION when the analyst asks for trend, over time, per hour, per day, timeline.
 
                 allowed overrideIntent values:
                 - SIMPLE_SEARCH
@@ -218,8 +218,6 @@ public class LlmIntentPromptBuilder {
                 - tim
                 - lay
 
-                Do not keep generic single-word error terms as textQuery.
-                If the only remaining searchable text is "loi", "lỗi", "error", or "errors", set textQuery to null.
                 Do not remove "error" or "errors" when they are part of a meaningful technical phrase.
                 Examples:
                 - timeout error
@@ -244,7 +242,7 @@ public class LlmIntentPromptBuilder {
                 - If a known event_type clearly matches the concept, use event_type instead.
 
                 === AGGREGATION RULES ===
-                Use groupBy only when the analyst explicitly asks for grouping, top, count by field, statistics by field, or distribution.
+                Use groupBy only when the analyst explicitly asks for grouping, top, count by field, statistics by field, distribution, or thống kê.
 
                 groupBy may only be one of:
                 - source
@@ -259,31 +257,31 @@ public class LlmIntentPromptBuilder {
                 - top IPs -> ip
                 - top users -> user
                 - top hosts -> host
+                - top events -> event_type
                 - by source -> source
                 - by severity -> severity
                 - by event type -> event_type
                 - by action -> action
+                - statistics -> event_type (if field not specified)
+                - thống kê / thong ke -> event_type (if field not specified)
+                - distribution -> event_type (if field not specified)
 
                 If intent is TERMS_AGGREGATION but groupBy cannot be determined:
-                keep intent = "TERMS_AGGREGATION", set groupBy = null, and use low confidence for groupBy.
-                The application layer will request confirmation instead of executing an unsafe aggregation.
+                return intent = "UNRESOLVABLE" with reason = "missing aggregation field".
 
                 If top N is requested, set topN to that number.
-                If count/grouping is requested but N is not specified, set topN to null.
+                If top/count/grouping is requested but N is not specified, set topN to 10.
                 If the query is not a terms aggregation, set topN to null unless explicitly meaningful.
 
                 Use metric = "COUNT" for count/statistics/top/group-by queries.
                 Otherwise metric should be null.
 
                 Time aggregation:
-                - Use TIME_AGGREGATION when analyst asks trend, timeline, over time, per hour, per day, per week, by quarter, or theo quy.
-                - "thong ke loi theo quy cua nam 2023" means date_histogram over timestamp by quarter for 2023.
-                - timeBucket may only be "1h", "1d", "1w", or "quarter".
+                - Use TIME_AGGREGATION when analyst asks trend, timeline, over time, per hour, per day, per week.
+                - timeBucket may only be "1h", "1d", or "1w".
                 - Use "1h" for ranges <= 2 days or when user asks per hour.
                 - Use "1d" for ranges > 2 days and <= 90 days or when user asks per day.
                 - Use "1w" for ranges > 90 days or when user asks per week.
-                - Use "quarter" only when the user explicitly asks theo quy / by quarter / per quarter.
-                - Do not infer "quarter" merely because the time range is a year or because the question asks statistics.
                 - Default to "1d" when unclear.
                 - For TIME_AGGREGATION, groupBy should be null unless the analyst explicitly asks for both time trend and grouping.
 
@@ -408,6 +406,42 @@ public class LlmIntentPromptBuilder {
 
                 Confidence scores must be numbers from 0.0 to 1.0.
 
+                If the request cannot be resolved, return:
+                {
+                  "intent": "UNRESOLVABLE",
+                  "reason": "brief reason",
+                  "textQuery": null,
+                  "filters": {
+                    "source": null,
+                    "severity": null,
+                    "event_type": null,
+                    "action": null,
+                    "user": null,
+                    "host": null,
+                    "ip": null
+                  },
+                  "groupBy": null,
+                  "metric": null,
+                  "topN": null,
+                  "timeBucket": null,
+                  "timeRange": {
+                    "from": null,
+                    "to": null
+                  },
+                  "contextUsage": "NOT_AVAILABLE",
+                  "overrideIntent": null,
+                  "overrideReason": null,
+                  "semanticSpans": [],
+                  "unresolvedAmbiguities": ["brief ambiguity"],
+                  "confidenceScores": {
+                    "intent": 0.0,
+                    "textQuery": 0.0,
+                    "filters": 0.0,
+                    "groupBy": 0.0,
+                    "timeRange": 0.0
+                  }
+                }
+
                 === ANALYST QUESTION ===
                 %s
                 """.formatted(
@@ -421,18 +455,18 @@ public class LlmIntentPromptBuilder {
                 value(request.request().getHost()),
                 value(request.request().getIp()),
 
-                request.routingHint() == null ? "null" : value(request.routingHint().templateType()),
+                request.routingHint() == null ? "null" : request.routingHint().templateType(),
                 request.routingHint() == null ? "null" : request.routingHint().confidence(),
                 request.routingHint() == null ? "null" : value(request.routingHint().reason()),
                 request.routingHint() != null && request.routingHint().neutral(),
                 request.routingHint() != null && request.routingHint().lowConfidencePerception(),
 
-                request.heuristicHint() == null ? "null" : value(request.heuristicHint().templateType()),
+                request.heuristicHint() == null ? "null" : request.heuristicHint().templateType(),
                 request.heuristicHint() == null ? "null" : request.heuristicHint().confidence(),
                 request.heuristicHint() != null && request.heuristicHint().ambiguous(),
                 request.heuristicHint() == null ? "null" : value(request.heuristicHint().reason()),
 
-                request.semanticHint() == null ? "null" : value(request.semanticHint().templateType()),
+                request.semanticHint() == null ? "null" : request.semanticHint().templateType(),
                 request.semanticHint() == null ? "null" : request.semanticHint().confidence(),
                 request.semanticHint() != null && request.semanticHint().ambiguous(),
                 request.semanticHint() == null ? "null" : value(request.semanticHint().reason()),
@@ -444,14 +478,10 @@ public class LlmIntentPromptBuilder {
         );
     }
 
-    private String value(Object value) {
-        if (value == null) {
+    private String value(String value) {
+        if (value == null || value.isBlank() || "null".equalsIgnoreCase(value.trim())) {
             return "null";
         }
-        String text = value.toString();
-        if (text.isBlank() || "null".equalsIgnoreCase(text.trim())) {
-            return "null";
-        }
-        return text.trim();
+        return value.trim();
     }
 }
