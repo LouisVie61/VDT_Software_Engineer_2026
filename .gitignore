@@ -43,5 +43,5 @@ data/ingest/incoming/*
 !data/ingest/incoming/csv/.gitkeep
 !data/ingest/incoming/jsonl/.gitkeep\
 
-**/__pycache__/
+**/__pycache__/ 
 *.pyc
