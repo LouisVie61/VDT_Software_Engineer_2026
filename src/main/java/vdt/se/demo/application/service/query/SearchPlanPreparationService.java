@@ -9,6 +9,7 @@ import vdt.se.demo.application.port.outboundPort.semantic.MitreEnrichmentPort;
 import vdt.se.demo.application.service.context.ContextRetrievalService;
 import vdt.se.demo.application.service.intent.IntentMergeService;
 import vdt.se.demo.application.service.intent.SearchIntentNormalizer;
+import vdt.se.demo.application.service.routing.PerceptionPrefilterService;
 import vdt.se.demo.application.service.routing.RoutingHintPolicy;
 import vdt.se.demo.application.service.routing.QueryRoutingService;
 import vdt.se.demo.application.service.template.CanonicalPlanBuilder;
@@ -24,6 +25,7 @@ public class SearchPlanPreparationService {
 
     private final QueryRoutingService routingService;
     private final RoutingHintPolicy routingHintPolicy;
+    private final PerceptionPrefilterService perceptionPrefilterService;
     private final ContextRetrievalService contextRetrievalService;
     private final IntentExtractionPort intentExtractionPort;
     private final MitreEnrichmentPort mitreEnrichmentPort;
@@ -33,6 +35,7 @@ public class SearchPlanPreparationService {
     private final SearchCacheContextService cacheContextService;
 
     public SearchPlanPreparationService(QueryRoutingService routingService, RoutingHintPolicy routingHintPolicy,
+                                        PerceptionPrefilterService perceptionPrefilterService,
                                         ContextRetrievalService contextRetrievalService,
                                         IntentExtractionPort intentExtractionPort, MitreEnrichmentPort mitreEnrichmentPort,
                                         IntentMergeService intentMergeService, SearchIntentNormalizer searchIntentNormalizer,
@@ -40,6 +43,7 @@ public class SearchPlanPreparationService {
                                         SearchCacheContextService cacheContextService) {
         this.routingService = routingService;
         this.routingHintPolicy = routingHintPolicy;
+        this.perceptionPrefilterService = perceptionPrefilterService;
         this.contextRetrievalService = contextRetrievalService;
         this.intentExtractionPort = intentExtractionPort;
         this.mitreEnrichmentPort = mitreEnrichmentPort;
@@ -58,6 +62,24 @@ public class SearchPlanPreparationService {
         Optional<SearchIntent> previous = contextRetrievalService.inheritedIntent(
                 cache.sessionId(), cache.schemaVersion(), request.getQuestion(), routing.heuristic(), routing.semantic());
         RoutingHint llmHint = routingHintPolicy.hintForLlm(routing, previous.orElse(null));
+        Optional<SearchIntent> prefiltered = perceptionPrefilterService.prefilter(request, routing, previous.isPresent());
+        if (prefiltered.isPresent()) {
+            SearchIntent normalized = searchIntentNormalizer.normalize(request, prefiltered.get());
+            CanonicalQueryPlan plan = canonicalPlanBuilder.build(
+                    cacheContextService.normalizedQuery(request),
+                    cache.schemaVersion(),
+                    cache.sessionId(),
+                    llmHint,
+                    prefiltered.get(),
+                    normalized,
+                    "PERCEPTION_PREFILTER",
+                    prefiltered.get().toString());
+            log.debug("Search plan prepared without LLM: template={}, groupBy={}, routingConfidence={}",
+                    plan.templateSelection() == null ? null : plan.templateSelection().type(),
+                    normalized.getGroupBy(),
+                    llmHint == null ? null : llmHint.confidence());
+            return new PreparedSearchPlan(llmHint, "PERCEPTION_PREFILTER", plan);
+        }
         ExtractedIntent extracted = intentExtractionPort.extract(IntentExtractionRequest.builder()
                 .request(request)
                 .routingHint(llmHint)

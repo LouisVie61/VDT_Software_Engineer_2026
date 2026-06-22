@@ -1,5 +1,7 @@
 package vdt.se.demo.application.service.routing;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vdt.se.demo.application.port.outboundPort.semantic.EmbeddingPort;
 import vdt.se.demo.domain.model.RoutingHint;
 import vdt.se.demo.domain.valueObjects.TemplateType;
@@ -8,6 +10,7 @@ import java.text.Normalizer;
 import java.util.regex.Pattern;
 
 public class QueryRoutingService {
+    private static final Logger log = LoggerFactory.getLogger(QueryRoutingService.class);
     private static final Pattern YEAR_PATTERN = Pattern.compile("\\b(?:19|20)\\d{2}\\b");
 
     private final EmbeddingPort embeddingPort;
@@ -19,6 +22,11 @@ public class QueryRoutingService {
     public RoutingDecision route(String question) {
         RoutingHint heuristic = heuristic(question);
         RoutingHint semantic = semantic(question);
+        log.info("[ROUTING] Question: {}", question);
+        log.info("[ROUTING] Heuristic: type={}, confidence={}, reason={}", 
+                heuristic.templateType(), heuristic.confidence(), heuristic.reason());
+        log.info("[ROUTING] Semantic: type={}, confidence={}, reason={}", 
+                semantic.templateType(), semantic.confidence(), semantic.reason());
         return new RoutingDecision(heuristic, semantic);
     }
 
@@ -106,7 +114,7 @@ public class QueryRoutingService {
     }
 
     private boolean containsStatisticsWord(String text) {
-        return containsAny(text, "statistic", "statistics", "stats", "thong ke", "dem", "count");
+        return containsAny(text, "statistic", "statistics", "stats", "thong ke", "thongke", "th", "dem", "count", "distribution", "phanpho");
     }
 
     private boolean containsTimeExpression(String text) {

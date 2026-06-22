@@ -47,7 +47,7 @@ public class QueryConfirmationWorkflow {
                 request.getConfirmationId(), request.getSessionId(), request.getEditedIntent() != null);
         PendingConfirmation pending = intentCachePort.findPendingConfirmation(request.getConfirmationId())
                 .orElseThrow(() -> new BadQueryException("Confirmation request not found or expired"));
-        log.debug("Pending confirmation loaded: confirmationId={}, pendingSessionId={}, schemaVersion={}, template={}",
+        log.info("Pending confirmation cache hit: confirmationId={}, pendingSessionId={}, schemaVersion={}, template={}",
                 request.getConfirmationId(), pending.sessionId(), pending.schemaVersion(), pending.templateSelection().type());
         if (request.getSessionId() != null && !request.getSessionId().isBlank()
                 && !request.getSessionId().equals(pending.sessionId())) {
@@ -78,6 +78,9 @@ public class QueryConfirmationWorkflow {
         }
         if (plan.warnings().stream().anyMatch(warning -> "GROUP_BY_REQUIRED".equals(warning.code()))) {
             throw new BadQueryException("Aggregation requires a grouping field before execution.");
+        }
+        if (plan.warnings().stream().anyMatch(warning -> "TOP_N_REQUIRED".equals(warning.code()))) {
+            throw new BadQueryException("Aggregation requires Top N before execution.");
         }
         log.debug("Confirmation validation completed: confirmationId={}, template={}, groupBy={}, size={}",
                 request.getConfirmationId(), plan.templateSelection().type(), plan.templateSelection().groupBy(),

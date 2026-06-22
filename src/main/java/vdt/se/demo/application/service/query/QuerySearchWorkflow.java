@@ -104,6 +104,9 @@ public class QuerySearchWorkflow {
         if (plan.warnings().stream().anyMatch(warning -> "GROUP_BY_REQUIRED".equals(warning.code()))) {
             return true;
         }
+        if (plan.warnings().stream().anyMatch(warning -> "TOP_N_REQUIRED".equals(warning.code()))) {
+            return true;
+        }
         boolean lowConfidence = plan.confidenceScores().values().stream().anyMatch(score -> score < 0.60d);
         return lowConfidence || plan.templateSelection().type() != TemplateType.SIMPLE_SEARCH
                 && (routingHint == null || routingHint.confidence() < 0.70d);
