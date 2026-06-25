@@ -76,9 +76,10 @@ public class QueryApplicationConfig {
                                                             SearchExecutionService searchExecutionService,
                                                             QueryResultPersistenceService persistenceService,
                                                             QueryAuditService auditService,
-                                                            ObjectMapper objectMapper) {
+                                                            ObjectMapper objectMapper,
+                                                            QuerySummaryService summaryService) {
         return new SearchDslCacheLookupService(dslCachePort, searchExecutionService, persistenceService,
-                auditService, objectMapper);
+                auditService, objectMapper, summaryService);
     }
 
     @Bean
