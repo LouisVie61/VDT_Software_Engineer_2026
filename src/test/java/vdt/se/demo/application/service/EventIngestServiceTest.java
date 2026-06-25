@@ -2,7 +2,8 @@ package vdt.se.demo.application.service;
 
 import org.junit.jupiter.api.Test;
 import vdt.se.demo.application.dto.IngestFileCommand;
-import vdt.se.demo.application.port.outboundPort.EventSpoolPort;
+import vdt.se.demo.application.port.outboundPort.ingest.EventSpoolPort;
+import vdt.se.demo.application.service.ingest.EventIngestService;
 import vdt.se.demo.domain.exception.BadQueryException;
 import vdt.se.demo.domain.model.IngestResult;
 import vdt.se.demo.domain.valueObjects.EventFileFormat;

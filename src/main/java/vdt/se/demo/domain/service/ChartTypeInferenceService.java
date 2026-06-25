@@ -23,7 +23,7 @@ public class ChartTypeInferenceService {
             JsonNode dslNode = objectMapper.readTree(dsl);
             return inferChartType(dslNode);
         } catch (Exception e) {
-            log.warn("Failed to parse DSL when inferring chart type: {}", e.getMessage());
+            log.debug("Failed to parse DSL when inferring chart type: {}", e.getMessage());
             return ChartType.TABLE;
         }
     }

@@ -14,7 +14,6 @@ import vdt.se.demo.application.port.inboundPort.EventIngestUseCase;
 @RestController
 @RequestMapping("/api/events")
 public class EventIngestController {
-
     private final EventIngestUseCase ingestUseCase;
 
     public EventIngestController(EventIngestUseCase ingestUseCase) {
@@ -29,6 +28,7 @@ public class EventIngestController {
                 file.getSize(),
                 file::getInputStream
         );
-        return ResponseEntity.accepted().body(IngestResponse.from(ingestUseCase.ingest(command)));
+        IngestResponse response = IngestResponse.from(ingestUseCase.ingest(command));
+        return ResponseEntity.accepted().body(response);
     }
 }

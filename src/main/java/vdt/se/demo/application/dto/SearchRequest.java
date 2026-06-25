@@ -3,15 +3,27 @@ package vdt.se.demo.application.dto;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Getter
+@Setter
 public class SearchRequest {
     @NotBlank
     private String question;
     @Min(0)
-    private int page = 0;
+    @Builder.Default
+    private Integer page = 0;
     @Min(1)
     @Max(500)
-    private int pageSize = 50;
+    @Builder.Default
+    private Integer pageSize = 50;
     private String from;
     private String to;
     private String severity;
@@ -19,84 +31,15 @@ public class SearchRequest {
     private String user;
     private String host;
     private String ip;
-
-    public String getQuestion() {
-        return question;
-    }
-
-    public void setQuestion(String question) {
-        this.question = question;
-    }
+    private String sessionId;
+    private String historySelectionId;
+    private String searchAfter;
 
     public int getPage() {
-        return page;
-    }
-
-    public void setPage(int page) {
-        this.page = page;
+        return page == null ? 0 : page;
     }
 
     public int getPageSize() {
-        return pageSize;
-    }
-
-    public void setPageSize(int pageSize) {
-        this.pageSize = pageSize;
-    }
-
-    public String getFrom() {
-        return from;
-    }
-
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
-    public String getTo() {
-        return to;
-    }
-
-    public void setTo(String to) {
-        this.to = to;
-    }
-
-    public String getSeverity() {
-        return severity;
-    }
-
-    public void setSeverity(String severity) {
-        this.severity = severity;
-    }
-
-    public String getEventType() {
-        return eventType;
-    }
-
-    public void setEventType(String eventType) {
-        this.eventType = eventType;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public String getIp() {
-        return ip;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
+        return pageSize == null ? 50 : pageSize;
     }
 }

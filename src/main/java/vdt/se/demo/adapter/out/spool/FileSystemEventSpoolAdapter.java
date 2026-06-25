@@ -1,9 +1,11 @@
 package vdt.se.demo.adapter.out.spool;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import vdt.se.demo.adapter.config.AppProperties;
 import vdt.se.demo.application.dto.IngestFileCommand;
-import vdt.se.demo.application.port.outboundPort.EventSpoolPort;
+import vdt.se.demo.application.port.outboundPort.ingest.EventSpoolPort;
 import vdt.se.demo.domain.exception.BadQueryException;
 import vdt.se.demo.domain.valueObjects.EventFileFormat;
 
@@ -16,6 +18,7 @@ import java.util.UUID;
 
 @Component
 public class FileSystemEventSpoolAdapter implements EventSpoolPort {
+    private static final Logger log = LoggerFactory.getLogger(FileSystemEventSpoolAdapter.class);
 
     private final AppProperties properties;
 
@@ -29,10 +32,15 @@ public class FileSystemEventSpoolAdapter implements EventSpoolPort {
         Path partialFile = targetDirectory.resolve(fileName(command, format, requestId) + ".part");
         Path finalFile = targetDirectory.resolve(fileName(command, format, requestId));
         try {
+            log.debug("Event spool write started: requestId={}, format={}, partialFile={}, finalFile={}",
+                    requestId, format, partialFile, finalFile);
             Files.createDirectories(targetDirectory);
             Files.copy(command.openStream(), partialFile, StandardCopyOption.REPLACE_EXISTING);
             moveCompleteFile(partialFile, finalFile);
+            log.debug("Event spool write completed: requestId={}, finalFile={}", requestId, finalFile);
         } catch (Exception e) {
+            log.debug("Event spool write failed: requestId={}, partialFile={}, error={}",
+                    requestId, partialFile, e.getMessage());
             deleteQuietly(partialFile);
             throw new BadQueryException("Cannot spool uploaded event file for Fluentd", e);
         }

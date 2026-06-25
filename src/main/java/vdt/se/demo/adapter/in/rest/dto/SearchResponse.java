@@ -1,9 +1,15 @@
 package vdt.se.demo.adapter.in.rest.dto;
 
 import tools.jackson.databind.JsonNode;
+import vdt.se.demo.domain.model.QueryConfirmation;
 import vdt.se.demo.domain.model.QueryResult;
+import vdt.se.demo.domain.model.SearchWarning;
+import vdt.se.demo.domain.model.ZeroResultDiagnostic;
 import vdt.se.demo.domain.valueObjects.ChartType;
+import vdt.se.demo.domain.valueObjects.SummaryStatus;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public record SearchResponse(
@@ -16,7 +22,18 @@ public record SearchResponse(
         int totalCount,
         ChartType chartType,
         Integer page,
-        Integer pageSize
+        Integer pageSize,
+        boolean needsConfirmation,
+        QueryConfirmation confirmation,
+        List<SearchWarning> warnings,
+        String selectedTemplate,
+        boolean cacheHit,
+        SummaryStatus summaryStatus,
+        ZeroResultDiagnostic diagnostic,
+        Map<String, Double> confidenceScores,
+        String overrideIntent,
+        String overrideReason,
+        UUID canonicalPlanId
 ) {
     public static SearchResponse from(QueryResult result) {
         return new SearchResponse(
@@ -29,7 +46,18 @@ public record SearchResponse(
                 result.getTotalCount(),
                 result.getChartType(),
                 result.getPage(),
-                result.getPageSize()
+                result.getPageSize(),
+                result.isNeedsConfirmation(),
+                result.getConfirmation(),
+                result.getWarnings(),
+                result.getSelectedTemplate(),
+                result.isCacheHit(),
+                result.getSummaryStatus(),
+                result.getDiagnostic(),
+                result.getConfidenceScores(),
+                result.getOverrideIntent(),
+                result.getOverrideReason(),
+                result.getCanonicalPlanId()
         );
     }
 }

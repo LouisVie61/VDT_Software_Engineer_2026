@@ -30,7 +30,11 @@ public class ElasticsearchEventIndexInitializer implements ApplicationRunner {
             return;
         }
         String indexName = properties.getElasticsearch().getEventsIndex();
-        httpClient.ensureIndex(indexName, indexDefinition.json());
-        log.info("Elasticsearch event index is ready: {}", indexName);
+        try {
+            httpClient.ensureIndex(indexName, indexDefinition.json());
+            log.debug("Elasticsearch event index is ready: {}", indexName);
+        } catch (RuntimeException e) {
+            log.warn("Elasticsearch event index initialization skipped for '{}': {}", indexName, e.getMessage());
+        }
     }
 }

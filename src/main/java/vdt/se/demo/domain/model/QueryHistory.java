@@ -8,6 +8,7 @@ import java.util.UUID;
 public record QueryHistory(
         UUID id,
         String userIdentity,
+        String sessionId,
         String nlQuery,
         String generatedDsl,
         String summary,

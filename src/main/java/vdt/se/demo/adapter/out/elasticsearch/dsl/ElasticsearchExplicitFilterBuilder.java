@@ -9,6 +9,7 @@ import vdt.se.demo.application.dto.SearchRequest;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 @Component
@@ -24,8 +25,8 @@ public class ElasticsearchExplicitFilterBuilder {
         List<JsonNode> filters = new ArrayList<>();
         Set<String> managedFields = new HashSet<>();
 
-        addTermFilter(filters, managedFields, "severity", request.getSeverity());
-        addTermFilter(filters, managedFields, "event_type", request.getEventType());
+        addTermFilter(filters, managedFields, "severity", lowercase(request.getSeverity()));
+        addTermFilter(filters, managedFields, "event_type", lowercase(request.getEventType()));
         addTermFilter(filters, managedFields, "user", request.getUser());
         addTermFilter(filters, managedFields, "host", request.getHost());
         addIpFilter(filters, managedFields, request.getIp());
@@ -74,5 +75,9 @@ public class ElasticsearchExplicitFilterBuilder {
 
     private boolean hasText(String value) {
         return value != null && !value.isBlank();
+    }
+
+    private String lowercase(String value) {
+        return hasText(value) ? value.trim().toLowerCase(Locale.ROOT) : value;
     }
 }

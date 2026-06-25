@@ -3,6 +3,7 @@ package vdt.se.demo.adapter.out.elasticsearch.query;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.JsonNode;
 import vdt.se.demo.domain.model.ExecutionResult;
+import vdt.se.demo.domain.model.SearchWarning;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -13,11 +14,30 @@ import java.util.Map;
 public class ElasticsearchSearchResponseMapper {
 
     public ExecutionResult map(JsonNode response) {
-        return new ExecutionResult(
-                extractRows(response),
-                extractAggregations(response),
-                extractTotalCount(response)
-        );
+        return ExecutionResult.builder()
+                .results(extractRows(response))
+                .aggregations(extractAggregations(response))
+                .totalCount(extractTotalCount(response))
+                .warnings(extractWarnings(response))
+                .build();
+    }
+
+    private List<SearchWarning> extractWarnings(JsonNode response) {
+        List<SearchWarning> warnings = new ArrayList<>();
+        if (response != null && response.path("timed_out").asBoolean(false)) {
+            warnings.add(SearchWarning.builder()
+                    .code("ELASTICSEARCH_TIMED_OUT")
+                    .message("Elasticsearch timed out; displayed data may be incomplete.")
+                    .build());
+        }
+        int failedShards = response == null ? 0 : response.path("_shards").path("failed").asInt(0);
+        if (failedShards > 0) {
+            warnings.add(SearchWarning.builder()
+                    .code("ELASTICSEARCH_SHARD_FAILURE")
+                    .message(failedShards + " Elasticsearch shard(s) failed; displayed data may be incomplete.")
+                    .build());
+        }
+        return warnings;
     }
 
     private List<Map<String, Object>> extractRows(JsonNode response) {

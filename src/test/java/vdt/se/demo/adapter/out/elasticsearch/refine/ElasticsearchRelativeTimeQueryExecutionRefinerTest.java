@@ -8,7 +8,7 @@ import vdt.se.demo.adapter.out.elasticsearch.dsl.ElasticsearchExplicitFilterBuil
 import vdt.se.demo.adapter.out.elasticsearch.dsl.ElasticsearchExplicitFilterDslEditor;
 import vdt.se.demo.application.dto.QueryExecution;
 import vdt.se.demo.application.dto.SearchRequest;
-import vdt.se.demo.application.port.outboundPort.QueryExecutorPort;
+import vdt.se.demo.application.port.outboundPort.execution.QueryExecutorPort;
 import vdt.se.demo.domain.model.ExecutionResult;
 import vdt.se.demo.domain.service.RelativeTimeWindowParser;
 
@@ -27,10 +27,11 @@ class ElasticsearchRelativeTimeQueryExecutionRefinerTest {
         RelativeWindowExecutor executor = new RelativeWindowExecutor();
         ElasticsearchRelativeTimeQueryExecutionRefiner refiner =
                 refiner(executor);
-        SearchRequest request = new SearchRequest();
-        request.setQuestion("Statistics on the number of login failed in the last 7 days");
+        SearchRequest request = SearchRequest.builder()
+                .question("Statistics on the number of login failed in the last 7 days")
+                .build();
 
-        QueryExecution refined = refiner.refine(request, relativeWindowDsl(), new ExecutionResult(List.of(), List.of(), 0));
+        QueryExecution refined = refiner.refine(request, relativeWindowDsl(), executionResult(List.of(), List.of(), 0));
 
         assertThat(refined.executionResult().totalCount()).isEqualTo(1);
         assertThat(refined.generatedDsl().toString()).contains("2030-06-17T21:15:05Z");
@@ -43,10 +44,11 @@ class ElasticsearchRelativeTimeQueryExecutionRefinerTest {
         RelativeWindowExecutor executor = new RelativeWindowExecutor();
         ElasticsearchRelativeTimeQueryExecutionRefiner refiner =
                 refiner(executor);
-        SearchRequest request = new SearchRequest();
-        request.setQuestion("Failed login in last 24h");
+        SearchRequest request = SearchRequest.builder()
+                .question("Failed login in last 24h")
+                .build();
 
-        QueryExecution refined = refiner.refine(request, relativeWindowDsl(), new ExecutionResult(List.of(), List.of(), 0));
+        QueryExecution refined = refiner.refine(request, relativeWindowDsl(), executionResult(List.of(), List.of(), 0));
 
         assertThat(refined.executionResult().totalCount()).isEqualTo(1);
         assertThat(refined.generatedDsl().toString()).contains("2030-06-23T21:15:05Z");
@@ -59,11 +61,12 @@ class ElasticsearchRelativeTimeQueryExecutionRefinerTest {
         RelativeWindowExecutor executor = new RelativeWindowExecutor();
         ElasticsearchRelativeTimeQueryExecutionRefiner refiner =
                 refiner(executor);
-        SearchRequest request = new SearchRequest();
-        request.setQuestion("Statistics on the number of login failed in the last 7 days");
-        request.setFrom("2026-06-08T00:00:00Z");
-        request.setTo("2026-06-15T00:00:00Z");
-        ExecutionResult emptyResult = new ExecutionResult(List.of(), List.of(), 0);
+        SearchRequest request = SearchRequest.builder()
+                .question("Statistics on the number of login failed in the last 7 days")
+                .from("2026-06-08T00:00:00Z")
+                .to("2026-06-15T00:00:00Z")
+                .build();
+        ExecutionResult emptyResult = executionResult(List.of(), List.of(), 0);
         JsonNode originalDsl = relativeWindowDsl();
 
         QueryExecution refined = refiner.refine(request, originalDsl, emptyResult);
@@ -81,15 +84,16 @@ class ElasticsearchRelativeTimeQueryExecutionRefinerTest {
     void appliesExplicitApiFiltersBeforeReturningExecution() throws Exception {
         RelativeWindowExecutor executor = new RelativeWindowExecutor();
         ElasticsearchRelativeTimeQueryExecutionRefiner refiner = refiner(executor);
-        SearchRequest request = new SearchRequest();
-        request.setQuestion("show events");
-        request.setFrom("2026-06-01T00:00:00Z");
-        request.setTo("2026-06-15T00:00:00Z");
-        request.setSeverity("high");
-        request.setEventType("auth");
-        request.setUser("alice");
-        request.setHost("host-1");
-        request.setIp("10.0.0.1");
+        SearchRequest request = SearchRequest.builder()
+                .question("show events")
+                .from("2026-06-01T00:00:00Z")
+                .to("2026-06-15T00:00:00Z")
+                .severity("High")
+                .eventType("AUTH")
+                .user("alice")
+                .host("host-1")
+                .ip("10.0.0.1")
+                .build();
         JsonNode generatedDsl = objectMapper.readTree("""
                 {
                   "query": {"match_all": {}},
@@ -98,12 +102,14 @@ class ElasticsearchRelativeTimeQueryExecutionRefinerTest {
                 """);
 
         QueryExecution refined = refiner.refine(request, generatedDsl,
-                new ExecutionResult(List.of(Map.of("unfiltered", true)), List.of(), 100));
+                executionResult(List.of(Map.of("unfiltered", true)), List.of(), 100));
 
         String dsl = refined.generatedDsl().toString();
         assertThat(refined.executionResult().totalCount()).isEqualTo(7);
         assertThat(dsl).contains("\"term\":{\"severity\":\"high\"}");
+        assertThat(dsl).doesNotContain("\"severity\":\"High\"");
         assertThat(dsl).contains("\"term\":{\"event_type\":\"auth\"}");
+        assertThat(dsl).doesNotContain("\"event_type\":\"AUTH\"");
         assertThat(dsl).contains("\"term\":{\"user\":\"alice\"}");
         assertThat(dsl).contains("\"term\":{\"host\":\"host-1\"}");
         assertThat(dsl).contains("\"term\":{\"ip\":\"10.0.0.1\"}");
@@ -141,6 +147,16 @@ class ElasticsearchRelativeTimeQueryExecutionRefinerTest {
         );
     }
 
+    private static ExecutionResult executionResult(List<Map<String, Object>> results,
+                                                   List<Map<String, Object>> aggregations,
+                                                   int totalCount) {
+        return ExecutionResult.builder()
+                .results(results)
+                .aggregations(aggregations)
+                .totalCount(totalCount)
+                .build();
+    }
+
     private static class RelativeWindowExecutor implements QueryExecutorPort {
         private final List<JsonNode> executedDsl = new ArrayList<>();
 
@@ -148,7 +164,7 @@ class ElasticsearchRelativeTimeQueryExecutionRefinerTest {
         public ExecutionResult execute(JsonNode generatedDsl) {
             executedDsl.add(generatedDsl);
             if (generatedDsl.has("aggs")) {
-                return new ExecutionResult(List.of(), List.of(Map.of(
+                return executionResult(List.of(), List.of(Map.of(
                         "aggregation", "latest_timestamp",
                         "value", 1.908566105E12,
                         "value_as_string", "2030-06-24T21:15:05Z"
@@ -156,12 +172,12 @@ class ElasticsearchRelativeTimeQueryExecutionRefinerTest {
             }
             String dsl = generatedDsl.toString();
             if (dsl.contains("2030-06-17T21:15:05Z") || dsl.contains("2030-06-23T21:15:05Z")) {
-                return new ExecutionResult(List.of(Map.of("user", "alice")), List.of(), 1);
+                return executionResult(List.of(Map.of("user", "alice")), List.of(), 1);
             }
             if (dsl.contains("2026-06-01T00:00:00Z") && dsl.contains("10.0.0.1")) {
-                return new ExecutionResult(List.of(Map.of("user", "alice")), List.of(), 7);
+                return executionResult(List.of(Map.of("user", "alice")), List.of(), 7);
             }
-            return new ExecutionResult(List.of(), List.of(), 0);
+            return executionResult(List.of(), List.of(), 0);
         }
     }
 }

@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vdt.se.demo.adapter.in.rest.dto.QueryHistoryResponse;
 import vdt.se.demo.adapter.in.rest.dto.SearchResponse;
+import vdt.se.demo.adapter.in.rest.dto.SummaryResponse;
+import vdt.se.demo.application.dto.ConfirmSearchRequest;
 import vdt.se.demo.application.dto.SearchRequest;
 import vdt.se.demo.application.port.inboundPort.QueryUseCase;
 
@@ -22,7 +24,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/search")
 public class QueryController {
-
     private final QueryUseCase queryUseCase;
 
     public QueryController(QueryUseCase queryUseCase) {
@@ -34,14 +35,25 @@ public class QueryController {
         return SearchResponse.from(queryUseCase.search(request));
     }
 
+    @PostMapping("/confirm")
+    public SearchResponse confirm(@Valid @RequestBody ConfirmSearchRequest request) {
+        return SearchResponse.from(queryUseCase.confirm(request));
+    }
+
     @GetMapping("/history")
     public List<QueryHistoryResponse> history(
             @RequestParam(defaultValue = "soc-analyst-demo") String userId,
+            @RequestParam(required = false) String sessionId,
             @RequestParam(defaultValue = "20") int limit
     ) {
-        return queryUseCase.history(userId, limit).stream()
+        return queryUseCase.history(userId, sessionId, limit).stream()
                 .map(QueryHistoryResponse::from)
                 .toList();
+    }
+
+    @GetMapping("/{queryId}/summary")
+    public SummaryResponse summary(@PathVariable UUID queryId) {
+        return SummaryResponse.from(queryUseCase.summary(queryId));
     }
 
     @GetMapping("/{queryId}/export.csv")

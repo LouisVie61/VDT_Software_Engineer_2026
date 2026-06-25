@@ -11,6 +11,7 @@ public class AppProperties {
     private final Elasticsearch elasticsearch = new Elasticsearch();
     private final Ingest ingest = new Ingest();
     private final Llm llm = new Llm();
+    private final Search search = new Search();
 
     public User getUser() {
         return user;
@@ -26,6 +27,10 @@ public class AppProperties {
 
     public Llm getLlm() {
         return llm;
+    }
+
+    public Search getSearch() {
+        return search;
     }
 
     public static class User {
@@ -110,6 +115,9 @@ public class AppProperties {
 
     public static class Llm {
         private String providerOrder = "GEMINI,GROQ";
+        private boolean summaryEnabled = false;
+        private int connectTimeoutSeconds = 2;
+        private int readTimeoutSeconds = 20;
         private final Gemini gemini = new Gemini();
         private final Groq groq = new Groq();
 
@@ -119,6 +127,30 @@ public class AppProperties {
 
         public void setProviderOrder(String providerOrder) {
             this.providerOrder = providerOrder;
+        }
+
+        public boolean isSummaryEnabled() {
+            return summaryEnabled;
+        }
+
+        public void setSummaryEnabled(boolean summaryEnabled) {
+            this.summaryEnabled = summaryEnabled;
+        }
+
+        public int getConnectTimeoutSeconds() {
+            return connectTimeoutSeconds;
+        }
+
+        public void setConnectTimeoutSeconds(int connectTimeoutSeconds) {
+            this.connectTimeoutSeconds = connectTimeoutSeconds;
+        }
+
+        public int getReadTimeoutSeconds() {
+            return readTimeoutSeconds;
+        }
+
+        public void setReadTimeoutSeconds(int readTimeoutSeconds) {
+            this.readTimeoutSeconds = readTimeoutSeconds;
         }
 
         public Gemini getGemini() {
@@ -178,6 +210,36 @@ public class AppProperties {
 
         public void setBaseUrl(String baseUrl) {
             this.baseUrl = baseUrl;
+        }
+    }
+
+    public static class Search {
+        private String schemaVersion = "v4";
+        private int confirmationTtlSeconds = 900;
+        private int cacheTtlSeconds = 3600;
+
+        public String getSchemaVersion() {
+            return schemaVersion;
+        }
+
+        public void setSchemaVersion(String schemaVersion) {
+            this.schemaVersion = schemaVersion;
+        }
+
+        public int getConfirmationTtlSeconds() {
+            return confirmationTtlSeconds;
+        }
+
+        public void setConfirmationTtlSeconds(int confirmationTtlSeconds) {
+            this.confirmationTtlSeconds = confirmationTtlSeconds;
+        }
+
+        public int getCacheTtlSeconds() {
+            return cacheTtlSeconds;
+        }
+
+        public void setCacheTtlSeconds(int cacheTtlSeconds) {
+            this.cacheTtlSeconds = cacheTtlSeconds;
         }
     }
 }

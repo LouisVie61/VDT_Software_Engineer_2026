@@ -6,8 +6,8 @@ import vdt.se.demo.adapter.out.elasticsearch.dsl.ElasticsearchDslTimeRangeEditor
 import vdt.se.demo.adapter.out.elasticsearch.dsl.ElasticsearchExplicitFilterDslEditor;
 import vdt.se.demo.application.dto.QueryExecution;
 import vdt.se.demo.application.dto.SearchRequest;
-import vdt.se.demo.application.port.outboundPort.QueryExecutionRefiner;
-import vdt.se.demo.application.port.outboundPort.QueryExecutorPort;
+import vdt.se.demo.application.port.outboundPort.execution.QueryExecutionRefiner;
+import vdt.se.demo.application.port.outboundPort.execution.QueryExecutorPort;
 import vdt.se.demo.domain.model.ExecutionResult;
 import vdt.se.demo.domain.service.RelativeTimeWindowParser;
 import vdt.se.demo.domain.valueObjects.RelativeTimeWindow;
