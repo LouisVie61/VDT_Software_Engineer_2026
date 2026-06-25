@@ -84,7 +84,7 @@ public class SearchExecutionService {
                 .chartType(chartType)
                 .page(request.getPage())
                 .pageSize(request.getPageSize())
-                .summaryStatus(executionResult.aggregations().isEmpty() ? SummaryStatus.NOT_REQUIRED : SummaryStatus.PENDING)
+                .summaryStatus(hasSummaryPayload(executionResult) ? SummaryStatus.PENDING : SummaryStatus.NOT_REQUIRED)
                 .overrideIntent(plan.overrideIntent())
                 .overrideReason(plan.overrideReason())
                 .confidenceScores(plan.confidenceScores())
@@ -102,7 +102,10 @@ public class SearchExecutionService {
                 queryId, stage, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt));
     }
 
+    private boolean hasSummaryPayload(ExecutionResult executionResult) {
+        return !executionResult.results().isEmpty() || !executionResult.aggregations().isEmpty();
+    }
+
     public record ExecutedSearch(QueryResult result, JsonNode dsl, ExecutionResult executionResult) {
     }
 }
-

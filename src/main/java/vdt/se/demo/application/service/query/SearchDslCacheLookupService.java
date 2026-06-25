@@ -12,7 +12,6 @@ import vdt.se.demo.domain.model.QueryResult;
 import vdt.se.demo.domain.valueObjects.SummaryStatus;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,15 +23,17 @@ public class SearchDslCacheLookupService {
     private final QueryResultPersistenceService persistenceService;
     private final QueryAuditService auditService;
     private final ObjectMapper objectMapper;
+    private final QuerySummaryService summaryService;
 
     public SearchDslCacheLookupService(DslCachePort dslCachePort, SearchExecutionService searchExecutionService,
                                        QueryResultPersistenceService persistenceService, QueryAuditService auditService,
-                                       ObjectMapper objectMapper) {
+                                       ObjectMapper objectMapper, QuerySummaryService summaryService) {
         this.dslCachePort = dslCachePort;
         this.searchExecutionService = searchExecutionService;
         this.persistenceService = persistenceService;
         this.auditService = auditService;
         this.objectMapper = objectMapper;
+        this.summaryService = summaryService;
     }
 
     public Optional<QueryResult> executeCached(UUID queryId, SearchRequest request,
@@ -52,12 +53,15 @@ public class SearchDslCacheLookupService {
         SearchExecutionService.ExecutedSearch executed = searchExecutionService.executeDsl(queryId, request, dsl, cachedPlan);
         QueryResult result = executed.result();
         result.setCacheHit(true);
-        result.setSummaryStatus(result.getAggregations() instanceof List<?> list && !list.isEmpty()
-                ? SummaryStatus.PENDING
-                : SummaryStatus.NOT_REQUIRED);
+        result.setSummaryStatus(hasSummaryPayload(executed) ? SummaryStatus.PENDING : SummaryStatus.NOT_REQUIRED);
+        summaryService.schedule(queryId, request, executed.dsl(), executed.executionResult(), result.getChartType());
         persistenceService.save(queryId, request, result, cachedDsl.get());
         auditService.success(queryId, request, cachedDsl.get(), result.getTotalCount(), started, cachedPlan, true);
         return Optional.of(result);
+    }
+
+    private boolean hasSummaryPayload(SearchExecutionService.ExecutedSearch executed) {
+        return !executed.executionResult().results().isEmpty() || !executed.executionResult().aggregations().isEmpty();
     }
 
     private CanonicalQueryPlan cachedPlan(CanonicalQueryPlan plan) {

@@ -30,7 +30,7 @@ public class QuerySummaryService {
 
     public void schedule(UUID queryId, SearchRequest request, JsonNode generatedDsl, ExecutionResult executionResult,
                          ChartType chartType) {
-        if (executionResult.aggregations().isEmpty()) {
+        if (!hasSummaryPayload(executionResult)) {
             results.put(queryId, SummaryResult.builder()
                     .status(SummaryStatus.NOT_REQUIRED)
                     .summary("")
@@ -60,6 +60,10 @@ public class QuerySummaryService {
                         .build());
             }
         }, summaryTaskExecutor);
+    }
+
+    private boolean hasSummaryPayload(ExecutionResult executionResult) {
+        return !executionResult.results().isEmpty() || !executionResult.aggregations().isEmpty();
     }
 
     public SummaryResult find(UUID queryId) {
