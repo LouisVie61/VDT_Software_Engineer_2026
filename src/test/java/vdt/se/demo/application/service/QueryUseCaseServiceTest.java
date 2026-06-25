@@ -151,7 +151,7 @@ class QueryUseCaseServiceTest {
         QuerySearchWorkflow searchWorkflow = new QuerySearchWorkflow(
                 cacheContextService,
                 planPreparationService,
-                new SearchDslCacheLookupService(dslCache, executionService, persistenceService, auditService, objectMapper),
+                new SearchDslCacheLookupService(dslCache, executionService, persistenceService, auditService, objectMapper, summaryService),
                 new PendingConfirmationResultFactory(intentCache, objectMapper),
                 finalizedSearchService,
                 auditService

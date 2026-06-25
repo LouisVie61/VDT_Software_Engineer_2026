@@ -185,6 +185,69 @@ class SearchEndToEndIntegrationTest {
         assertThat(queryExecutor.executedDsl).isEmpty();
     }
 
+    @Test
+    void confirmationPreservesExplicitRequestFiltersInExecutedDsl() throws Exception {
+        queryExecutor.executedDsl.clear();
+        String payload = """
+                {
+                  "question": "Search ip duoc nhieu nhat nam 2021",
+                  "page": 0,
+                  "pageSize": 50,
+                  "from": "2026-06-01T00:00:00Z",
+                  "to": "2026-06-15T00:00:00Z",
+                  "severity": "high",
+                  "eventType": "auth",
+                  "user": "alice",
+                  "host": "host-1",
+                  "ip": "10.0.0.1"
+                }
+                """;
+
+        MvcResult pending = mockMvc.perform(post("/api/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.needsConfirmation").value(true))
+                .andExpect(jsonPath("$.confirmation.requestFilters.severity").value("high"))
+                .andExpect(jsonPath("$.confirmation.requestFilters.eventType").value("auth"))
+                .andReturn();
+
+        String confirmationId = objectMapper.readTree(pending.getResponse().getContentAsString())
+                .path("confirmation")
+                .path("confirmationId")
+                .asString();
+
+        String confirmPayload = """
+                {
+                  "confirmationId": "%s",
+                  "page": 0,
+                  "pageSize": 50,
+                  "editedIntent": {
+                    "intent": "TERMS_AGGREGATION",
+                    "groupBy": "ip",
+                    "metric": "COUNT",
+                    "topN": 10
+                  }
+                }
+                """.formatted(confirmationId);
+
+        mockMvc.perform(post("/api/search/confirm")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(confirmPayload))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.needsConfirmation").value(false));
+
+        assertThat(queryExecutor.executedDsl).hasSize(1);
+        assertThat(queryExecutor.executedDsl.getFirst().toString())
+                .contains("\"severity\":\"high\"")
+                .contains("\"event_type\":\"auth\"")
+                .contains("\"user\":\"alice\"")
+                .contains("\"host\":\"host-1\"")
+                .contains("\"ip\":\"10.0.0.1\"")
+                .contains("\"gte\":\"2026-06-01T00:00:00Z\"")
+                .contains("\"lte\":\"2026-06-15T00:00:00Z\"");
+    }
+
     @TestConfiguration
     static class TestPorts {
 
