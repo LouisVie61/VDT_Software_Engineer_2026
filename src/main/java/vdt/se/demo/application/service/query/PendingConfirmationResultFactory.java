@@ -13,7 +13,9 @@ import vdt.se.demo.domain.valueObjects.ChartType;
 import vdt.se.demo.domain.valueObjects.SummaryStatus;
 
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class PendingConfirmationResultFactory {
@@ -37,6 +39,13 @@ public class PendingConfirmationResultFactory {
                 .schemaVersion(cache.schemaVersion())
                 .sessionId(cache.sessionId())
                 .question(request.getQuestion())
+                .from(request.getFrom())
+                .to(request.getTo())
+                .severity(request.getSeverity())
+                .eventType(request.getEventType())
+                .user(request.getUser())
+                .host(request.getHost())
+                .ip(request.getIp())
                 .intent(plan.mergedIntent())
                 .templateSelection(plan.templateSelection())
                 .createdAt(Instant.now())
@@ -49,6 +58,7 @@ public class PendingConfirmationResultFactory {
                 .intent(plan.mergedIntent())
                 .templateSelection(plan.templateSelection())
                 .warnings(plan.warnings())
+                .requestFilters(requestFilters(request))
                 .build());
         result.setWarnings(plan.warnings());
         result.setSelectedTemplate(plan.templateSelection().type().name());
@@ -73,5 +83,23 @@ public class PendingConfirmationResultFactory {
                 .confidenceScores(plan.confidenceScores())
                 .canonicalPlanId(queryId)
                 .build();
+    }
+
+    private Map<String, String> requestFilters(SearchRequest request) {
+        Map<String, String> filters = new LinkedHashMap<>();
+        put(filters, "from", request.getFrom());
+        put(filters, "to", request.getTo());
+        put(filters, "severity", request.getSeverity());
+        put(filters, "eventType", request.getEventType());
+        put(filters, "user", request.getUser());
+        put(filters, "host", request.getHost());
+        put(filters, "ip", request.getIp());
+        return filters;
+    }
+
+    private void put(Map<String, String> filters, String field, String value) {
+        if (value != null && !value.isBlank()) {
+            filters.put(field, value.trim());
+        }
     }
 }

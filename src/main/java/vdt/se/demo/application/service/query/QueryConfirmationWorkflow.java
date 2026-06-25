@@ -119,6 +119,13 @@ public class QueryConfirmationWorkflow {
                 .sessionId(pending.sessionId())
                 .page(request.getPage())
                 .pageSize(request.getPageSize())
+                .from(pending.from())
+                .to(pending.to())
+                .severity(pending.severity())
+                .eventType(pending.eventType())
+                .user(pending.user())
+                .host(pending.host())
+                .ip(pending.ip())
                 .build();
     }
 

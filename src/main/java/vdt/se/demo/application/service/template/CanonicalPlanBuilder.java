@@ -155,7 +155,7 @@ public class CanonicalPlanBuilder {
     }
 
     private int boundedSize(Integer topN) {
-        return topN == null ? DEFAULT_GROUPING_SIZE : Math.max(1, Math.min(topN, 100));
+        return topN == null || topN < 1 ? DEFAULT_GROUPING_SIZE : Math.min(topN, 100);
     }
 
     private Map<String, Double> confidenceScores(SearchIntent intent) {

@@ -68,10 +68,10 @@ public class TemplateSelectionService {
     }
 
     private int boundedSize(Integer topN) {
-        if (topN == null) {
+        if (topN == null || topN < 1) {
             return DEFAULT_GROUPING_SIZE;
         }
-        return Math.max(1, Math.min(topN, 100));
+        return Math.min(topN, 100);
     }
 
     private String normalize(String value) {
