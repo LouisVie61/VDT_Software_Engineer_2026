@@ -7,21 +7,20 @@ import vdt.se.demo.application.port.inboundPort.EventIngestUseCase;
 import vdt.se.demo.application.port.outboundPort.ingest.EventSpoolPort;
 import vdt.se.demo.domain.exception.BadQueryException;
 import vdt.se.demo.domain.model.IngestResult;
+import vdt.se.demo.domain.model.SocEventSchema;
 import vdt.se.demo.domain.valueObjects.EventFileFormat;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
 public class EventIngestService implements EventIngestUseCase {
 
     private static final Logger log = LoggerFactory.getLogger(EventIngestService.class);
-    private static final String CANONICAL_CSV_HEADER = String.join(",",
-            List.of("timestamp", "source", "severity", "event_type", "user", "host", "ip", "message", "raw"));
+    private static final String CANONICAL_CSV_HEADER = SocEventSchema.canonicalCsvHeader();
 
     private final EventSpoolPort eventSpoolPort;
 

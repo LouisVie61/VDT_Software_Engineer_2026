@@ -115,7 +115,7 @@ public class AppProperties {
 
     public static class Llm {
         private String providerOrder = "GEMINI,GROQ";
-        private boolean summaryEnabled = false;
+        private boolean summaryEnabled = true;
         private int connectTimeoutSeconds = 2;
         private int readTimeoutSeconds = 20;
         private final Gemini gemini = new Gemini();
@@ -214,7 +214,7 @@ public class AppProperties {
     }
 
     public static class Search {
-        private String schemaVersion = "v4";
+        private String schemaVersion = "v5";
         private int confirmationTtlSeconds = 900;
         private int cacheTtlSeconds = 3600;
 

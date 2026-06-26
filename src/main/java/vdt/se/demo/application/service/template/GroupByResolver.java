@@ -1,5 +1,7 @@
 package vdt.se.demo.application.service.template;
 
+import vdt.se.demo.domain.model.SocEventSchema;
+
 import java.text.Normalizer;
 import java.util.List;
 import java.util.Locale;
@@ -9,9 +11,17 @@ public class GroupByResolver {
     public Optional<String> resolve(String query) {
         String text = normalizeAscii(query);
         if (containsAny(text, "event type", "event_type", "loai event")) {
-            return Optional.of("event_type");
+            return Optional.of(SocEventSchema.EVENT_TYPE);
         }
-        for (String field : List.of("ip", "user", "host", "action", "source", "severity")) {
+        if (containsAny(query, "location", "locations", "city", "country", "province", "region", "địa điểm", "vị trí")) {
+            return Optional.of(SocEventSchema.GEO_LOCATION);
+        }
+        if (containsAny(text, "user agent", "user_agent", "browser", "trinh duyet")) {
+            return Optional.of(SocEventSchema.USER_AGENT);
+        }
+        for (String field : List.of(
+                SocEventSchema.IP, SocEventSchema.USER, SocEventSchema.HOST,
+                SocEventSchema.ACTION, SocEventSchema.SOURCE, SocEventSchema.SEVERITY)) {
             if (containsAny(text, field)) {
                 return Optional.of(field);
             }

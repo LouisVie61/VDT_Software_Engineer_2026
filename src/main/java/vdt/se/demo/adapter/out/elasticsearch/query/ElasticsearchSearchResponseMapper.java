@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import tools.jackson.databind.JsonNode;
 import vdt.se.demo.domain.model.ExecutionResult;
 import vdt.se.demo.domain.model.SearchWarning;
+import vdt.se.demo.domain.model.SocEventSchema;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -57,15 +58,9 @@ public class ElasticsearchSearchResponseMapper {
         JsonNode source = hit == null ? null : hit.get("_source");
         Map<String, Object> row = new LinkedHashMap<>();
         row.put("id", text(source, "id", text(hit, "_id", null)));
-        row.put("timestamp", text(source, "timestamp", null));
-        row.put("source", text(source, "source", null));
-        row.put("severity", text(source, "severity", null));
-        row.put("event_type", text(source, "event_type", null));
-        row.put("user", text(source, "user", null));
-        row.put("host", text(source, "host", null));
-        row.put("ip", text(source, "ip", null));
-        row.put("message", text(source, "message", null));
-        row.put("raw", text(source, "raw", null));
+        for (String field : SocEventSchema.RESPONSE_FIELDS) {
+            row.put(field, text(source, field, null));
+        }
         return row;
     }
 
