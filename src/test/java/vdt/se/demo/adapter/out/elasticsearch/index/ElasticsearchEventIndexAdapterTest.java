@@ -20,7 +20,6 @@ import static org.mockito.Mockito.verify;
 class ElasticsearchEventIndexAdapterTest {
 
     @Test
-    @SuppressWarnings({"rawtypes", "unchecked"})
     void writesBatchToConfiguredIndex() {
         ElasticsearchOperations operations = mock(ElasticsearchOperations.class);
         AppProperties properties = new AppProperties();
@@ -38,7 +37,7 @@ class ElasticsearchEventIndexAdapterTest {
         adapter.indexBatch(List.of(event));
 
         ArgumentCaptor<IndexCoordinates> coordinates = ArgumentCaptor.forClass(IndexCoordinates.class);
-        verify(operations).save(any(Iterable.class), coordinates.capture());
+        verify(operations).save(any(SocEventDocument.class), coordinates.capture());
         assertThat(coordinates.getValue().getIndexName()).isEqualTo("custom-events");
     }
 }

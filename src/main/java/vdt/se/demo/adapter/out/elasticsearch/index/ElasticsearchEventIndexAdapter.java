@@ -37,7 +37,8 @@ public class ElasticsearchEventIndexAdapter implements EventIndexPort {
     @Override
     public void indexBatch(List<SocEvent> events) {
         List<SocEventDocument> documents = events.stream().map(documentMapper::toDocument).toList();
-        operations.save(documents, IndexCoordinates.of(indexName()));
+        IndexCoordinates index = IndexCoordinates.of(indexName());
+        documents.forEach(document -> operations.save(document, index));
     }
 
     @Override
