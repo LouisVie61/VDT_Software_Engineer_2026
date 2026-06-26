@@ -1,6 +1,8 @@
 # Annotation Guideline
 
-Moi dong trong file `cases/*.jsonl` la mot JSON object doc lap.
+Moi dong trong file `cases/**/*.jsonl` la mot JSON object doc lap.
+
+Nhom `cases/ablation/` dung rieng cho black-box comparison giua hai phien ban backend. Cac nhom con lai, nhu `workflow/` va `regression/`, dung cho benchmark/test mot version backend binh thuong.
 
 ## Schema
 
@@ -131,7 +133,7 @@ Dung `TOP_N_REQUIRED` khi cau hoi co group field ro rang nhung thieu lua chon bu
 - "count events by source".
 - "group by severity".
 - "statistics by host" neu khong noi top bao nhieu.
-- `topN=0` la mot gia tri hop le voi nghia "khong ap Top N cu the tu user"; khi execute, backend duoc dung cap ky thuat mac dinh cho `terms.size` de tranh query bucket vo han.
+- `topN=0` la mot gia tri hop le voi nghia "khong ap Top N cu the tu user"; khi execute, backend duoc dung cap ky thuat mac dinh `10` cho `terms.size` de tranh query bucket vo han.
 - Khong duoc dien giai `topN=0` thanh `terms.size=1`.
 
 Expectation nen co:

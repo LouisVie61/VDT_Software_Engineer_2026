@@ -26,7 +26,7 @@ class EvaluationCase:
 def load_cases(paths: list[Path]) -> list[EvaluationCase]:
     cases: list[EvaluationCase] = []
     for path in paths:
-        with path.open("r", encoding="utf-8") as handle:
+        with path.open("r", encoding="utf-8-sig") as handle:
             for line_number, line in enumerate(handle, start=1):
                 stripped = line.strip()
                 if not stripped:

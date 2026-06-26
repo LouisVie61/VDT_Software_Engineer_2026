@@ -12,11 +12,11 @@ from metrics import format_ms, format_rate, summarize_runs
 
 
 DEFAULT_CASES = [
-    Path("evaluation/cases/soc_nl2plan_v1.jsonl"),
-    Path("evaluation/cases/temporal_cases.jsonl"),
-    Path("evaluation/cases/residual_cases.jsonl"),
-    Path("evaluation/cases/ambiguity_cases.jsonl"),
-    Path("evaluation/cases/llm_language_cases.jsonl"),
+    Path("evaluation/cases/workflow/soc_nl2plan_v1.jsonl"),
+    Path("evaluation/cases/workflow/ambiguity_cases.jsonl"),
+    Path("evaluation/cases/workflow/llm_language_cases.jsonl"),
+    Path("evaluation/cases/workflow/temporal_cases.jsonl"),
+    Path("evaluation/cases/regression/residual_cases.jsonl"),
 ]
 
 
