@@ -36,16 +36,16 @@ app:
       max-requests: ${APP_INGEST_RATE_LIMIT_MAX_REQUESTS:10}
       window-seconds: ${APP_INGEST_RATE_LIMIT_WINDOW_SECONDS:60}
   llm:
-    summary-enabled: ${APP_LLM_SUMMARY_ENABLED:false}
+    summary-enabled: ${APP_LLM_SUMMARY_ENABLED:true}
     provider-order: ${APP_LLM_PROVIDER_ORDER:GEMINI,GROQ}
     gemini:
       model: ${GEMINI_MODEL:gemini-2.5-flash}
-      api-key: ${GEMINI_API_KEY:}
+      api-key: ${GEMINI_API_KEY:${GOOGLE_API_KEY:}}
     groq:
       model: ${GROQ_MODEL:llama-3.3-70b-versatile}
       api-key: ${GROQ_API_KEY:}
       base-url: ${GROQ_BASE_URL:https://api.groq.com/openai/v1/chat/completions}
   search:
-    schema-version: ${APP_SCHEMA_VERSION:v4}
+    schema-version: ${APP_SCHEMA_VERSION:v5}
     confirmation-ttl-seconds: ${APP_CONFIRMATION_TTL_SECONDS:900}
     cache-ttl-seconds: ${APP_QUERY_CACHE_TTL_SECONDS:3600}
