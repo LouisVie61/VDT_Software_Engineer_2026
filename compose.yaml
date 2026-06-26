@@ -1,5 +1,8 @@
+name: b-llm-only
+
 services:
   elasticsearch:
+    container_name: b-llm-only-elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:9.2.8
     environment:
       - discovery.type=single-node
@@ -16,6 +19,7 @@ services:
       - elasticsearch-data-v9:/usr/share/elasticsearch/data
 
   postgres:
+    container_name: b-llm-only-postgres
     image: postgres:16
     environment:
       - POSTGRES_DB=demo_db
@@ -32,11 +36,12 @@ services:
       - postgres-data:/var/lib/postgresql/data
 
   spring-boot-app:
+    container_name: b-llm-only-spring-boot-app
     build: .
     ports:
       - "8080:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_PROFILES_ACTIVE=postgres
       - POSTGRES_URL=jdbc:postgresql://postgres:5432/demo_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
@@ -50,6 +55,7 @@ services:
         condition: service_healthy
 
 volumes:
-  elasticsearch-data:
   elasticsearch-data-v9:
+    name: b-llm-only-elasticsearch-data-v9
   postgres-data:
+    name: b-llm-only-postgres-data
