@@ -18,6 +18,7 @@ class IntentResponseParserTest {
                   "intent": "SIMPLE_SEARCH",
                   "textQuery": "failed",
                   "filters": {"event_type": "auth"},
+                  "recurringTime": {"mode": "EVERY_YEAR", "month": 7},
                   "semanticSpans": [
                     {"kind": "TEMPORAL", "status": "RESOLVED", "text": "2025", "canonical": "year_2025", "start": 10, "end": 14},
                     {"kind": "FILTER", "status": "AMBIGUOUS", "text": "attack"}
@@ -31,5 +32,7 @@ class IntentResponseParserTest {
         assertThat(intent.getSemanticSpans().getFirst().status()).isEqualTo(SemanticSpan.Status.RESOLVED);
         assertThat(intent.getSemanticSpans().getFirst().canonical()).isEqualTo("year_2025");
         assertThat(intent.getSemanticSpans().get(1).status()).isEqualTo(SemanticSpan.Status.AMBIGUOUS);
+        assertThat(intent.getRecurringTime().mode()).isEqualTo("EVERY_YEAR");
+        assertThat(intent.getRecurringTime().month()).isEqualTo(7);
     }
 }

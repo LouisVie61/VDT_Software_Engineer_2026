@@ -120,6 +120,36 @@ class SearchIntentNormalizerTest {
     }
 
     @Test
+    void canonicalizesLocationFilterAliasesToGeoLocation() {
+        SearchRequest request = SearchRequest.builder()
+                .question("show events at Vietnam")
+                .build();
+        SearchIntent llmIntent = SearchIntent.builder()
+                .filters(Map.of("country", " Vietnam "))
+                .build();
+
+        SearchIntent normalized = normalizer.normalize(request, llmIntent);
+
+        assertThat(normalized.getFilters())
+                .containsEntry("geo_location", "Vietnam")
+                .doesNotContainKeys("country", "location");
+    }
+
+    @Test
+    void normalizesMojibakeVietnamGeoLocationValue() {
+        SearchRequest request = SearchRequest.builder()
+                .question("show events tai Viet Nam")
+                .build();
+        SearchIntent llmIntent = SearchIntent.builder()
+                .filters(Map.of("geo_location", " Vi?t Nam "))
+                .build();
+
+        SearchIntent normalized = normalizer.normalize(request, llmIntent);
+
+        assertThat(normalized.getFilters()).containsEntry("geo_location", "Vietnam");
+    }
+
+    @Test
     void removesNonFilterableFieldsFromLlmOutput() {
         SearchRequest request = SearchRequest.builder()
                 .question("show message equals failed")
@@ -190,6 +220,58 @@ class SearchIntentNormalizerTest {
                 .anySatisfy(span -> {
                     assertThat(span.kind()).isEqualTo(SemanticSpan.Kind.TEMPORAL);
                     assertThat(span.status()).isEqualTo(SemanticSpan.Status.AMBIGUOUS);
+                });
+    }
+
+    @Test
+    void rotatesLlmConcreteYearIntoAnnualRecurringMonth() {
+        SearchRequest request = SearchRequest.builder()
+                .question("thong ke su kien trong thang 7 hang nam")
+                .build();
+        SearchIntent llmIntent = SearchIntent.builder()
+                .intent(TemplateType.TIME_AGGREGATION)
+                .timeFrom("2026-07-01T00:00:00Z")
+                .timeTo("2026-08-01T00:00:00Z")
+                .timeBucket("1d")
+                .build();
+
+        SearchIntent normalized = normalizer.normalize(request, llmIntent);
+
+        assertThat(normalized.getTimeFrom()).isNull();
+        assertThat(normalized.getTimeTo()).isNull();
+        assertThat(normalized.getTimeBucket()).isEqualTo("1h");
+        assertThat(normalized.getRecurringTime().mode()).isEqualTo("EVERY_YEAR");
+        assertThat(normalized.getRecurringTime().month()).isEqualTo(7);
+        assertThat(normalized.getSemanticSpans())
+                .anySatisfy(span -> {
+                    assertThat(span.kind()).isEqualTo(SemanticSpan.Kind.TEMPORAL);
+                    assertThat(span.status()).isEqualTo(SemanticSpan.Status.UNSUPPORTED);
+                    assertThat(span.canonical()).isEqualTo("annual_recurring_month:7");
+                });
+    }
+
+    @Test
+    void rotatesAnnualRecurringMonthFromLlmRangeWhenQuestionOmitsMonthNumber() {
+        SearchRequest request = SearchRequest.builder()
+                .question("show this pattern every year")
+                .build();
+        SearchIntent llmIntent = SearchIntent.builder()
+                .intent(TemplateType.TIME_AGGREGATION)
+                .timeFrom("2026-07-01T00:00:00Z")
+                .timeTo("2026-08-01T00:00:00Z")
+                .build();
+
+        SearchIntent normalized = normalizer.normalize(request, llmIntent);
+
+        assertThat(normalized.getTimeFrom()).isNull();
+        assertThat(normalized.getTimeTo()).isNull();
+        assertThat(normalized.getRecurringTime().mode()).isEqualTo("EVERY_YEAR");
+        assertThat(normalized.getRecurringTime().month()).isEqualTo(7);
+        assertThat(normalized.getSemanticSpans())
+                .anySatisfy(span -> {
+                    assertThat(span.kind()).isEqualTo(SemanticSpan.Kind.TEMPORAL);
+                    assertThat(span.status()).isEqualTo(SemanticSpan.Status.UNSUPPORTED);
+                    assertThat(span.canonical()).isEqualTo("annual_recurring_month:7");
                 });
     }
 }

@@ -2,6 +2,7 @@ package vdt.se.demo.adapter.out.llm;
 
 import org.springframework.stereotype.Component;
 import vdt.se.demo.application.dto.SearchRequest;
+import vdt.se.demo.domain.model.SocEventSchema;
 
 import java.time.Instant;
 import java.util.Set;
@@ -9,10 +10,7 @@ import java.util.Set;
 @Component
 public class LlmDslPromptBuilder {
 
-    public static final Set<String> FIELD_WHITELIST = Set.of(
-            "timestamp", "source", "severity", "event_type", "user", "host", "ip",
-            "message", "raw"
-    );
+    public static final Set<String> FIELD_WHITELIST = Set.copyOf(SocEventSchema.FIELD_WHITELIST);
 
     private static final String SYSTEM_CONTRACT = """
             You are a SOC analyst assistant. Convert the analyst's natural language question
@@ -28,7 +26,7 @@ public class LlmDslPromptBuilder {
 
     private static final String SCHEMA_CONTRACT = """
             Current datetime:
-            Now: %s (ISO 8601, UTC)
+            Now: %%s (ISO 8601, UTC)
             Use this to resolve all relative and calendar time expressions to absolute ISO 8601 timestamps.
             Never use relative strings in DSL.
             Quarter 1 = Jan 01 to Mar 31.
@@ -41,21 +39,22 @@ public class LlmDslPromptBuilder {
             "dau nam" = January 1 of current year to now.
 
             Allowed fields:
-            - timestamp: date, range filters and date_histogram only
-            - source: keyword
-            - severity: keyword
-            - event_type: keyword
-            - user: keyword
-            - host: keyword
-            - ip: ip
-            - message: text, free-text search only
-            - raw: not indexed, never query/filter/aggregate
+            %s
+            
+            Location mapping:
+            Vietnamese/English location prepositions such as:
+            tai /tại /ở /o /trên /tren /in /at
+            followed by a Province/City/Region/State/Country must map to geo_location.
+            
+            Never output these fields:
+            location /city /province /country /region/state
+            Use geo_location for all city/province/country/region/state/location meanings.
 
             Use bool.filter for exact filters and ranges.
-            Use simple_query_string on ["message"] only for unresolved free text.
+            Use simple_query_string on %s only for unresolved free text.
             Search DSL must include from, size, and timestamp desc sort.
             Aggregation DSL must set size=0 and use aggs.result.
-            Terms aggregation fields: source, severity, event_type, user, host, ip.
+            Terms aggregation fields: %s.
             Date histogram field: timestamp.
 
             Known field values:
@@ -72,7 +71,11 @@ public class LlmDslPromptBuilder {
             failed / failure / that bai / loi dang nhap maps to message free text when not a known event_type.
             statistics / thong ke / dem / count / top maps to aggregation.
             trend / xu huong / theo thoi gian / over time / per hour / per day maps to date_histogram.
-            """;
+            """.formatted(
+            SocEventPromptSchema.allowedFields(),
+            SocEventPromptSchema.fullTextFields(),
+            SocEventPromptSchema.groupableFields()
+    );
 
     public String build(SearchRequest request) {
         int page = Math.max(0, request.getPage());

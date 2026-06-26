@@ -52,7 +52,7 @@ public class SearchExecutionService {
         ExecutionResult executionResult = queryExecutorPort.execute(generatedDsl);
         long elapsedMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt);
         logStage(queryId, "elasticsearch.primary", startedAt);
-        log.info("[SEARCH_EXECUTION] Elasticsearch response: totalCount={}, resultsSize={}, agsSize={}, warningsCount={}, elapsedMs={}",
+        log.info("[SEARCH_EXECUTION] Elasticsearch response: totalCount={}, resultsSize={}, agsSize={}, esWarningsCount={}, elapsedMs={}",
                 executionResult.totalCount(), executionResult.results().size(), 
                 executionResult.aggregations().size(), executionResult.warnings().size(), elapsedMs);
         if (executionResult.totalCount() == 0) {
@@ -92,8 +92,8 @@ public class SearchExecutionService {
                 .build();
         result.setWarnings(warnings);
         result.setSelectedTemplate(plan.templateSelection().type().name());
-        log.info("[SEARCH_EXECUTION] Query completed: queryId={}, totalCount={}, chartType={}, hasWarnings={}",
-                queryId, result.getTotalCount(), chartType, !warnings.isEmpty());
+        log.info("[SEARCH_EXECUTION] Query completed: queryId={}, totalCount={}, chartType={}, warningsCount={}, hasWarnings={}",
+                queryId, result.getTotalCount(), chartType, warnings.size(), !warnings.isEmpty());
         return new ExecutedSearch(result, generatedDsl, executionResult);
     }
 

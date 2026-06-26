@@ -9,6 +9,7 @@ import vdt.se.demo.application.dto.SearchRequest;
 import vdt.se.demo.application.port.outboundPort.execution.SearchDslBuilderPort;
 import vdt.se.demo.domain.model.CanonicalQueryPlan;
 import vdt.se.demo.domain.model.SearchIntent;
+import vdt.se.demo.domain.model.SocEventSchema;
 import vdt.se.demo.domain.model.TemplateSelection;
 import vdt.se.demo.domain.valueObjects.TemplateType;
 
@@ -17,10 +18,6 @@ import java.util.Locale;
 
 @Component
 public class ElasticsearchSearchDslBuilder implements SearchDslBuilderPort {
-    private static final String[] FULL_TEXT_FIELDS = {
-            "message"
-    };
-
     private final ObjectMapper objectMapper;
 
     public ElasticsearchSearchDslBuilder(ObjectMapper objectMapper) {
@@ -102,6 +99,7 @@ public class ElasticsearchSearchDslBuilder implements SearchDslBuilderPort {
         addTermFilter(filter, "host", request.getHost());
         addTermFilter(filter, "ip", request.getIp());
         addTimeRangeFilter(filter, request, intent);
+        addRecurringTimeFilter(filter, intent);
 
         String textQuery = intent == null ? null : intent.getTextQuery();
         if (hasText(textQuery)) {
@@ -110,7 +108,7 @@ public class ElasticsearchSearchDslBuilder implements SearchDslBuilderPort {
             ObjectNode body = sqs.putObject("simple_query_string");
             body.put("query", textQuery.trim());
             ArrayNode fields = body.putArray("fields");
-            for (String field : FULL_TEXT_FIELDS) {
+            for (String field : SocEventSchema.FULL_TEXT_FIELDS) {
                 fields.add(field);
             }
             body.put("default_operator", "and");
@@ -145,6 +143,21 @@ public class ElasticsearchSearchDslBuilder implements SearchDslBuilderPort {
         ObjectNode range = objectMapper.createObjectNode();
         range.putObject("range").set("timestamp", timestamp);
         filters.add(range);
+    }
+
+    private void addRecurringTimeFilter(ArrayNode filters, SearchIntent intent) {
+        if (intent == null || intent.getRecurringTime() == null
+                || intent.getRecurringTime().month() == null
+                || intent.getRecurringTime().month() < 1
+                || intent.getRecurringTime().month() > 12
+                || !"EVERY_YEAR".equalsIgnoreCase(intent.getRecurringTime().mode())) {
+            return;
+        }
+        ObjectNode scriptWrapper = objectMapper.createObjectNode();
+        ObjectNode script = scriptWrapper.putObject("script").putObject("script");
+        script.put("source", "doc['timestamp'].size()!=0 && doc['timestamp'].value.getMonthValue() == params.month");
+        script.putObject("params").put("month", intent.getRecurringTime().month());
+        filters.add(scriptWrapper);
     }
 
     private void addTermFilter(ArrayNode filters, String field, String value) {

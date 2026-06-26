@@ -16,11 +16,14 @@ class SocEventIndexDefinitionTest {
         JsonNode properties = mapping.get("mappings").get("properties");
 
         for (String field : java.util.List.of(
-                "timestamp", "source", "severity", "event_type", "user", "host", "ip", "message", "raw")) {
+                "timestamp", "source", "severity", "event_type", "user", "host", "ip",
+                "geo_location", "user_agent", "message", "raw")) {
             assertThat(properties.get(field)).isNotNull();
         }
         assertThat(properties.get("ip").get("type").asString()).isEqualTo("ip");
         assertThat(properties.get("ip").get("ignore_malformed").asBoolean()).isTrue();
+        assertThat(properties.get("geo_location").get("type").asString()).isEqualTo("keyword");
+        assertThat(properties.get("user_agent").get("type").asString()).isEqualTo("keyword");
         JsonNode metadata = properties.get("metadata");
         assertThat(metadata.get("type").asString()).isEqualTo("flattened");
     }

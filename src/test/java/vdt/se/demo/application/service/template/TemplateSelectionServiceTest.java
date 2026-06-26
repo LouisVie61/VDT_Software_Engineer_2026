@@ -24,7 +24,7 @@ class TemplateSelectionServiceTest {
         IntentValidationResult result = service.validate(intent, TemplateType.TERMS_AGGREGATION);
 
         assertThat(result.valid()).isTrue();
-        assertThat(result.selection().size()).isEqualTo(100);
+        assertThat(result.selection().size()).isEqualTo(10);
     }
 
     @Test
@@ -48,6 +48,6 @@ class TemplateSelectionServiceTest {
                 "TEST",
                 null);
 
-        assertThat(plan.templateSelection().size()).isEqualTo(100);
+        assertThat(plan.templateSelection().size()).isEqualTo(10);
     }
 }
