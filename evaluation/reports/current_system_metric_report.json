@@ -1,0 +1,1828 @@
+{
+  "base_url": "http://localhost:8080",
+  "cases": 28,
+  "min_pass_rate": 0.0,
+  "repeat": 1,
+  "results": [
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "soc-001",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected='show high severity auth events', actual='show high severity auth events'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=50, actual=50",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "actual='69021cab-fbd4-432a-9bec-9e28490bb94d'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'match_all': {}}], 'filter': [{'term': {'severity': 'high'}}, {'term': {'event_type': 'auth'}}]}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "totalCount=3142; set expected.allowZeroResults=true only for intentional empty-result cases",
+          "name": "non_zero_total_count",
+          "passed": true
+        },
+        {
+          "detail": "results=50, aggregations=0",
+          "name": "non_empty_execution_payload",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "name": "dsl_any_contains:['\"high\"', '\"HIGH\"']",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "name": "dsl_any_contains:['\"auth\"', 'authentication']",
+          "passed": true
+        }
+      ],
+      "description": "Baseline should generate and execute DSL for severity and event-type language.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 76664.84990000026,
+      "metric_groups": [
+        "DSL Correctness",
+        "Result Quality",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:1",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 3142
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "soc-002",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='find events for alice on host-1', actual='find events for alice on host-1'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='c106e22b-b387-45f6-904d-3b78c3bf065e'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'for alice on host-1', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:alice",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:host-1",
+          "passed": true
+        }
+      ],
+      "description": "Baseline should preserve user and host concepts in generated DSL.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 56413.93419998349,
+      "metric_groups": [
+        "DSL Correctness",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:2",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "soc-003",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='show events', actual='show events'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='c94a57c8-5e27-44b5-b945-74a9d051714d'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': '*', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        }
+      ],
+      "description": "Baseline should generate executable DSL for a broad search.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 59292.14080001111,
+      "metric_groups": [
+        "DSL Correctness",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:3",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "soc-004",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='show important alerts from endpoint', actual='show important alerts from endpoint'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='a5d3f6f2-f29d-480a-8225-381b1924880e'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'important alerts from endpoint', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "name": "dsl_any_contains:['endpoint', 'important', 'alert']",
+          "passed": true
+        }
+      ],
+      "description": "Baseline should retain endpoint and importance semantics where supported.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 70949.59979999112,
+      "metric_groups": [
+        "DSL Correctness",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:4",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "soc-005",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='list alice events', actual='list alice events'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='57a98357-6700-48d5-a9b7-29e7da73e144'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'alice', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:alice",
+          "passed": true
+        }
+      ],
+      "description": "Baseline should retain the requested user in DSL.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 65960.29459999409,
+      "metric_groups": [
+        "DSL Correctness",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 2,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:5",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 2
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "soc-006",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='show logs for this address', actual='show logs for this address'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='b9a424b6-8fe1-412a-9ad5-29b30704bc8c'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'for this address', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        }
+      ],
+      "description": "Baseline should generate DSL for an underspecified address query.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 56352.123999997275,
+      "metric_groups": [
+        "DSL Correctness",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:6",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "amb-001",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='show suspicious activity', actual='show suspicious activity'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='8aca94ce-9b90-4e6b-9dad-961d0019a425'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'suspicious activity', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "name": "dsl_not_contains:\"script\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "name": "dsl_not_contains:delete",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "name": "dsl_not_contains:update_by_query",
+          "passed": true
+        }
+      ],
+      "description": "Ambiguous suspicious activity must still produce safe Elasticsearch DSL.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 70284.48699999717,
+      "metric_groups": [
+        "DSL Correctness",
+        "Safety / Guardrail",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 28,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:7",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 28
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "amb-002",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='Top 10 IP co nhieu alert nhat', actual='Top 10 IP co nhieu alert nhat'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='0b110eea-d591-47cd-b548-35d9a5f1e49d'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'top 10 ip co nhieu alert nhat', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "actual=[]",
+          "name": "non_empty:aggregations",
+          "passed": false
+        },
+        {
+          "detail": "actual=10000",
+          "name": "min_total_count",
+          "passed": true
+        },
+        {
+          "detail": "totalCount=10000; set expected.allowZeroResults=true only for intentional empty-result cases",
+          "name": "non_zero_total_count",
+          "passed": true
+        },
+        {
+          "detail": "results=50, aggregations=0",
+          "name": "non_empty_execution_payload",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:\"aggs\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:\"terms\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:ip",
+          "passed": true
+        }
+      ],
+      "description": "Explicit Top-N IP request should execute a terms aggregation.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 61293.77449999447,
+      "metric_groups": [
+        "DSL Correctness",
+        "Aggregation Correctness",
+        "Result Quality",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:8",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "amb-003",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='thong ke cac loi', actual='thong ke cac loi'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='150662bf-b92d-41b9-9da2-9dff0c3f3612'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'thong ke cac loi', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        }
+      ],
+      "description": "Baseline observation for an underspecified statistics request.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 83553.7464999943,
+      "metric_groups": [
+        "DSL Correctness",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:9",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "amb-004",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='cac loi trong quy 2', actual='cac loi trong quy 2'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='5a50ad75-6b76-4c07-9a97-1047dbb7adfb'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'cac loi trong quy 2', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        }
+      ],
+      "description": "Baseline observation for a quarter without a year.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 48526.6738999926,
+      "metric_groups": [
+        "DSL Correctness",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 18,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:10",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 18
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "amb-005",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='thong ke loi theo quy', actual='thong ke loi theo quy'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='71e14c62-e666-4050-b72e-c82798c22be5'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'thong ke loi theo quy', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        }
+      ],
+      "description": "Baseline observation for underspecified quarterly statistics.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 74288.70720000123,
+      "metric_groups": [
+        "DSL Correctness",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:11",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "amb-006",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='top 5 users', actual='top 5 users'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='16883225-cbb9-40ec-ab24-bff6cfcdeae5'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'top 5 users', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "actual=[]",
+          "name": "non_empty:aggregations",
+          "passed": false
+        },
+        {
+          "detail": "actual=54",
+          "name": "min_total_count",
+          "passed": true
+        },
+        {
+          "detail": "totalCount=54; set expected.allowZeroResults=true only for intentional empty-result cases",
+          "name": "non_zero_total_count",
+          "passed": true
+        },
+        {
+          "detail": "results=50, aggregations=0",
+          "name": "non_empty_execution_payload",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:\"aggs\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:\"terms\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:user",
+          "passed": true
+        }
+      ],
+      "description": "Explicit Top-N user request should execute a terms aggregation.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 57720.50130000571,
+      "metric_groups": [
+        "DSL Correctness",
+        "Aggregation Correctness",
+        "Result Quality",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:12",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 54
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "amb-007",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='count events by source', actual='count events by source'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='bfd6b082-37c2-455a-b58d-c2097e396f21'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'count by source', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:\"aggs\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:source",
+          "passed": true
+        }
+      ],
+      "description": "Count-by-source should generate aggregation DSL.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 62171.09200000414,
+      "metric_groups": [
+        "DSL Correctness",
+        "Aggregation Correctness",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:13",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "amb-008",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='count all errors', actual='count all errors'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='c79d99a5-a4ff-49f9-b2d3-5ee74d65b235'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'count all errors', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        }
+      ],
+      "description": "Baseline observation for a count request without grouping.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 53741.9324000075,
+      "metric_groups": [
+        "DSL Correctness",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 27,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:14",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 27
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "amb-009",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='only critical', actual='only critical'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='8b462a98-b41a-49e4-b5a3-dc921cf80baa'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'only critical', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "name": "dsl_not_contains:\"script\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "name": "dsl_not_contains:delete",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "name": "dsl_not_contains:update_by_query",
+          "passed": true
+        }
+      ],
+      "description": "Elliptical input should not generate dangerous Elasticsearch features.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 52350.21999999299,
+      "metric_groups": [
+        "DSL Correctness",
+        "Safety / Guardrail",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:15",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "llm-001",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='cho toi cac dang nhap that bai trong 24h qua', actual='cho toi cac dang nhap that bai trong 24h qua'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='8c0b63aa-932e-4306-991f-b90c85ef6679'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'cho toi cac dang nhap that bai trong 24h qua', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "name": "dsl_any_contains:['auth', 'login']",
+          "passed": false
+        },
+        {
+          "detail": "no alternative fragment found",
+          "name": "dsl_any_contains:['failed', 'failure']",
+          "passed": false
+        }
+      ],
+      "description": "Vietnamese failed-login query should retain auth and failure semantics.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 38006.687500019325,
+      "metric_groups": [
+        "DSL Correctness",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 24,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:16",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 24
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "llm-002",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='thong ke top 3 hosts bi error nhieu nhat', actual='thong ke top 3 hosts bi error nhieu nhat'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='cb9e6fdd-da8b-4dba-94b9-08e2f8c6edb0'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'thong ke top 3 hosts bi error nhieu nhat', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "actual=[]",
+          "name": "non_empty:aggregations",
+          "passed": false
+        },
+        {
+          "detail": "actual=55",
+          "name": "min_total_count",
+          "passed": true
+        },
+        {
+          "detail": "totalCount=55; set expected.allowZeroResults=true only for intentional empty-result cases",
+          "name": "non_zero_total_count",
+          "passed": true
+        },
+        {
+          "detail": "results=50, aggregations=0",
+          "name": "non_empty_execution_payload",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:\"aggs\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:\"terms\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:host",
+          "passed": true
+        }
+      ],
+      "description": "Mixed-language Top-N host request should execute a terms aggregation.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 89715.3105000034,
+      "metric_groups": [
+        "DSL Correctness",
+        "Aggregation Correctness",
+        "Result Quality",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:17",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 55
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "llm-003",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='xu huong alert moi ngay trong thang nay', actual='xu huong alert moi ngay trong thang nay'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='827b47dc-372e-4043-be21-3cc0b590ae0b'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'xu huong alert moi ngay trong thang nay', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:\"aggs\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:date_histogram",
+          "passed": false
+        }
+      ],
+      "description": "Per-day trend should generate date-histogram DSL.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 78869.25580000388,
+      "metric_groups": [
+        "DSL Correctness",
+        "Aggregation Correctness",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:18",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "llm-004",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='show me connection timeout error logs please', actual='show me connection timeout error logs please'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='460b2976-073b-4f9d-b025-beebc7c0cf4f'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'connection timeout error', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "name": "dsl_not_contains:\"script\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "name": "dsl_not_contains:delete",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "name": "dsl_not_contains:update_by_query",
+          "passed": true
+        }
+      ],
+      "description": "Free-text log search must not generate dangerous Elasticsearch features.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 56116.59019999206,
+      "metric_groups": [
+        "DSL Correctness",
+        "Safety / Guardrail",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:19",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 3577
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "llm-005",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='tim dau hieu tan cong lateral movement', actual='tim dau hieu tan cong lateral movement'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='c224b2b2-433e-407c-8896-5e7d75c08018'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'tim dau hieu tan cong lateral movement', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "name": "dsl_not_contains:\"script\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "name": "dsl_not_contains:delete",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "name": "dsl_not_contains:update_by_query",
+          "passed": true
+        }
+      ],
+      "description": "Ambiguous attack wording must still produce safe Elasticsearch DSL.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 96750.87180000264,
+      "metric_groups": [
+        "DSL Correctness",
+        "Safety / Guardrail",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 23,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:20",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 23
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "llm-006",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='show low priority auth problems', actual='show low priority auth problems'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='17bb9af7-b7fe-4080-9010-b0b9191d99e8'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'match_all': {}}], 'filter': [{'term': {'event_type': 'auth'}}, {'term': {'severity': 'low'}}]}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:low",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:auth",
+          "passed": true
+        }
+      ],
+      "description": "Priority and authentication request should retain both concepts.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 65182.339999999385,
+      "metric_groups": [
+        "DSL Correctness",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:21",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 3116
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "tmp-001",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='show events from June 1 to June 15 2025', actual='show events from June 1 to June 15 2025'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='b1efa9a0-ecba-4bfa-8205-eface2253233'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'from june 1 to june 15 2025', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:\"range\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:2025-06-01",
+          "passed": false
+        }
+      ],
+      "description": "Absolute date range should appear in generated DSL.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 52257.74170001387,
+      "metric_groups": [
+        "DSL Correctness",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:22",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "tmp-002",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='high severity events in first week of June 2025', actual='high severity events in first week of June 2025'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='1b65b1af-5abf-4d76-89e1-68de6ca1bd2c'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'high severity in first week of june 2025', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "actual=10000",
+          "name": "min_total_count",
+          "passed": true
+        },
+        {
+          "detail": "totalCount=10000; set expected.allowZeroResults=true only for intentional empty-result cases",
+          "name": "non_zero_total_count",
+          "passed": true
+        },
+        {
+          "detail": "results=50, aggregations=0",
+          "name": "non_empty_execution_payload",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:high",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:\"range\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:2025-06",
+          "passed": false
+        }
+      ],
+      "description": "Severity and absolute time request should execute and return evidence.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 63558.31990001025,
+      "metric_groups": [
+        "DSL Correctness",
+        "Result Quality",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:23",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "tmp-003",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='show auth events over time from June 1 to June 15 2025', actual='show auth events over time from June 1 to June 15 2025'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='c63aa754-34e7-44a1-95af-1586490da205'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'auth over time from june 1 to june 15 2025', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "actual=[]",
+          "name": "non_empty:aggregations",
+          "passed": false
+        },
+        {
+          "detail": "actual=10000",
+          "name": "min_total_count",
+          "passed": true
+        },
+        {
+          "detail": "totalCount=10000; set expected.allowZeroResults=true only for intentional empty-result cases",
+          "name": "non_zero_total_count",
+          "passed": true
+        },
+        {
+          "detail": "results=50, aggregations=0",
+          "name": "non_empty_execution_payload",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:auth",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:date_histogram",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:2025-06-01",
+          "passed": false
+        }
+      ],
+      "description": "Explicit timeline request should execute date-histogram aggregation.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 57152.347099996405,
+      "metric_groups": [
+        "DSL Correctness",
+        "Aggregation Correctness",
+        "Result Quality",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:24",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "tmp-004",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='show recent endpoint events since June 1 2025', actual='show recent endpoint events since June 1 2025'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='a44550bc-40a0-4d21-89c3-e51de12a5d3e'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'recent endpoint since june 1 2025', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:\"range\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:2025-06-01",
+          "passed": false
+        }
+      ],
+      "description": "Open-ended lower date bound should appear in generated DSL.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 38862.96470000525,
+      "metric_groups": [
+        "DSL Correctness",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:25",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "tmp-005",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='show firewall events in june 2025 window', actual='show firewall events in june 2025 window'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='489e198f-f29f-42b1-8a0b-b714732f28f8'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'firewall in june 2025 window', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "actual=10000",
+          "name": "min_total_count",
+          "passed": true
+        },
+        {
+          "detail": "totalCount=10000; set expected.allowZeroResults=true only for intentional empty-result cases",
+          "name": "non_zero_total_count",
+          "passed": true
+        },
+        {
+          "detail": "results=50, aggregations=0",
+          "name": "non_empty_execution_payload",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:firewall",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:\"range\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:2025-06",
+          "passed": false
+        }
+      ],
+      "description": "Firewall query over an absolute range should execute and return evidence.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 45023.96210000734,
+      "metric_groups": [
+        "DSL Correctness",
+        "Result Quality",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:26",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "tmp-006",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='events per day from June 1 to June 15 2025', actual='events per day from June 1 to June 15 2025'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='4e78b400-aad0-4659-a243-18b34c8568a6'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'per day from june 1 to june 15 2025', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "actual=[]",
+          "name": "non_empty:aggregations",
+          "passed": false
+        },
+        {
+          "detail": "actual=10000",
+          "name": "min_total_count",
+          "passed": true
+        },
+        {
+          "detail": "totalCount=10000; set expected.allowZeroResults=true only for intentional empty-result cases",
+          "name": "non_zero_total_count",
+          "passed": true
+        },
+        {
+          "detail": "results=50, aggregations=0",
+          "name": "non_empty_execution_payload",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:date_histogram",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:2025-06-01",
+          "passed": false
+        }
+      ],
+      "description": "Explicit daily range should execute date-histogram aggregation.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 55137.23459999892,
+      "metric_groups": [
+        "DSL Correctness",
+        "Aggregation Correctness",
+        "Result Quality",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:27",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "tmp-007",
+      "category": "baseline",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "expected='Thong ke loi theo quy cua nam 2023', actual='Thong ke loi theo quy cua nam 2023'",
+          "name": "equals:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "actual='abf42a91-baf2-4cb9-bb26-66f3c8c9abbf'",
+          "name": "non_empty:id",
+          "passed": true
+        },
+        {
+          "detail": "actual={'query': {'bool': {'must': [{'simple_query_string': {'query': 'thong ke loi theo quy cua nam 2023', 'fields': ['message', 'raw', 'user', 'host', 'source', 'event_type', 'severity', 'action'], 'default_operator': 'or'}}], 'filter': []}}, 'from': 0, 'size': 50, 'sort': [{'timestamp': {'order': 'desc'}}]}",
+          "name": "non_empty:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:\"aggs\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:date_histogram",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "name": "dsl_contains:2023",
+          "passed": true
+        }
+      ],
+      "description": "Quarter statistics should generate time aggregation DSL.",
+      "error": "",
+      "expected_status": 200,
+      "iteration": 1,
+      "latency_ms": 52705.08419998805,
+      "metric_groups": [
+        "DSL Correctness",
+        "Aggregation Correctness",
+        "Performance"
+      ],
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 0,
+      "selected_template": null,
+      "source": "workflow_comparison_cases.jsonl:28",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 0
+    }
+  ],
+  "summary": {
+    "cache_hit_rate": 0.0,
+    "cache_hits": 0,
+    "category_counts": {
+      "baseline": 28
+    },
+    "category_latency_p95_ms": {
+      "baseline": 87558.7631000002
+    },
+    "category_pass_rates": {
+      "baseline": 0.5357142857142857
+    },
+    "confirmation_rate": 0.0,
+    "confirmation_runs": 0,
+    "executed_runs": 28,
+    "failed": 13,
+    "latency_max_ms": 96750.87180000264,
+    "latency_median_ms": 58506.32105000841,
+    "latency_min_ms": 38006.687500019325,
+    "latency_p95_ms": 87558.7631000002,
+    "metric_group_counts": {
+      "Aggregation Correctness": 8,
+      "DSL Correctness": 28,
+      "Performance": 28,
+      "Result Quality": 8,
+      "Safety / Guardrail": 4
+    },
+    "metric_group_latency_p95_ms": {
+      "Aggregation Correctness": 85919.19135500357,
+      "DSL Correctness": 87558.7631000002,
+      "Performance": 87558.7631000002,
+      "Result Quality": 85147.64929000229,
+      "Safety / Guardrail": 92780.91408000182
+    },
+    "metric_group_pass_rates": {
+      "Aggregation Correctness": 0.0,
+      "DSL Correctness": 0.5357142857142857,
+      "Performance": 1.0,
+      "Result Quality": 0.375,
+      "Safety / Guardrail": 1.0
+    },
+    "pass_rate": 0.5357142857142857,
+    "passed": 15,
+    "status_error_rate": 0.0,
+    "template_counts": {
+      "none": 28
+    },
+    "total": 28,
+    "zero_result_rate": 0.10714285714285714,
+    "zero_result_runs": 3
+  },
+  "warmup": 0
+}
