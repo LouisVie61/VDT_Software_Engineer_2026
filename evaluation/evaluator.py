@@ -4,7 +4,7 @@ import json
 import time
 import urllib.error
 import urllib.request
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -80,7 +80,7 @@ def run_case(case: EvaluationCase, base_url: str, timeout: float, iteration: int
         error = str(exc)
 
     latency_ms = (time.perf_counter() - started) * 1000
-    checks = evaluate_expectations(case, status, response_json, response_text, latency_ms)
+    checks = assign_metric_groups(case, evaluate_expectations(case, status, response_json, response_text, latency_ms))
     passed = all(check.passed for check in checks)
     response_stats = execution_stats(response_json)
 
@@ -101,10 +101,40 @@ def run_case(case: EvaluationCase, base_url: str, timeout: float, iteration: int
         "needs_confirmation": response_stats["needs_confirmation"],
         "cache_hit": response_stats["cache_hit"],
         "summary_status": response_stats["summary_status"],
+        "generated_dsl": response_json.get("generatedDsl") if response_json else None,
         "passed": passed,
         "checks": checks,
         "error": error,
     }
+
+
+def assign_metric_groups(case: EvaluationCase, checks: list[CheckResult]) -> list[CheckResult]:
+    expected_text = json.dumps(case.expected, sort_keys=True).lower()
+    aggregation_case = any(token in expected_text for token in (
+        "terms_aggregation", "time_aggregation", "date_histogram", "top_values"
+    ))
+
+    def group_for(name: str) -> str:
+        lowered = name.lower()
+        if name == "latency_budget":
+            return "Performance"
+        if any(token in lowered for token in (
+            "confirmation", "warning", "diagnostic", "response_contains",
+            "dsl_not_contains", "path_not_exists", "field_not_exists",
+        )):
+            return "Safety / Guardrail"
+        if any(token in lowered for token in (
+            "execution_evidence", "total_count", "execution_payload",
+            "non_empty:results", "non_empty:aggregations",
+        )):
+            return "Result Quality"
+        if any(token in lowered for token in (
+            "generateddsl", "dsl_", "selectedtemplate", "selected_template", "charttype", "chart_type"
+        )):
+            return "Aggregation Correctness" if aggregation_case else "DSL Correctness"
+        return "Result Quality"
+
+    return [replace(check, metric_group=group_for(check.name)) for check in checks]
 
 
 def evaluate_expectations(
@@ -181,7 +211,11 @@ def evaluate_expectations(
             checks.append(CheckResult(f"response_contains:{fragment}", fragment in compact_response, "fragment not found"))
 
     if "anyOf" in expected:
-        checks.append(any_of_check(expected["anyOf"], response_json))
+        checks.append(any_of_check(
+            expected["anyOf"],
+            response_json,
+            inherited_allow_zero_results=expected.get("allowZeroResults", False),
+        ))
 
     if "max_latency_ms" in thresholds:
         max_latency_ms = float(thresholds["max_latency_ms"])
@@ -190,10 +224,14 @@ def evaluate_expectations(
     return checks
 
 
-def any_of_check(branches: list[dict[str, Any]], response_json: dict[str, Any]) -> CheckResult:
+def any_of_check(
+    branches: list[dict[str, Any]],
+    response_json: dict[str, Any],
+    inherited_allow_zero_results: bool = False,
+) -> CheckResult:
     failures: list[str] = []
     for index, branch in enumerate(branches, start=1):
-        branch_checks = evaluate_branch(branch, response_json)
+        branch_checks = evaluate_branch(branch, response_json, inherited_allow_zero_results)
         if all(check.passed for check in branch_checks):
             return CheckResult("any_of", True, f"matched branch {index}")
         failed = ", ".join(f"{check.name}: {check.detail}" for check in branch_checks if not check.passed)
@@ -201,7 +239,11 @@ def any_of_check(branches: list[dict[str, Any]], response_json: dict[str, Any]) 
     return CheckResult("any_of", False, "; ".join(failures))
 
 
-def evaluate_branch(expected: dict[str, Any], response_json: dict[str, Any]) -> list[CheckResult]:
+def evaluate_branch(
+    expected: dict[str, Any],
+    response_json: dict[str, Any],
+    inherited_allow_zero_results: bool = False,
+) -> list[CheckResult]:
     checks: list[CheckResult] = []
 
     for field in expected.get("responseFields", []):
@@ -256,7 +298,8 @@ def evaluate_branch(expected: dict[str, Any], response_json: dict[str, Any]) -> 
         for fragment in expected["responseContains"]:
             checks.append(CheckResult(f"response_contains:{fragment}", fragment in compact_response, "fragment not found"))
 
-    if expected.get("requiresExecutionEvidence", False):
+    allow_zero_results = expected.get("allowZeroResults", inherited_allow_zero_results)
+    if expected.get("requiresExecutionEvidence", False) and not allow_zero_results:
         checks.extend(execution_evidence_checks(response_json))
 
     return checks

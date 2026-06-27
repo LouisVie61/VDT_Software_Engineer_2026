@@ -1,0 +1,5428 @@
+{
+  "base_url": "http://localhost:8080",
+  "cases": 28,
+  "min_pass_rate": 0.9,
+  "repeat": 1,
+  "results": [
+    {
+      "aggregation_count": 0,
+      "cache_hit": true,
+      "case_id": "soc-001",
+      "category": "soc_nl2plan",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=50, actual=50",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected='SIMPLE_SEARCH', actual='SIMPLE_SEARCH'",
+          "metric_group": "DSL Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "expected='table', actual='table'",
+          "metric_group": "DSL Correctness",
+          "name": "equals:chartType",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 2",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        },
+        {
+          "detail": "budget=8000.0 ms, actual=3511.7 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Basic high severity authentication filter should be classified as simple search; confirmation must preserve explicit request filters.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "severity": "high"
+                }
+              },
+              {
+                "term": {
+                  "event_type": "auth"
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ],
+        "timeout": "5s",
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 3511.690999963321,
+      "needs_confirmation": false,
+      "passed": true,
+      "result_count": 50,
+      "selected_template": "SIMPLE_SEARCH",
+      "source": "workflow_comparison_cases.jsonl:1",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [],
+      "total_count": 3142
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": true,
+      "case_id": "soc-002",
+      "category": "soc_nl2plan",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=25, actual=25",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected='SIMPLE_SEARCH', actual='SIMPLE_SEARCH'",
+          "metric_group": "DSL Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 2",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        },
+        {
+          "detail": "budget=5000.0 ms, actual=3524.5 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Host and user filters may execute directly when confidence is sufficient, or require confirmation while preserving both filters.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "user": "alice"
+                }
+              },
+              {
+                "term": {
+                  "host": "host-1"
+                }
+              }
+            ]
+          }
+        },
+        "size": 25,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ],
+        "timeout": "5s",
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 3524.469700001646,
+      "needs_confirmation": false,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "SIMPLE_SEARCH",
+      "source": "workflow_comparison_cases.jsonl:2",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "soc-003",
+      "category": "api_contract",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.confirmationId",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.intent",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.templateSelection",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=50, actual=50",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "expected='NOT_REQUIRED', actual='NOT_REQUIRED'",
+          "metric_group": "Result Quality",
+          "name": "equals:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "expected='table', actual='table'",
+          "metric_group": "DSL Correctness",
+          "name": "equals:chartType",
+          "passed": true
+        },
+        {
+          "detail": "actual='5e7f98fa-e11c-482d-9f5b-7197343d3880'",
+          "metric_group": "Safety / Guardrail",
+          "name": "non_empty:confirmation.confirmationId",
+          "passed": true
+        },
+        {
+          "detail": "expected=True, actual=True",
+          "metric_group": "Safety / Guardrail",
+          "name": "equals:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "expected='SIMPLE_SEARCH', actual='SIMPLE_SEARCH'",
+          "metric_group": "DSL Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:aggs",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:sort",
+          "passed": true
+        },
+        {
+          "detail": "budget=3000.0 ms, actual=2724.9 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Null pagination should fall back to backend defaults even when the initial broad search requires confirmation.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 2724.864699994214,
+      "needs_confirmation": true,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "SIMPLE_SEARCH",
+      "source": "workflow_comparison_cases.jsonl:3",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "soc-004",
+      "category": "api_contract",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=30, actual=30",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected='SIMPLE_SEARCH', actual='SIMPLE_SEARCH'",
+          "metric_group": "DSL Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 2",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        },
+        {
+          "detail": "budget=8000.0 ms, actual=6585.6 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Explicit severity may execute directly or require confirmation; either path must preserve the supported severity filter.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "source": "endpoint"
+                }
+              },
+              {
+                "term": {
+                  "event_type": "alert"
+                }
+              },
+              {
+                "term": {
+                  "severity": "critical"
+                }
+              }
+            ]
+          }
+        },
+        "size": 30,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ],
+        "timeout": "5s",
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 6585.560400038958,
+      "needs_confirmation": false,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "SIMPLE_SEARCH",
+      "source": "workflow_comparison_cases.jsonl:4",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [
+        "explicit_filters",
+        "review"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": true,
+      "case_id": "soc-005",
+      "category": "api_contract",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "expected=2, actual=2",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=10, actual=10",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected='SIMPLE_SEARCH', actual='SIMPLE_SEARCH'",
+          "metric_group": "DSL Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 2",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        },
+        {
+          "detail": "budget=5000.0 ms, actual=2997.9 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Second-page user search may execute directly or require confirmation while preserving user and pagination.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {
+        "from": 20,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "user": "alice"
+                }
+              }
+            ]
+          }
+        },
+        "size": 10,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ],
+        "timeout": "5s",
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 2997.901099966839,
+      "needs_confirmation": false,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "SIMPLE_SEARCH",
+      "source": "workflow_comparison_cases.jsonl:5",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [
+        "pagination",
+        "exact_filter",
+        "review"
+      ],
+      "total_count": 1
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": true,
+      "case_id": "soc-006",
+      "category": "api_contract",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=50, actual=50",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected='SIMPLE_SEARCH', actual='SIMPLE_SEARCH'",
+          "metric_group": "DSL Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 2",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        },
+        {
+          "detail": "budget=5000.0 ms, actual=3353.5 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Exact-IP search may execute directly or require confirmation; either path must preserve the IP filter.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "ip": "10.0.0.1"
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ],
+        "timeout": "5s",
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 3353.4800999914296,
+      "needs_confirmation": false,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "SIMPLE_SEARCH",
+      "source": "workflow_comparison_cases.jsonl:6",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [
+        "ip",
+        "exact_filter",
+        "review"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "amb-001",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=50, actual=50",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected one of=['SIMPLE_SEARCH', None], actual='SIMPLE_SEARCH'",
+          "metric_group": "DSL Correctness",
+          "name": "field_in:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "confirmation response does not execute search",
+          "metric_group": "Result Quality",
+          "name": "execution_evidence",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        },
+        {
+          "detail": "budget=3000.0 ms, actual=1107.6 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Broad suspicious-activity query may execute as simple search only if it returns evidence, or ask for confirmation.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 1107.5801000115462,
+      "needs_confirmation": true,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "SIMPLE_SEARCH",
+      "source": "workflow_comparison_cases.jsonl:7",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 1,
+      "cache_hit": true,
+      "case_id": "amb-002",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl.query",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl.sort",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=500, actual=500",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected=500, actual=500",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:generatedDsl.size",
+          "passed": true
+        },
+        {
+          "detail": "expected='ip', actual='ip'",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:generatedDsl.aggs.top_values.terms.field",
+          "passed": true
+        },
+        {
+          "detail": "expected=10, actual=10",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:generatedDsl.aggs.top_values.terms.size",
+          "passed": true
+        },
+        {
+          "detail": "expected=True, actual=True",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:generatedDsl.track_total_hits",
+          "passed": true
+        },
+        {
+          "detail": "expected=False, actual=False",
+          "metric_group": "Safety / Guardrail",
+          "name": "equals:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "expected='TERMS_AGGREGATION', actual='TERMS_AGGREGATION'",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "expected='bar_chart', actual='bar_chart'",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:chartType",
+          "passed": true
+        },
+        {
+          "detail": "actual=100001",
+          "metric_group": "Result Quality",
+          "name": "min_total_count",
+          "passed": true
+        },
+        {
+          "detail": "totalCount=100001; set expected.allowZeroResults=true only for intentional empty-result cases",
+          "metric_group": "Result Quality",
+          "name": "non_zero_total_count",
+          "passed": true
+        },
+        {
+          "detail": "results=500, aggregations=1",
+          "metric_group": "Result Quality",
+          "name": "non_empty_execution_payload",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:sort",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"aggs\":{\"top_values\"",
+          "passed": true
+        },
+        {
+          "detail": "budget=5000.0 ms, actual=152.2 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Top-N IP query is not ambiguous because the grouping field is explicit, so it executes terms aggregation and returns a scrollable hits page.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {
+        "aggs": {
+          "top_values": {
+            "terms": {
+              "field": "ip",
+              "size": 10
+            }
+          }
+        },
+        "query": {
+          "bool": {
+            "filter": [],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 500,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ],
+        "timeout": "5s",
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 152.18350000213832,
+      "needs_confirmation": false,
+      "passed": true,
+      "result_count": 500,
+      "selected_template": "TERMS_AGGREGATION",
+      "source": "workflow_comparison_cases.jsonl:8",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [],
+      "total_count": 100001
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "amb-003",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.confirmationId",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.intent",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.templateSelection",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=50, actual=50",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "expected='NOT_REQUIRED', actual='NOT_REQUIRED'",
+          "metric_group": "Result Quality",
+          "name": "equals:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "expected='table', actual='table'",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:chartType",
+          "passed": true
+        },
+        {
+          "detail": "expected=10, actual=10",
+          "metric_group": "Safety / Guardrail",
+          "name": "equals:confirmation.templateSelection.size",
+          "passed": true
+        },
+        {
+          "detail": "expected='TERMS_AGGREGATION', actual='TERMS_AGGREGATION'",
+          "metric_group": "Safety / Guardrail",
+          "name": "equals:confirmation.templateSelection.type",
+          "passed": true
+        },
+        {
+          "detail": "actual='e0ec36d0-b094-477c-bd8b-5235d3a48c8d'",
+          "metric_group": "Safety / Guardrail",
+          "name": "non_empty:confirmation.confirmationId",
+          "passed": true
+        },
+        {
+          "detail": "expected=True, actual=True",
+          "metric_group": "Safety / Guardrail",
+          "name": "equals:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "expected='TERMS_AGGREGATION', actual='TERMS_AGGREGATION'",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:aggs",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:sort",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Safety / Guardrail",
+          "name": "response_contains:GROUP_BY_REQUIRED",
+          "passed": true
+        },
+        {
+          "detail": "budget=3000.0 ms, actual=6857.3 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": false
+        }
+      ],
+      "description": "Vietnamese statistics query asks for 'cac loi' without a concrete grouping field, so benchmark should reject silent nearest-template selection.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 6857.306900026742,
+      "needs_confirmation": true,
+      "passed": false,
+      "result_count": 0,
+      "selected_template": "TERMS_AGGREGATION",
+      "source": "workflow_comparison_cases.jsonl:9",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "amb-004",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.confirmationId",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.intent",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.templateSelection",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=50, actual=50",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "expected='NOT_REQUIRED', actual='NOT_REQUIRED'",
+          "metric_group": "Result Quality",
+          "name": "equals:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "expected='table', actual='table'",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:chartType",
+          "passed": true
+        },
+        {
+          "detail": "expected one of=['SIMPLE_SEARCH', 'TERMS_AGGREGATION', 'TIME_AGGREGATION', None], actual='SIMPLE_SEARCH'",
+          "metric_group": "Aggregation Correctness",
+          "name": "field_in:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "actual='47811193-66e8-4c96-8e06-91ca5b9fa415'",
+          "metric_group": "Safety / Guardrail",
+          "name": "non_empty:confirmation.confirmationId",
+          "passed": true
+        },
+        {
+          "detail": "expected=True, actual=True",
+          "metric_group": "Safety / Guardrail",
+          "name": "equals:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:aggs",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:sort",
+          "passed": true
+        },
+        {
+          "detail": "budget=3000.0 ms, actual=328.2 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Quarter reference without a year is temporally ambiguous and should require controlled confirmation instead of silently selecting a time window.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 328.1862000003457,
+      "needs_confirmation": true,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "SIMPLE_SEARCH",
+      "source": "workflow_comparison_cases.jsonl:10",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "amb-005",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.confirmationId",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.intent",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.templateSelection",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=50, actual=50",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "expected='NOT_REQUIRED', actual='NOT_REQUIRED'",
+          "metric_group": "Result Quality",
+          "name": "equals:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "expected='table', actual='table'",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:chartType",
+          "passed": true
+        },
+        {
+          "detail": "expected one of=['TERMS_AGGREGATION', 'TIME_AGGREGATION', None], actual='TIME_AGGREGATION'",
+          "metric_group": "Aggregation Correctness",
+          "name": "field_in:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "actual='ba1d9d5f-3751-4031-9f38-15c43dd235c1'",
+          "metric_group": "Safety / Guardrail",
+          "name": "non_empty:confirmation.confirmationId",
+          "passed": true
+        },
+        {
+          "detail": "expected=True, actual=True",
+          "metric_group": "Safety / Guardrail",
+          "name": "equals:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:aggs",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:sort",
+          "passed": true
+        },
+        {
+          "detail": "budget=3000.0 ms, actual=8159.2 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": false
+        }
+      ],
+      "description": "Statistics over a quarter lacks both a concrete quarter year and a safe bucket policy, so it should ask for confirmation.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 8159.164600016084,
+      "needs_confirmation": true,
+      "passed": false,
+      "result_count": 0,
+      "selected_template": "TIME_AGGREGATION",
+      "source": "workflow_comparison_cases.jsonl:11",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 5,
+      "cache_hit": true,
+      "case_id": "amb-006",
+      "category": "perception_prefilter",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl.query",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl.sort",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=100, actual=100",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected=True, actual=True",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:generatedDsl.track_total_hits",
+          "passed": true
+        },
+        {
+          "detail": "expected=100, actual=100",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:generatedDsl.size",
+          "passed": true
+        },
+        {
+          "detail": "expected=False, actual=False",
+          "metric_group": "Safety / Guardrail",
+          "name": "equals:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "expected='TERMS_AGGREGATION', actual='TERMS_AGGREGATION'",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "expected='bar_chart', actual='bar_chart'",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:chartType",
+          "passed": true
+        },
+        {
+          "detail": "actual=100001",
+          "metric_group": "Result Quality",
+          "name": "min_total_count",
+          "passed": true
+        },
+        {
+          "detail": "totalCount=100001; set expected.allowZeroResults=true only for intentional empty-result cases",
+          "metric_group": "Result Quality",
+          "name": "non_zero_total_count",
+          "passed": true
+        },
+        {
+          "detail": "results=100, aggregations=5",
+          "metric_group": "Result Quality",
+          "name": "non_empty_execution_payload",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:aggs",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:sort",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"terms\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"user\"",
+          "passed": true
+        },
+        {
+          "detail": "budget=5000.0 ms, actual=98.5 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Obvious top users query should be eligible for fast perception prefilter or equivalent LLM terms aggregation.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {
+        "aggs": {
+          "top_values": {
+            "terms": {
+              "field": "user",
+              "size": 5
+            }
+          }
+        },
+        "query": {
+          "bool": {
+            "filter": [],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 100,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ],
+        "timeout": "5s",
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 98.49010000471026,
+      "needs_confirmation": false,
+      "passed": true,
+      "result_count": 100,
+      "selected_template": "TERMS_AGGREGATION",
+      "source": "workflow_comparison_cases.jsonl:12",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "prefilter",
+        "terms_aggregation"
+      ],
+      "total_count": 100001
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "amb-007",
+      "category": "perception_prefilter",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.confirmationId",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.intent",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.templateSelection",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=100, actual=100",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "expected='NOT_REQUIRED', actual='NOT_REQUIRED'",
+          "metric_group": "Result Quality",
+          "name": "equals:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "expected='table', actual='table'",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:chartType",
+          "passed": true
+        },
+        {
+          "detail": "expected=10, actual=10",
+          "metric_group": "Safety / Guardrail",
+          "name": "equals:confirmation.templateSelection.size",
+          "passed": true
+        },
+        {
+          "detail": "expected='TERMS_AGGREGATION', actual='TERMS_AGGREGATION'",
+          "metric_group": "Safety / Guardrail",
+          "name": "equals:confirmation.templateSelection.type",
+          "passed": true
+        },
+        {
+          "detail": "actual='e37c8d1f-cf22-4c24-a60d-af2667a14e95'",
+          "metric_group": "Safety / Guardrail",
+          "name": "non_empty:confirmation.confirmationId",
+          "passed": true
+        },
+        {
+          "detail": "expected=True, actual=True",
+          "metric_group": "Safety / Guardrail",
+          "name": "equals:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "expected='TERMS_AGGREGATION', actual='TERMS_AGGREGATION'",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:aggs",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:sort",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Safety / Guardrail",
+          "name": "response_contains:TOP_N_REQUIRED",
+          "passed": true
+        },
+        {
+          "detail": "budget=5000.0 ms, actual=13.7 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Count by source has explicit grouping but no Top N, so execution should wait for confirmation.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 13.672100030817091,
+      "needs_confirmation": true,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "TERMS_AGGREGATION",
+      "source": "workflow_comparison_cases.jsonl:13",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [
+        "prefilter",
+        "terms_aggregation",
+        "top_n_required"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "amb-008",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.confirmationId",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.intent",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.templateSelection",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=50, actual=50",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "expected='NOT_REQUIRED', actual='NOT_REQUIRED'",
+          "metric_group": "Result Quality",
+          "name": "equals:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "expected='table', actual='table'",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:chartType",
+          "passed": true
+        },
+        {
+          "detail": "expected=10, actual=10",
+          "metric_group": "Safety / Guardrail",
+          "name": "equals:confirmation.templateSelection.size",
+          "passed": true
+        },
+        {
+          "detail": "expected='TERMS_AGGREGATION', actual='TERMS_AGGREGATION'",
+          "metric_group": "Safety / Guardrail",
+          "name": "equals:confirmation.templateSelection.type",
+          "passed": true
+        },
+        {
+          "detail": "actual='07170fe2-e6a9-4cba-bd78-55191b04517a'",
+          "metric_group": "Safety / Guardrail",
+          "name": "non_empty:confirmation.confirmationId",
+          "passed": true
+        },
+        {
+          "detail": "expected=True, actual=True",
+          "metric_group": "Safety / Guardrail",
+          "name": "equals:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:aggs",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:sort",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Safety / Guardrail",
+          "name": "response_contains:GROUP_BY_REQUIRED",
+          "passed": true
+        },
+        {
+          "detail": "budget=3000.0 ms, actual=321.5 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Count request without by-field should not silently pick a grouping field.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 321.53469999320805,
+      "needs_confirmation": true,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "TERMS_AGGREGATION",
+      "source": "workflow_comparison_cases.jsonl:14",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [
+        "missing_group_by"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "amb-009",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=50, actual=50",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        },
+        {
+          "detail": "budget=3000.0 ms, actual=295.3 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Elliptical follow-up should be allowed to use context or ask confirmation, but should not execute an unrelated broad query silently.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 295.27599998982623,
+      "needs_confirmation": true,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "SIMPLE_SEARCH",
+      "source": "workflow_comparison_cases.jsonl:15",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [
+        "follow_up"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "llm-001",
+      "category": "llm_language",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=50, actual=50",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        },
+        {
+          "detail": "budget=8000.0 ms, actual=305.6 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Vietnamese failed-login query with relative time may require confirmation before executable DSL is exposed.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 305.5811999947764,
+      "needs_confirmation": true,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "SIMPLE_SEARCH",
+      "source": "workflow_comparison_cases.jsonl:16",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [
+        "vietnamese",
+        "auth",
+        "temporal"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 1,
+      "cache_hit": true,
+      "case_id": "llm-002",
+      "category": "llm_language",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl.query",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl.sort",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=100, actual=100",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected=True, actual=True",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:generatedDsl.track_total_hits",
+          "passed": true
+        },
+        {
+          "detail": "expected=100, actual=100",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:generatedDsl.size",
+          "passed": true
+        },
+        {
+          "detail": "expected=False, actual=False",
+          "metric_group": "Safety / Guardrail",
+          "name": "equals:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "expected='TERMS_AGGREGATION', actual='TERMS_AGGREGATION'",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "expected='bar_chart', actual='bar_chart'",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:sort",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"terms\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"host\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"size\":3",
+          "passed": true
+        },
+        {
+          "detail": "budget=8000.0 ms, actual=59.6 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Mixed Vietnamese/English top-N query should map top/count wording to terms aggregation and group by host.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {
+        "aggs": {
+          "top_values": {
+            "terms": {
+              "field": "host",
+              "size": 3
+            }
+          }
+        },
+        "query": {
+          "bool": {
+            "filter": [],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 100,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ],
+        "timeout": "5s",
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 59.60069998400286,
+      "needs_confirmation": false,
+      "passed": true,
+      "result_count": 100,
+      "selected_template": "TERMS_AGGREGATION",
+      "source": "workflow_comparison_cases.jsonl:17",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "mixed_language",
+        "statistics"
+      ],
+      "total_count": 100001
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "llm-003",
+      "category": "llm_language",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=100, actual=100",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        },
+        {
+          "detail": "budget=8000.0 ms, actual=300.4 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Per-day trend language should either produce a daily time aggregation or stop for confirmation when confidence is low.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 300.43569998815656,
+      "needs_confirmation": true,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "SIMPLE_SEARCH",
+      "source": "workflow_comparison_cases.jsonl:18",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [
+        "time_bucket",
+        "trend"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "llm-004",
+      "category": "llm_language",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=50, actual=50",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected='SIMPLE_SEARCH', actual='SIMPLE_SEARCH'",
+          "metric_group": "DSL Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        },
+        {
+          "detail": "budget=8000.0 ms, actual=293.0 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Command/UI noise with residual free text should be confirmed or executed as a message-only query.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 293.0136999930255,
+      "needs_confirmation": true,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "SIMPLE_SEARCH",
+      "source": "workflow_comparison_cases.jsonl:19",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [
+        "command_noise",
+        "free_text"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "llm-005",
+      "category": "llm_language",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=50, actual=50",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected='SIMPLE_SEARCH', actual='SIMPLE_SEARCH'",
+          "metric_group": "DSL Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        },
+        {
+          "detail": "budget=8000.0 ms, actual=279.6 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Ambiguous attack wording should require confirmation or remain message free text unless an exact known event_type is justified.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 279.6187999774702,
+      "needs_confirmation": true,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "SIMPLE_SEARCH",
+      "source": "workflow_comparison_cases.jsonl:20",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [
+        "mitre_like",
+        "ambiguous_attack"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "llm-006",
+      "category": "llm_language",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=50, actual=50",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected='SIMPLE_SEARCH', actual='SIMPLE_SEARCH'",
+          "metric_group": "DSL Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        },
+        {
+          "detail": "budget=5000.0 ms, actual=328.1 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Explicit API severity should either execute with the API filters or require confirmation that preserves those filters.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 328.1157999881543,
+      "needs_confirmation": true,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "SIMPLE_SEARCH",
+      "source": "workflow_comparison_cases.jsonl:21",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [
+        "explicit_filter_priority"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "tmp-001",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=50, actual=50",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected='SIMPLE_SEARCH', actual='SIMPLE_SEARCH'",
+          "metric_group": "DSL Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        },
+        {
+          "detail": "budget=8000.0 ms, actual=361.5 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Explicit absolute 2025 time range may execute directly, or require confirmation that preserves from/to bounds.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 361.52279999805614,
+      "needs_confirmation": true,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "SIMPLE_SEARCH",
+      "source": "workflow_comparison_cases.jsonl:22",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "tmp-002",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=50, actual=50",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected='SIMPLE_SEARCH', actual='SIMPLE_SEARCH'",
+          "metric_group": "DSL Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        },
+        {
+          "detail": "budget=8000.0 ms, actual=280.1 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Explicit 2025 time range with severity may execute directly, or require confirmation that preserves time and severity filters.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 280.11789999436587,
+      "needs_confirmation": true,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "SIMPLE_SEARCH",
+      "source": "workflow_comparison_cases.jsonl:23",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "tmp-003",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=100, actual=100",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected='TIME_AGGREGATION', actual='TIME_AGGREGATION'",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        },
+        {
+          "detail": "budget=8000.0 ms, actual=356.8 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Timeline wording over a populated 2025 range should route to time aggregation; confirmation must preserve event type and time bounds.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 356.8383000092581,
+      "needs_confirmation": true,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "TIME_AGGREGATION",
+      "source": "workflow_comparison_cases.jsonl:24",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "tmp-004",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=50, actual=50",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected='SIMPLE_SEARCH', actual='SIMPLE_SEARCH'",
+          "metric_group": "DSL Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        },
+        {
+          "detail": "budget=8000.0 ms, actual=321.0 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Open-ended lower bound with endpoint wording may require confirmation, and must preserve the explicit lower bound.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 320.96139999339357,
+      "needs_confirmation": true,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "SIMPLE_SEARCH",
+      "source": "workflow_comparison_cases.jsonl:25",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [
+        "explicit_time",
+        "open_range"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "tmp-005",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "expected=1, actual=1",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=15, actual=15",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected='SIMPLE_SEARCH', actual='SIMPLE_SEARCH'",
+          "metric_group": "DSL Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        },
+        {
+          "detail": "budget=8000.0 ms, actual=349.6 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Explicit 2025 firewall time window should preserve pagination and filters on confirmation or execution response.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 349.61579996161163,
+      "needs_confirmation": true,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "SIMPLE_SEARCH",
+      "source": "workflow_comparison_cases.jsonl:26",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [
+        "explicit_time",
+        "pagination"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "tmp-006",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=100, actual=100",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected='TIME_AGGREGATION', actual='TIME_AGGREGATION'",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        },
+        {
+          "detail": "budget=8000.0 ms, actual=301.5 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Explicit daily trend over a populated 2025 range may execute as time aggregation, or require confirmation that preserves time bounds.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 301.50569998659194,
+      "needs_confirmation": true,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "TIME_AGGREGATION",
+      "source": "workflow_comparison_cases.jsonl:27",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [
+        "time_aggregation",
+        "explicit_time"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "tmp-007",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:id",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:nlQuery",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:warnings",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:chartType",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:page",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:cacheHit",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:confidenceScores",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:canonicalPlanId",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.confirmationId",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.intent",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Safety / Guardrail",
+          "name": "field:confirmation.templateSelection",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:page",
+          "passed": true
+        },
+        {
+          "detail": "expected=50, actual=50",
+          "metric_group": "Result Quality",
+          "name": "equals:pageSize",
+          "passed": true
+        },
+        {
+          "detail": "expected=0, actual=0",
+          "metric_group": "Result Quality",
+          "name": "equals:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "expected='NOT_REQUIRED', actual='NOT_REQUIRED'",
+          "metric_group": "Result Quality",
+          "name": "equals:summaryStatus",
+          "passed": true
+        },
+        {
+          "detail": "expected='table', actual='table'",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:chartType",
+          "passed": true
+        },
+        {
+          "detail": "actual='c15ad57e-88ed-4a75-9302-819515589a2d'",
+          "metric_group": "Safety / Guardrail",
+          "name": "non_empty:confirmation.confirmationId",
+          "passed": true
+        },
+        {
+          "detail": "expected=True, actual=True",
+          "metric_group": "Safety / Guardrail",
+          "name": "equals:needsConfirmation",
+          "passed": true
+        },
+        {
+          "detail": "expected='TIME_AGGREGATION', actual='TIME_AGGREGATION'",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:selectedTemplate",
+          "passed": true
+        },
+        {
+          "detail": "expected='table', actual='table'",
+          "metric_group": "Aggregation Correctness",
+          "name": "equals:chartType",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:aggs",
+          "passed": true
+        },
+        {
+          "detail": "path exists",
+          "metric_group": "Safety / Guardrail",
+          "name": "generatedDsl_path_not_exists:sort",
+          "passed": true
+        },
+        {
+          "detail": "budget=8000.0 ms, actual=278.5 ms",
+          "metric_group": "Performance",
+          "name": "latency_budget",
+          "passed": true
+        }
+      ],
+      "description": "Vietnamese quarter statistics for a concrete year should be classified as time aggregation, with confirmation before execution if confidence is low.",
+      "error": "",
+      "expected_status": 200,
+      "generated_dsl": {},
+      "iteration": 1,
+      "latency_ms": 278.5232000169344,
+      "needs_confirmation": true,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "TIME_AGGREGATION",
+      "source": "workflow_comparison_cases.jsonl:28",
+      "status": 200,
+      "summary_status": "NOT_REQUIRED",
+      "tags": [
+        "quarter",
+        "time_aggregation",
+        "regression"
+      ],
+      "total_count": 0
+    }
+  ],
+  "summary": {
+    "cache_hit_rate": 0.25,
+    "cache_hits": 7,
+    "category_counts": {
+      "ambiguity": 7,
+      "api_contract": 4,
+      "llm_language": 6,
+      "perception_prefilter": 2,
+      "soc_nl2plan": 2,
+      "temporal": 7
+    },
+    "category_latency_p95_ms": {
+      "ambiguity": 7768.607290019281,
+      "api_contract": 6100.748355031827,
+      "llm_language": 322.48214998980984,
+      "perception_prefilter": 94.2492000060156,
+      "soc_nl2plan": 3523.8307649997296,
+      "temporal": 360.1174500014167
+    },
+    "category_pass_rates": {
+      "ambiguity": 0.7142857142857143,
+      "api_contract": 1.0,
+      "llm_language": 1.0,
+      "perception_prefilter": 1.0,
+      "soc_nl2plan": 1.0,
+      "temporal": 1.0
+    },
+    "confirmation_rate": 0.7142857142857143,
+    "confirmation_runs": 20,
+    "executed_runs": 8,
+    "failed": 2,
+    "latency_max_ms": 8159.164600016084,
+    "latency_median_ms": 324.8252499906812,
+    "latency_min_ms": 13.672100030817091,
+    "latency_p95_ms": 6762.195625031018,
+    "metric_group_check_counts": {
+      "Aggregation Correctness": 86,
+      "DSL Correctness": 61,
+      "Performance": 28,
+      "Result Quality": 431,
+      "Safety / Guardrail": 131
+    },
+    "metric_group_check_pass_rates": {
+      "Aggregation Correctness": 1.0,
+      "DSL Correctness": 1.0,
+      "Performance": 0.9285714285714286,
+      "Result Quality": 1.0,
+      "Safety / Guardrail": 1.0
+    },
+    "metric_group_latency_p95_ms": {
+      "Aggregation Correctness": 7378.049980022477,
+      "DSL Correctness": 4442.796910012836,
+      "Performance": 6762.195625031018,
+      "Result Quality": 6762.195625031018,
+      "Safety / Guardrail": 6762.195625031018
+    },
+    "metric_group_run_counts": {
+      "Aggregation Correctness": 13,
+      "DSL Correctness": 15,
+      "Performance": 28,
+      "Result Quality": 28,
+      "Safety / Guardrail": 28
+    },
+    "metric_group_run_pass_rates": {
+      "Aggregation Correctness": 1.0,
+      "DSL Correctness": 1.0,
+      "Performance": 0.9285714285714286,
+      "Result Quality": 1.0,
+      "Safety / Guardrail": 1.0
+    },
+    "pass_rate": 0.9285714285714286,
+    "passed": 26,
+    "status_error_rate": 0.0,
+    "template_counts": {
+      "SIMPLE_SEARCH": 18,
+      "TERMS_AGGREGATION": 6,
+      "TIME_AGGREGATION": 4
+    },
+    "total": 28,
+    "zero_result_rate": 0.5,
+    "zero_result_runs": 4
+  },
+  "warmup": 0
+}

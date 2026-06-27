@@ -132,6 +132,31 @@ def render_report(args: argparse.Namespace, cases: list, results: list[dict], su
 
     lines.extend([
         "",
+        "## Metric Group Scorecard",
+        "",
+        "| Metric group | Runs | Run pass rate | Checks | Check pass rate | Latency p95 |",
+        "|---|---:|---:|---:|---:|---:|",
+    ])
+    metric_group_order = [
+        "DSL Correctness",
+        "Aggregation Correctness",
+        "Result Quality",
+        "Safety / Guardrail",
+        "Performance",
+    ]
+    for group in metric_group_order:
+        count = summary["metric_group_run_counts"].get(group, 0)
+        if count == 0:
+            continue
+        lines.append(
+            f"| {group} | {count} | {format_rate(summary['metric_group_run_pass_rates'].get(group, 0.0))} | "
+            f"{summary['metric_group_check_counts'].get(group, 0)} | "
+            f"{format_rate(summary['metric_group_check_pass_rates'].get(group, 0.0))} | "
+            f"{format_ms(summary['metric_group_latency_p95_ms'].get(group, 0.0))} |"
+        )
+
+    lines.extend([
+        "",
         "## Template Distribution",
         "",
         "| Template | Runs |",

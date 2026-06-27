@@ -11,6 +11,7 @@ class CheckResult:
     name: str
     passed: bool
     detail: str = ""
+    metric_group: str = "Result Quality"
 
 
 def get_path(value: Any, path: str) -> Any:
@@ -59,9 +60,26 @@ def summarize_runs(results: list[dict[str, Any]]) -> dict[str, Any]:
     category_counts = Counter(str(result.get("category") or "uncategorized") for result in results)
     category_passed = Counter(str(result.get("category") or "uncategorized") for result in results if result["passed"])
     category_latencies: dict[str, list[float]] = defaultdict(list)
+    metric_check_counts: Counter[str] = Counter()
+    metric_check_passed: Counter[str] = Counter()
+    metric_run_counts: Counter[str] = Counter()
+    metric_run_passed: Counter[str] = Counter()
+    metric_latencies: dict[str, list[float]] = defaultdict(list)
     for result in results:
         if result.get("latency_ms") is not None:
             category_latencies[str(result.get("category") or "uncategorized")].append(result["latency_ms"])
+        checks_by_group: dict[str, list[CheckResult]] = defaultdict(list)
+        for check in result.get("checks") or []:
+            checks_by_group[check.metric_group].append(check)
+            metric_check_counts[check.metric_group] += 1
+            if check.passed:
+                metric_check_passed[check.metric_group] += 1
+        for group, checks in checks_by_group.items():
+            metric_run_counts[group] += 1
+            if all(check.passed for check in checks):
+                metric_run_passed[group] += 1
+            if result.get("latency_ms") is not None:
+                metric_latencies[group].append(result["latency_ms"])
 
     return {
         "total": total,
@@ -89,6 +107,20 @@ def summarize_runs(results: list[dict[str, Any]]) -> dict[str, Any]:
         "category_latency_p95_ms": {
             category: percentile(values, 0.95)
             for category, values in sorted(category_latencies.items())
+        },
+        "metric_group_check_counts": dict(sorted(metric_check_counts.items())),
+        "metric_group_check_pass_rates": {
+            group: metric_check_passed[group] / count
+            for group, count in sorted(metric_check_counts.items())
+        },
+        "metric_group_run_counts": dict(sorted(metric_run_counts.items())),
+        "metric_group_run_pass_rates": {
+            group: metric_run_passed[group] / count
+            for group, count in sorted(metric_run_counts.items())
+        },
+        "metric_group_latency_p95_ms": {
+            group: percentile(values, 0.95)
+            for group, values in sorted(metric_latencies.items())
         },
     }
 
