@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class TemplateSelectionService {
-    private static final int DEFAULT_GROUPING_SIZE = 100;
+    private static final int DEFAULT_GROUPING_SIZE = 10;
 
     private final SearchSchemaRegistry schemaRegistry;
 

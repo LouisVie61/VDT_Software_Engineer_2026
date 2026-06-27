@@ -41,8 +41,8 @@ class EventIngestServiceTest {
         EventIngestService service = new EventIngestService(spool);
 
         IngestResult result = service.ingest(command("events.csv", "text/csv", """
-                timestamp,source,severity,event_type,user,host,ip,message,raw
-                2025-05-28T23:46:49Z,SIEM,high,auth,alice,host-1,10.0.0.1,Auth failed,raw one
+                timestamp,source,severity,event_type,user,host,ip,message,raw,advanced_metadata
+                2025-05-28T23:46:49Z,SIEM,high,auth,alice,host-1,10.0.0.1,Auth failed,raw one,"{""geo_location"":""Vietnam"",""user_agent"":""Mozilla""}"
                 """));
 
         assertThat(result.format()).isEqualTo(EventFileFormat.CSV);

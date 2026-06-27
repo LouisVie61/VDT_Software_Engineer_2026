@@ -5,10 +5,13 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import vdt.se.demo.application.dto.SearchRequest;
 import vdt.se.demo.domain.model.CanonicalQueryPlan;
+import vdt.se.demo.domain.model.RecurringTime;
 import vdt.se.demo.domain.model.SearchIntent;
 import vdt.se.demo.domain.model.TemplateSelection;
 import vdt.se.demo.domain.valueObjects.ChartType;
 import vdt.se.demo.domain.valueObjects.TemplateType;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -92,7 +95,7 @@ class ElasticsearchSearchDslBuilderTest {
     }
 
     @Test
-    void fullTextSearchUsesMessageOnly() {
+    void fullTextSearchUsesSearchableTextFieldsOnly() {
         SearchRequest request = SearchRequest.builder()
                 .question("connection timeout")
                 .page(0)
@@ -107,7 +110,7 @@ class ElasticsearchSearchDslBuilderTest {
         JsonNode fields = dsl.path("query").path("bool").path("must").path(0)
                 .path("simple_query_string").path("fields");
 
-        assertThat(fields.toString()).isEqualTo("[\"message\"]");
+        assertThat(fields.toString()).isEqualTo("[\"message\",\"user_agent\"]");
         assertThat(dsl.toString()).doesNotContain("\"raw\"");
     }
 
@@ -139,6 +142,69 @@ class ElasticsearchSearchDslBuilderTest {
         assertThat(compact).contains("\"term\":{\"ip\":\"10.0.0.1\"}");
         assertThat(compact).contains("\"gte\":\"2026-01-01T00:00:00Z\"");
         assertThat(compact).contains("\"lte\":\"2026-01-31T23:59:59Z\"");
+    }
+
+    @Test
+    void buildsGeoLocationFilterFromCanonicalIntent() {
+        SearchRequest request = SearchRequest.builder()
+                .question("show events at Vietnam")
+                .page(0)
+                .pageSize(25)
+                .build();
+        SearchIntent intent = SearchIntent.builder()
+                .intent(TemplateType.SIMPLE_SEARCH)
+                .filters(Map.of("geo_location", "Vietnam"))
+                .build();
+
+        JsonNode dsl = builder.build(request, plan(intent, TemplateType.SIMPLE_SEARCH, null));
+        String compact = dsl.toString();
+
+        assertThat(compact).contains("\"term\":{\"geo_location\":\"Vietnam\"}");
+        assertThat(compact).doesNotContain("\"country\"");
+        assertThat(compact).doesNotContain("\"location\"");
+    }
+
+    @Test
+    void usesNormalizedVietnamGeoLocationValue() {
+        SearchRequest request = SearchRequest.builder()
+                .question("show events tai Viet Nam")
+                .page(0)
+                .pageSize(25)
+                .build();
+        SearchIntent intent = SearchIntent.builder()
+                .intent(TemplateType.SIMPLE_SEARCH)
+                .filters(Map.of("geo_location", "Vietnam"))
+                .build();
+
+        JsonNode dsl = builder.build(request, plan(intent, TemplateType.SIMPLE_SEARCH, null));
+        String compact = dsl.toString();
+
+        assertThat(compact).contains("\"term\":{\"geo_location\":\"Vietnam\"}");
+        assertThat(compact).doesNotContain("Vi?t Nam");
+    }
+
+    @Test
+    void buildsRecurringMonthFilterWithoutDroppingTemporalCondition() {
+        SearchRequest request = SearchRequest.builder()
+                .question("thong ke su kien trong thang 7 hang nam")
+                .page(0)
+                .pageSize(25)
+                .build();
+        SearchIntent intent = SearchIntent.builder()
+                .intent(TemplateType.TIME_AGGREGATION)
+                .recurringTime(RecurringTime.builder()
+                        .mode("EVERY_YEAR")
+                        .month(7)
+                        .build())
+                .build();
+
+        JsonNode dsl = builder.build(request, plan(intent, TemplateType.TIME_AGGREGATION, "timestamp"));
+        String compact = dsl.toString();
+
+        assertThat(compact).contains("\"script\"");
+        assertThat(compact).contains("getMonthValue() == params.month");
+        assertThat(compact).contains("\"month\":7");
+        assertThat(compact).doesNotContain("2026-07-01");
     }
 
     private CanonicalQueryPlan plan(SearchIntent intent, TemplateType type, String groupBy) {

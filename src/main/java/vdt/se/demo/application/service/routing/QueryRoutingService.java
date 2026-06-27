@@ -40,7 +40,8 @@ public class QueryRoutingService {
                     .semantic(false)
                     .build();
         }
-        if (containsStatisticsWord(text) && containsAny(text, "loi", "error", "errors", "failure", "failures")) {
+        if (containsStatisticsWord(text) && containsAny(text, "loi", "error", "errors", "failure", "failures")
+                && hasExplicitTermsSignal(text)) {
             return RoutingHint.builder()
                     .templateType(TemplateType.TERMS_AGGREGATION)
                     .confidence(0.78d)
@@ -48,8 +49,10 @@ public class QueryRoutingService {
                     .semantic(false)
                     .build();
         }
-        if (containsAny(text, "over time", "timeline", "theo thoi gian", "so event theo gio",
-                "hourly", "daily") || (containsStatisticsWord(text) && containsTimeExpression(text))) {
+        if (containsAny(text, "over time", "timeline", "trend", "trends", "theo thoi gian", "so event theo gio",
+                "hourly", "daily", "weekly", "monthly", "per hour", "per day", "per week", "per month",
+                "moi gio", "hang gio", "moi ngay", "hang ngay", "moi tuan", "hang tuan", "moi thang", "hang thang")
+                || (containsStatisticsWord(text) && containsTimeExpression(text) && !hasExplicitTermsSignal(text))) {
             return RoutingHint.builder()
                     .templateType(TemplateType.TIME_AGGREGATION)
                     .confidence(0.82d)
@@ -57,8 +60,7 @@ public class QueryRoutingService {
                     .semantic(false)
                     .build();
         }
-        if (containsAny(text, "top", "group by", "group", "by ", "theo tung", "dem", "count",
-                "statistics by", "stats by", "thong ke theo")) {
+        if (hasExplicitTermsSignal(text)) {
             return RoutingHint.builder()
                     .templateType(TemplateType.TERMS_AGGREGATION)
                     .confidence(0.74d)
@@ -117,9 +119,17 @@ public class QueryRoutingService {
         return containsAny(text, "statistic", "statistics", "stats", "thong ke", "thongke", "th", "dem", "count", "distribution", "phanpho");
     }
 
+    private boolean hasExplicitTermsSignal(String text) {
+        return containsAny(text, "top", "most frequent", "most common", "nhieu nhat", "group by", "grouped by",
+                "by event type", "by type", "by source", "by severity", "by user", "by host", "by ip",
+                "statistics by", "stats by", "thong ke theo", "theo loai", "theo nguon", "theo muc do",
+                "theo user", "theo host", "theo ip", "phan bo", "distribution");
+    }
+
     private boolean containsTimeExpression(String text) {
         return YEAR_PATTERN.matcher(text).find()
-                || containsAny(text, "last ", "past ", "previous ", "ngay qua", "gio qua", "nam ", "year ");
+                || containsAny(text, "last ", "past ", "previous ", "from ", "to ", "between ", "ngay qua", "gio qua",
+                "tu ngay", "den ngay", "tu thang", "den thang", "nam ", "year ", "month ", "thang ");
     }
 
     private boolean containsAny(String text, String... values) {

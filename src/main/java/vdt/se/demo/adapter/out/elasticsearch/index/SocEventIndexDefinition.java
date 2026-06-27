@@ -1,7 +1,6 @@
 package vdt.se.demo.adapter.out.elasticsearch.index;
 
 import org.springframework.stereotype.Component;
-
 @Component
 public class SocEventIndexDefinition {
 
@@ -10,19 +9,10 @@ public class SocEventIndexDefinition {
                 {
                   "mappings": {
                     "properties": {
-                      "timestamp": { "type": "date" },
-                      "source": { "type": "keyword" },
-                      "severity": { "type": "keyword" },
-                      "event_type": { "type": "keyword" },
-                      "user": { "type": "keyword" },
-                      "host": { "type": "keyword" },
-                      "ip": { "type": "ip", "ignore_malformed": true },
-                      "message": { "type": "text" },
-                      "raw": { "type": "text" },
-                      "metadata": { "type": "flattened" }
+                %s
                     }
                   }
                 }
-                """;
+                """.formatted(SocEventElasticsearchMapping.propertiesJson());
     }
 }

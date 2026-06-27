@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class CanonicalPlanBuilder {
-    private static final int DEFAULT_GROUPING_SIZE = 100;
+    private static final int DEFAULT_GROUPING_SIZE = 10;
 
     private final TemplateSelectionService templateSelectionService;
     private final TemplateIntentSelector templateIntentSelector;
@@ -36,9 +36,10 @@ public class CanonicalPlanBuilder {
         SearchIntent intent = mergedIntent == null ? new SearchIntent() : mergedIntent.copy();
         TemplateType selectedType = templateIntentSelector.select(routingHint, intent);
         intent.setIntent(selectedType);
-
+        
         List<SearchWarning> warnings = new ArrayList<>();
         warnings.addAll(spanWarnings(intent));
+        
         if (selectedType == TemplateType.TERMS_AGGREGATION && !hasText(intent.getGroupBy())) {
             Optional<CanonicalQueryPlan> pending = resolveMissingGroupBy(normalizedQuery, schemaVersion, sessionId,
                     routingHint, extractedFields, intent, provider, rawLlmContent, warnings);

@@ -19,13 +19,23 @@ class QueryRoutingServiceTest {
     }
 
     @Test
-    void routesStatisticalErrorYearQuestionAsTermsAggregation() {
+    void routesStatisticalErrorYearQuestionAsTimeAggregationWithoutGroupingSignal() {
         QueryRoutingService service = new QueryRoutingService((left, right) -> 0.0d);
 
         QueryRoutingService.RoutingDecision decision =
                 service.route("Statistic cac loi trong nam 2026");
 
-        assertThat(decision.heuristic().templateType()).isEqualTo(TemplateType.TERMS_AGGREGATION);
+        assertThat(decision.heuristic().templateType()).isEqualTo(TemplateType.TIME_AGGREGATION);
+    }
+
+    @Test
+    void timePhraseAloneDoesNotRouteAsTimeAggregation() {
+        QueryRoutingService service = new QueryRoutingService((left, right) -> 0.0d);
+
+        QueryRoutingService.RoutingDecision decision =
+                service.route("from June 1 to June 15 2025");
+
+        assertThat(decision.heuristic().templateType()).isEqualTo(TemplateType.SIMPLE_SEARCH);
     }
 
     @Test

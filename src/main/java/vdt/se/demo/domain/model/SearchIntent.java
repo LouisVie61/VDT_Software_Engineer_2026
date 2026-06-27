@@ -27,6 +27,7 @@ public class SearchIntent {
     private String timeBucket;
     private String timeFrom;
     private String timeTo;
+    private RecurringTime recurringTime;
     private String overrideIntent;
     private String overrideReason;
     @Builder.Default
@@ -45,6 +46,7 @@ public class SearchIntent {
                 .timeBucket(timeBucket)
                 .timeFrom(timeFrom)
                 .timeTo(timeTo)
+                .recurringTime(recurringTime)
                 .overrideIntent(overrideIntent)
                 .overrideReason(overrideReason)
                 .semanticSpans(semanticSpans == null ? List.of() : List.copyOf(semanticSpans))

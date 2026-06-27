@@ -1,14 +1,38 @@
 package vdt.se.demo.application.service.intent;
 
 import vdt.se.demo.application.dto.SearchRequest;
+import vdt.se.demo.domain.model.RecurringTime;
 import vdt.se.demo.domain.model.SearchIntent;
+import vdt.se.demo.domain.model.SemanticSpan;
 import vdt.se.demo.domain.valueObjects.TemplateType;
 
 import java.text.Normalizer;
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SearchIntentNormalizer {
+    private static final Pattern VI_MONTH_PATTERN = Pattern.compile("\\bthang\\s+(1[0-2]|[1-9])\\b");
+    private static final Map<String, Integer> EN_MONTHS = Map.ofEntries(
+            Map.entry("january", 1),
+            Map.entry("february", 2),
+            Map.entry("march", 3),
+            Map.entry("april", 4),
+            Map.entry("may", 5),
+            Map.entry("june", 6),
+            Map.entry("july", 7),
+            Map.entry("august", 8),
+            Map.entry("september", 9),
+            Map.entry("october", 10),
+            Map.entry("november", 11),
+            Map.entry("december", 12)
+    );
+
     private final SearchTimeExpressionResolver timeExpressionResolver;
     private final SearchFilterValidator filterValidator;
 
@@ -32,6 +56,17 @@ public class SearchIntentNormalizer {
         filterValidator.validateAndNormalize(intent);
         removeFiltersOverriddenByRequest(request, intent);
 
+        Optional<Integer> annualMonth = annualRecurringMonth(request == null ? null : request.getQuestion(), intent);
+        if (annualMonth.isPresent()) {
+            intent.setTimeFrom(null);
+            intent.setTimeTo(null);
+            intent.setTimeBucket(null);
+            intent.setRecurringTime(RecurringTime.builder()
+                    .mode("EVERY_YEAR")
+                    .month(annualMonth.get())
+                    .build());
+            intent.setSemanticSpans(withAnnualRecurrenceWarning(intent.getSemanticSpans(), request.getQuestion(), annualMonth.get()));
+        }
         timeExpressionResolver.apply(request, intent);
         intent.setTextQuery(cleanTextQuery(intent.getTextQuery()));
         intent.setGroupBy(cleanField(intent.getGroupBy()));
@@ -114,6 +149,56 @@ public class SearchIntentNormalizer {
                 || normalized.contains("by quarter")
                 || normalized.contains("per quarter")
                 || normalized.contains("quarterly");
+    }
+
+    private Optional<Integer> annualRecurringMonth(String question, SearchIntent intent) {
+        String normalized = canonicalize(question);
+        boolean annual = (normalized.contains("hang nam")
+                || normalized.contains("moi nam")
+                || normalized.contains("yearly")
+                || normalized.contains("annually")
+                || normalized.contains("every year"));
+        if (!annual) {
+            return Optional.empty();
+        }
+        return monthFromQuestion(normalized).or(() -> monthFromTimeFrom(intent == null ? null : intent.getTimeFrom()));
+    }
+
+    private Optional<Integer> monthFromQuestion(String normalizedQuestion) {
+        Matcher matcher = VI_MONTH_PATTERN.matcher(normalizedQuestion);
+        if (matcher.find()) {
+            return Optional.of(Integer.parseInt(matcher.group(1)));
+        }
+        for (Map.Entry<String, Integer> entry : EN_MONTHS.entrySet()) {
+            if (normalizedQuestion.contains(entry.getKey())) {
+                return Optional.of(entry.getValue());
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<Integer> monthFromTimeFrom(String timeFrom) {
+        if (!hasText(timeFrom)) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(Instant.parse(timeFrom.trim()).atZone(java.time.ZoneOffset.UTC).getMonthValue());
+        } catch (DateTimeParseException ignored) {
+            return Optional.empty();
+        }
+    }
+
+    private List<SemanticSpan> withAnnualRecurrenceWarning(List<SemanticSpan> spans, String question, int month) {
+        List<SemanticSpan> next = new java.util.ArrayList<>(spans == null ? List.of() : spans);
+        next.add(SemanticSpan.builder()
+                .kind(SemanticSpan.Kind.TEMPORAL)
+                .status(SemanticSpan.Status.UNSUPPORTED)
+                .text(question == null ? "annual recurring month" : question)
+                .canonical("annual_recurring_month:%d".formatted(month))
+                .start(0)
+                .end(question == null ? 0 : question.length())
+                .build());
+        return next;
     }
 
     private String value(String value) {

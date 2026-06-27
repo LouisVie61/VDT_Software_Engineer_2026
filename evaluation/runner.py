@@ -12,11 +12,11 @@ from metrics import format_ms, format_rate, summarize_runs
 
 
 DEFAULT_CASES = [
-    Path("evaluation/cases/soc_nl2plan_v1.jsonl"),
-    Path("evaluation/cases/temporal_cases.jsonl"),
-    Path("evaluation/cases/residual_cases.jsonl"),
-    Path("evaluation/cases/ambiguity_cases.jsonl"),
-    Path("evaluation/cases/llm_language_cases.jsonl"),
+    Path("evaluation/cases/workflow/soc_nl2plan_v1.jsonl"),
+    Path("evaluation/cases/workflow/ambiguity_cases.jsonl"),
+    Path("evaluation/cases/workflow/llm_language_cases.jsonl"),
+    Path("evaluation/cases/workflow/temporal_cases.jsonl"),
+    Path("evaluation/cases/regression/residual_cases.jsonl"),
 ]
 
 
@@ -128,6 +128,31 @@ def render_report(args: argparse.Namespace, cases: list, results: list[dict], su
         lines.append(
             f"| {category} | {count} | {format_rate(summary['category_pass_rates'].get(category, 0.0))} | "
             f"{format_ms(summary['category_latency_p95_ms'].get(category, 0.0))} |"
+        )
+
+    lines.extend([
+        "",
+        "## Metric Group Scorecard",
+        "",
+        "| Metric group | Runs | Run pass rate | Checks | Check pass rate | Latency p95 |",
+        "|---|---:|---:|---:|---:|---:|",
+    ])
+    metric_group_order = [
+        "DSL Correctness",
+        "Aggregation Correctness",
+        "Result Quality",
+        "Safety / Guardrail",
+        "Performance",
+    ]
+    for group in metric_group_order:
+        count = summary["metric_group_run_counts"].get(group, 0)
+        if count == 0:
+            continue
+        lines.append(
+            f"| {group} | {count} | {format_rate(summary['metric_group_run_pass_rates'].get(group, 0.0))} | "
+            f"{summary['metric_group_check_counts'].get(group, 0)} | "
+            f"{format_rate(summary['metric_group_check_pass_rates'].get(group, 0.0))} | "
+            f"{format_ms(summary['metric_group_latency_p95_ms'].get(group, 0.0))} |"
         )
 
     lines.extend([

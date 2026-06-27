@@ -86,6 +86,11 @@ public class LlmIntentPromptBuilder {
                 - Quarter 2 = Apr 01 to Jun 30
                 - Quarter 3 = Jul 01 to Sep 30
                 - Quarter 4 = Oct 01 to Dec 31
+                - "thang 7 hang nam", "thang 7 moi nam", "July every year", and similar annual recurring
+                  month/date phrases are recurrence constraints, not a concrete time range.
+                  Do not resolve them to the next/current calendar year such as July 2026.
+                  Leave timeRange.from and timeRange.to null and set recurringTime={"mode":"EVERY_YEAR","month":7}
+                  unless the user names a concrete year.
                 - "tuan truoc" means past 7 days from now
                 - "hom nay" means start of today UTC to now
                 - "thang nay" means first day of current month to now
@@ -110,31 +115,25 @@ public class LlmIntentPromptBuilder {
                 - null
 
                 Use overrideIntent only when extracted fields clearly contradict a non-neutral routing hint.
+                Do not override TIME_AGGREGATION to TERMS_AGGREGATION merely because the question says
+                "statistics events" or "thong ke event"; explicit grouping/top/frequency wording is required.
                 Do not explain the override outside JSON.
 
                 === ALLOWED FIELDS ===
-                timestamp: date
-                source: keyword
-                severity: keyword
-                event_type: keyword
-                action: keyword
-                user: keyword
-                host: keyword
-                ip: ip
-                message: text, free-text search only
-                raw: not indexed, never query, never filter, never aggregate
+                %s
 
                 Structured filters may only use:
-                - source
-                - severity
-                - event_type
-                - action
-                - user
-                - host
-                - ip
+                %s
 
-                textQuery may only represent searchable free text for the message field.
+                textQuery may only represent searchable free text for the message and user_agent fields.
                 Never use raw.
+
+                Location field contract:
+                - Natural-language location/country/city/province/region/state/address mentions must use filters.geo_location.
+                - Never output filters named location, country, city, province, region, state, or address.
+                - Examples: "at Vietnam", "in Vietnam", "tai Vietnam", "o Vietnam" -> filters.geo_location = "Vietnam".
+                - Do not add geo_location merely because the query is written in Vietnamese, mentions a language,
+                  or references Vietnam as non-filter context. Use geo_location only for an explicit location constraint.
 
                 === KNOWN FIELD VALUES ===
                 severity values:
@@ -176,12 +175,11 @@ public class LlmIntentPromptBuilder {
 
                 === LINGUISTIC MAPPING GUIDANCE ===
                 Prefer structured filters for:
-                - severity
-                - event_type
-                - action
-                - user
-                - host
-                - ip
+                %s
+
+                Location phrases map to geo_location:
+                - at/in/o/tai/tại/ở + country/city/province/region/state/address -> geo_location
+                - country/location/city/province/region/state/address are semantic aliases, not output field names
 
                 Valid IP addresses should become ip filters.
                 Do not put IP addresses into textQuery unless the analyst explicitly says the message contains that IP.
@@ -242,29 +240,36 @@ public class LlmIntentPromptBuilder {
                 - If a known event_type clearly matches the concept, use event_type instead.
 
                 === AGGREGATION RULES ===
-                Use groupBy only when the analyst explicitly asks for grouping, top, count by field, statistics by field, distribution, or thống kê.
+                Use groupBy only when the analyst explicitly asks for grouping, top, most frequent, count by field,
+                statistics by field, or distribution by field.
+
+                Do not infer groupBy=event_type merely because the user asks for statistics/events.
+                "statistics events", "statistics of events", "thong ke event", or "thong ke su kien" alone means
+                aggregate event counts according to the strongest other signal, not group by event_type.
+                Only set groupBy when the user explicitly asks "by type", "by source", "by severity", "top",
+                "most frequent", "group by", "theo loai", "theo nguon", "theo muc do", or "nhieu nhat".
+                If the user asks for statistics over a time period without explicit grouping, prefer
+                TIME_AGGREGATION with a suitable timeBucket.
 
                 groupBy may only be one of:
-                - source
-                - severity
-                - event_type
-                - action
-                - user
-                - host
-                - ip
+                %s
 
                 Infer groupBy only when explicit:
                 - top IPs -> ip
                 - top users -> user
                 - top hosts -> host
+                - top locations/countries/addresses -> geo_location
+                - top user agents/browsers/clients -> user_agent
                 - top events -> event_type
                 - by source -> source
                 - by severity -> severity
                 - by event type -> event_type
                 - by action -> action
-                - statistics -> event_type (if field not specified)
-                - thống kê / thong ke -> event_type (if field not specified)
-                - distribution -> event_type (if field not specified)
+                - by geo location/location/country/address -> geo_location
+                - by user agent/browser/client -> user_agent
+                - statistics by event type -> event_type
+                - thong ke theo loai su kien -> event_type
+                - distribution by event type -> event_type
 
                 If intent is TERMS_AGGREGATION but groupBy cannot be determined:
                 return intent = "UNRESOLVABLE" with reason = "missing aggregation field".
@@ -371,7 +376,9 @@ public class LlmIntentPromptBuilder {
                     "action": null,
                     "user": null,
                     "host": null,
-                    "ip": null
+                    "ip": null,
+                    "geo_location": null,
+                    "user_agent": null
                   },
                   "groupBy": null,
                   "metric": null,
@@ -381,6 +388,7 @@ public class LlmIntentPromptBuilder {
                     "from": null,
                     "to": null
                   },
+                  "recurringTime": null,
                   "contextUsage": "NOT_AVAILABLE",
                   "overrideIntent": null,
                   "overrideReason": null,
@@ -418,7 +426,9 @@ public class LlmIntentPromptBuilder {
                     "action": null,
                     "user": null,
                     "host": null,
-                    "ip": null
+                    "ip": null,
+                    "geo_location": null,
+                    "user_agent": null
                   },
                   "groupBy": null,
                   "metric": null,
@@ -428,6 +438,7 @@ public class LlmIntentPromptBuilder {
                     "from": null,
                     "to": null
                   },
+                  "recurringTime": null,
                   "contextUsage": "NOT_AVAILABLE",
                   "overrideIntent": null,
                   "overrideReason": null,
@@ -446,6 +457,8 @@ public class LlmIntentPromptBuilder {
                 %s
                 """.formatted(
                 Instant.now().toString(),
+                SocEventPromptSchema.allowedFields(),
+                SocEventPromptSchema.filterableFieldBullets(),
 
                 value(request.request().getFrom()),
                 value(request.request().getTo()),
@@ -454,6 +467,9 @@ public class LlmIntentPromptBuilder {
                 value(request.request().getUser()),
                 value(request.request().getHost()),
                 value(request.request().getIp()),
+
+                SocEventPromptSchema.filterableFieldBullets(),
+                SocEventPromptSchema.groupableFieldBullets(),
 
                 request.routingHint() == null ? "null" : request.routingHint().templateType(),
                 request.routingHint() == null ? "null" : request.routingHint().confidence(),

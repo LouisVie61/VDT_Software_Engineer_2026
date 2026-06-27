@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import vdt.se.demo.domain.exception.BadQueryException;
+import vdt.se.demo.domain.model.RecurringTime;
 import vdt.se.demo.domain.model.SearchIntent;
 import vdt.se.demo.domain.model.SemanticSpan;
 import vdt.se.demo.domain.valueObjects.TemplateType;
@@ -36,6 +37,7 @@ public class IntentResponseParser {
                     .timeBucket(text(root, "timeBucket"))
                     .timeFrom(text(root.get("timeRange"), "from"))
                     .timeTo(text(root.get("timeRange"), "to"))
+                    .recurringTime(recurringTime(root.get("recurringTime")))
                     .overrideIntent(text(root, "overrideIntent"))
                     .overrideReason(text(root, "overrideReason"))
                     .semanticSpans(semanticSpans(root.get("semanticSpans")))
@@ -74,6 +76,21 @@ public class IntentResponseParser {
             }
         }
         return spans;
+    }
+
+    private RecurringTime recurringTime(JsonNode node) {
+        if (node == null || !node.isObject()) {
+            return null;
+        }
+        String mode = text(node, "mode");
+        Integer month = node.hasNonNull("month") && node.get("month").isNumber() ? node.get("month").asInt() : null;
+        if (mode == null && month == null) {
+            return null;
+        }
+        return RecurringTime.builder()
+                .mode(mode)
+                .month(month)
+                .build();
     }
 
     private <T extends Enum<T>> T enumValue(Class<T> type, String value, T fallback) {

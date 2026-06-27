@@ -17,11 +17,15 @@ evaluation/
 +-- README.md
 +-- annotation_guideline.md
 +-- cases/
-|   +-- soc_nl2plan_v1.jsonl
-|   +-- temporal_cases.jsonl
-|   +-- residual_cases.jsonl
-|   +-- ambiguity_cases.jsonl
-|   +-- llm_language_cases.jsonl
+|   +-- workflow/
+|   |   +-- soc_nl2plan_v1.jsonl
+|   |   +-- ambiguity_cases.jsonl
+|   |   +-- llm_language_cases.jsonl
+|   |   +-- temporal_cases.jsonl
+|   +-- regression/
+|   |   +-- residual_cases.jsonl
+|   +-- ablation/
+|   |   +-- workflow_comparison_cases.jsonl
 +-- reports/
 |   +-- .gitkeep
 +-- evaluator.py
@@ -63,7 +67,7 @@ demo/evaluation/reports/backend_evaluation_report.md
 ```powershell
 python evaluation\runner.py `
   --base-url http://localhost:8080 `
-  --cases evaluation\cases\soc_nl2plan_v1.jsonl evaluation\cases\temporal_cases.jsonl `
+  --cases evaluation\cases\workflow\soc_nl2plan_v1.jsonl evaluation\cases\workflow\temporal_cases.jsonl `
   --repeat 5 `
   --warmup 1 `
   --timeout 10 `
@@ -73,11 +77,37 @@ python evaluation\runner.py `
 
 ## Benchmark profiles
 
-Default suite chay tat ca case, bao gom `llm_language_cases.jsonl`. Neu muon benchmark backend contract ma khong phu thuoc LLM provider/API key, chay subset on dinh:
+### Ablation metric scorecard
+
+Suite `workflow_comparison_cases.jsonl` duoc cham black-box theo 5 nhom:
+
+- `DSL Correctness`: template, generated DSL, filter, pagination va time range.
+- `Aggregation Correctness`: terms/time aggregation, bucket va chart contract.
+- `Result Quality`: HTTP/JSON contract, execution evidence, result va total count.
+- `Safety / Guardrail`: confirmation, warning, ambiguity va prohibited DSL behavior.
+- `Performance`: latency budget cua tung case va latency p95.
+
+Moi assertion trong JSON report co field `metric_group`. Scorecard Markdown va
+JSON cung bao cao ca run pass rate va check pass rate, nen loi cua mot nhom
+khong lam sai diem cua nhom khac.
 
 ```powershell
 python evaluation\runner.py `
-  --cases evaluation\cases\soc_nl2plan_v1.jsonl evaluation\cases\temporal_cases.jsonl evaluation\cases\residual_cases.jsonl evaluation\cases\ambiguity_cases.jsonl `
+  --base-url http://localhost:8080 `
+  --cases evaluation\cases\ablation\workflow_comparison_cases.jsonl `
+  --repeat 1 `
+  --timeout 30 `
+  --output evaluation\reports\ablation_report.md `
+  --json-output evaluation\reports\ablation_report.json
+```
+
+Default suite chay cac case `workflow/` va `regression/` de test mot version backend binh thuong. Nhom `ablation/` khong nam trong default suite; dung rieng de black-box compare hai phien ban.
+
+Neu muon benchmark backend contract ma khong phu thuoc LLM provider/API key, chay subset on dinh:
+
+```powershell
+python evaluation\runner.py `
+  --cases evaluation\cases\workflow\soc_nl2plan_v1.jsonl evaluation\cases\workflow\temporal_cases.jsonl evaluation\cases\regression\residual_cases.jsonl evaluation\cases\workflow\ambiguity_cases.jsonl `
   --repeat 3
 ```
 
@@ -85,9 +115,27 @@ Neu muon benchmark prompt/LLM language quality rieng:
 
 ```powershell
 python evaluation\runner.py `
-  --cases evaluation\cases\llm_language_cases.jsonl `
+  --cases evaluation\cases\workflow\llm_language_cases.jsonl `
   --repeat 3 `
   --timeout 15
+```
+
+Neu muon black-box compare hai phien ban backend, chay cung mot ablation suite tren tung version va ghi report rieng:
+
+```powershell
+python evaluation\runner.py `
+  --base-url http://localhost:8080 `
+  --cases evaluation\cases\ablation\workflow_comparison_cases.jsonl `
+  --repeat 3 `
+  --output evaluation\reports\ablation_v1_report.md `
+  --json-output evaluation\reports\ablation_v1_report.json
+
+python evaluation\runner.py `
+  --base-url http://localhost:8081 `
+  --cases evaluation\cases\ablation\workflow_comparison_cases.jsonl `
+  --repeat 3 `
+  --output evaluation\reports\ablation_v2_report.md `
+  --json-output evaluation\reports\ablation_v2_report.json
 ```
 
 ## Tieu chuan pass mac dinh

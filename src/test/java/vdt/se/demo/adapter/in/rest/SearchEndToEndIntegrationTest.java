@@ -178,7 +178,7 @@ class SearchEndToEndIntegrationTest {
                 .andExpect(jsonPath("$.selectedTemplate").value("TERMS_AGGREGATION"))
                 .andExpect(jsonPath("$.confirmation.confirmationId").isNotEmpty())
                 .andExpect(jsonPath("$.confirmation.intent.topN").doesNotExist())
-                .andExpect(jsonPath("$.confirmation.templateSelection.size").value(100))
+                .andExpect(jsonPath("$.confirmation.templateSelection.size").value(10))
                 .andExpect(content -> assertThat(content.getResponse().getContentAsString())
                         .contains("TOP_N_REQUIRED"));
 
