@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import platform
 import sys
@@ -30,6 +31,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", type=Path, default=Path("evaluation/reports/backend_evaluation_report.md"), help="Markdown report path.")
     parser.add_argument("--json-output", type=Path, default=None, help="Optional machine-readable JSON report path.")
     parser.add_argument("--min-pass-rate", type=float, default=0.90, help="Minimum acceptable pass rate, from 0 to 1.")
+    parser.add_argument("--variant", default="unspecified", help="Stable label for the backend variant under test.")
+    parser.add_argument("--data-snapshot", default="unspecified", help="Shared Elasticsearch snapshot/version label for A/B validation.")
+    parser.add_argument("--provider-config", default="unspecified", help="Shared provider/model/config label for A/B validation.")
+    parser.add_argument("--cache-regime", choices=("unspecified", "cold", "warm", "mixed"), default="unspecified", help="Cache state used by this run.")
+    parser.add_argument("--auto-confirm", action="store_true", help="Follow needsConfirmation responses through /api/search/confirm.")
+    parser.add_argument("--require-executions", type=int, default=None, help="Require exactly this many finalized executions.")
     return parser.parse_args()
 
 
@@ -40,18 +47,25 @@ def main() -> int:
 
     for iteration in range(1, args.warmup + 1):
         for case in cases:
-            result = run_case(case, args.base_url, args.timeout, iteration)
+            result = run_case(case, args.base_url, args.timeout, iteration, auto_confirm=args.auto_confirm)
             status = "PASS" if result["passed"] else "FAIL"
             print(f"[WARMUP {status}] iter={iteration} case={case.id} latency={result['latency_ms']:.1f}ms")
 
     for iteration in range(1, args.repeat + 1):
         for case in cases:
-            result = run_case(case, args.base_url, args.timeout, iteration)
+            result = run_case(case, args.base_url, args.timeout, iteration, auto_confirm=args.auto_confirm)
             results.append(result)
             status = "PASS" if result["passed"] else "FAIL"
             print(f"[{status}] iter={iteration} case={case.id} latency={result['latency_ms']:.1f}ms")
 
     summary = summarize_runs(results)
+    summary["variant"] = args.variant
+    summary["request_fingerprint"] = cases_fingerprint(cases, include_expectations=False)
+    summary["evaluation_fingerprint"] = cases_fingerprint(cases, include_expectations=True)
+    summary["required_executions"] = args.require_executions
+    summary["execution_target_met"] = (
+        args.require_executions is None or summary["executed_runs"] == args.require_executions
+    )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(render_report(args, cases, results, summary), encoding="utf-8")
     if args.json_output is not None:
@@ -61,7 +75,22 @@ def main() -> int:
     print(f"\nReport written to {args.output}")
     if args.json_output is not None:
         print(f"JSON report written to {args.json_output}")
-    return 0 if summary["pass_rate"] >= args.min_pass_rate else 1
+    return 0 if benchmark_passed(summary, args.min_pass_rate) else 1
+
+
+def benchmark_passed(summary: dict, min_pass_rate: float) -> bool:
+    return summary["pass_rate"] >= min_pass_rate and summary.get("execution_target_met", True)
+
+
+def cases_fingerprint(cases: list, include_expectations: bool) -> str:
+    payload = []
+    for case in cases:
+        item = {"id": case.id, "request": case.request}
+        if include_expectations:
+            item["expected"] = case.expected
+        payload.append(item)
+    encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
 def render_json_report(args: argparse.Namespace, cases: list, results: list[dict], summary: dict) -> str:
@@ -70,6 +99,12 @@ def render_json_report(args: argparse.Namespace, cases: list, results: list[dict
         "cases": len(cases),
         "repeat": args.repeat,
         "warmup": args.warmup,
+        "variant": args.variant,
+        "data_snapshot": args.data_snapshot,
+        "provider_config": args.provider_config,
+        "cache_regime": args.cache_regime,
+        "request_fingerprint": summary["request_fingerprint"],
+        "evaluation_fingerprint": summary["evaluation_fingerprint"],
         "min_pass_rate": args.min_pass_rate,
         "summary": summary,
         "results": [
@@ -85,7 +120,7 @@ def render_json_report(args: argparse.Namespace, cases: list, results: list[dict
 
 def render_report(args: argparse.Namespace, cases: list, results: list[dict], summary: dict) -> str:
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
-    verdict = "PASS" if summary["pass_rate"] >= args.min_pass_rate else "FAIL"
+    verdict = "PASS" if benchmark_passed(summary, args.min_pass_rate) else "FAIL"
     lines = [
         "# Backend Evaluation Report",
         "",
@@ -95,6 +130,12 @@ def render_report(args: argparse.Namespace, cases: list, results: list[dict], su
         f"- Cases: `{len(cases)}`",
         f"- Repeat: `{args.repeat}`",
         f"- Warmup: `{args.warmup}`",
+        f"- Variant: `{args.variant}`",
+        f"- Data snapshot: `{args.data_snapshot}`",
+        f"- Provider config: `{args.provider_config}`",
+        f"- Cache regime: `{args.cache_regime}`",
+        f"- Request fingerprint: `{summary['request_fingerprint']}`",
+        f"- Evaluation fingerprint: `{summary['evaluation_fingerprint']}`",
         f"- Verdict: **{verdict}**",
         "",
         "## Summary",
@@ -107,7 +148,10 @@ def render_report(args: argparse.Namespace, cases: list, results: list[dict], su
         f"| Pass rate | {format_rate(summary['pass_rate'])} |",
         f"| Status error rate | {format_rate(summary['status_error_rate'])} |",
         f"| Executed runs | {summary['executed_runs']} |",
+        f"| Required executions | {summary['required_executions'] if summary['required_executions'] is not None else '-'} |",
+        f"| Execution target met | {summary['execution_target_met']} |",
         f"| Confirmation runs | {summary['confirmation_runs']} |",
+        f"| Confirmations followed | {summary['confirmation_followed_runs']} |",
         f"| Confirmation rate | {format_rate(summary['confirmation_rate'])} |",
         f"| Cache hits | {summary['cache_hits']} |",
         f"| Cache hit rate | {format_rate(summary['cache_hit_rate'])} |",
@@ -186,7 +230,7 @@ def render_report(args: argparse.Namespace, cases: list, results: list[dict], su
                 iteration=result["iteration"],
                 status=result["status"],
                 template=result.get("selected_template") or "-",
-                confirm=result.get("needs_confirmation"),
+                confirm=result.get("initial_needs_confirmation", result.get("needs_confirmation")),
                 cache=result.get("cache_hit"),
                 total=result.get("total_count"),
                 rows=result.get("result_count", 0),
