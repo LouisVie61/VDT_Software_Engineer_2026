@@ -11,6 +11,7 @@ class CheckResult:
     name: str
     passed: bool
     detail: str = ""
+    metric_group: str = "Result Quality"
 
 
 def get_path(value: Any, path: str) -> Any:
@@ -46,32 +47,43 @@ def summarize_runs(results: list[dict[str, Any]]) -> dict[str, Any]:
     failed = total - passed
     latencies = [result["latency_ms"] for result in results if result.get("latency_ms") is not None]
     status_errors = sum(1 for result in results if result.get("status") != result.get("expected_status"))
-    executed = [result for result in results if result.get("status") == 200 and result.get("needs_confirmation") is not True]
+    executed = [result for result in results if result.get("final_execution") is True]
     zero_result_runs = sum(
         1
         for result in executed
         if result.get("total_count") == 0
         or (result.get("result_count", 0) == 0 and result.get("aggregation_count", 0) == 0)
     )
-    confirmation_runs = sum(1 for result in results if result.get("needs_confirmation") is True)
+    confirmation_runs = sum(
+        1 for result in results
+        if result.get("initial_needs_confirmation", result.get("needs_confirmation")) is True
+    )
+    confirmation_followed_runs = sum(1 for result in results if result.get("confirmation_followed") is True)
     cache_hits = sum(1 for result in results if result.get("cache_hit") is True)
     template_counts = Counter(str(result.get("selected_template") or "none") for result in results)
     category_counts = Counter(str(result.get("category") or "uncategorized") for result in results)
     category_passed = Counter(str(result.get("category") or "uncategorized") for result in results if result["passed"])
     category_latencies: dict[str, list[float]] = defaultdict(list)
-    metric_group_counts: Counter[str] = Counter()
-    metric_group_pass_counts: Counter[str] = Counter()
-    metric_group_latencies: dict[str, list[float]] = defaultdict(list)
+    metric_check_counts: Counter[str] = Counter()
+    metric_check_passed: Counter[str] = Counter()
+    metric_run_counts: Counter[str] = Counter()
+    metric_run_passed: Counter[str] = Counter()
+    metric_latencies: dict[str, list[float]] = defaultdict(list)
     for result in results:
         if result.get("latency_ms") is not None:
             category_latencies[str(result.get("category") or "uncategorized")].append(result["latency_ms"])
-        for group in result.get("metric_groups") or ["uncategorized"]:
-            group = str(group)
-            metric_group_counts[group] += 1
-            if metric_group_passed(result, group):
-                metric_group_pass_counts[group] += 1
+        checks_by_group: dict[str, list[CheckResult]] = defaultdict(list)
+        for check in result.get("checks") or []:
+            checks_by_group[check.metric_group].append(check)
+            metric_check_counts[check.metric_group] += 1
+            if check.passed:
+                metric_check_passed[check.metric_group] += 1
+        for group, checks in checks_by_group.items():
+            metric_run_counts[group] += 1
+            if all(check.passed for check in checks):
+                metric_run_passed[group] += 1
             if result.get("latency_ms") is not None:
-                metric_group_latencies[group].append(result["latency_ms"])
+                metric_latencies[group].append(result["latency_ms"])
 
     return {
         "total": total,
@@ -82,6 +94,7 @@ def summarize_runs(results: list[dict[str, Any]]) -> dict[str, Any]:
         "executed_runs": len(executed),
         "confirmation_runs": confirmation_runs,
         "confirmation_rate": confirmation_runs / total if total else 0.0,
+        "confirmation_followed_runs": confirmation_followed_runs,
         "cache_hits": cache_hits,
         "cache_hit_rate": cache_hits / total if total else 0.0,
         "zero_result_runs": zero_result_runs,
@@ -100,57 +113,21 @@ def summarize_runs(results: list[dict[str, Any]]) -> dict[str, Any]:
             category: percentile(values, 0.95)
             for category, values in sorted(category_latencies.items())
         },
-        "metric_group_counts": dict(sorted(metric_group_counts.items())),
-        "metric_group_pass_rates": {
-            group: metric_group_pass_counts[group] / count
-            for group, count in sorted(metric_group_counts.items())
+        "metric_group_check_counts": dict(sorted(metric_check_counts.items())),
+        "metric_group_check_pass_rates": {
+            group: metric_check_passed[group] / count
+            for group, count in sorted(metric_check_counts.items())
+        },
+        "metric_group_run_counts": dict(sorted(metric_run_counts.items())),
+        "metric_group_run_pass_rates": {
+            group: metric_run_passed[group] / count
+            for group, count in sorted(metric_run_counts.items())
         },
         "metric_group_latency_p95_ms": {
             group: percentile(values, 0.95)
-            for group, values in sorted(metric_group_latencies.items())
+            for group, values in sorted(metric_latencies.items())
         },
     }
-
-
-def metric_group_passed(result: dict[str, Any], group: str) -> bool:
-    checks = result.get("checks") or []
-    common_names = {"http_status", "json_response"}
-
-    def relevant(name: str) -> bool:
-        if name in common_names:
-            return True
-        if group == "Performance":
-            return False
-        if group == "DSL Correctness":
-            return (
-                "generatedDsl" in name
-                or name.startswith("dsl_")
-                or name == "valid_generated_dsl"
-                or name in {"non_empty:generatedDsl", "equals:nlQuery"}
-            )
-        if group == "Aggregation Correctness":
-            return (
-                "generatedDsl" in name
-                or name.startswith("dsl_")
-                or name in {"valid_generated_dsl", "aggregation_dsl", "aggregation_evidence"}
-                or name == "non_empty:aggregations"
-            )
-        if group == "Result Quality":
-            return name in {
-                "min_total_count", "max_total_count", "execution_evidence",
-                "non_zero_total_count", "non_empty_execution_payload",
-                "non_empty:results", "non_empty:aggregations", "aggregation_evidence",
-            }
-        if group == "Safety / Guardrail":
-            return (
-                name.startswith("dsl_not_contains:")
-                or name.startswith("field_not_exists:")
-                or name.startswith("generatedDsl_path_not_exists:")
-            )
-        return True
-
-    selected = [check for check in checks if relevant(check.name)]
-    return bool(selected) and all(check.passed for check in selected)
 
 
 def format_ms(value: float) -> str:

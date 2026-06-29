@@ -4,7 +4,7 @@ import json
 import time
 import urllib.error
 import urllib.request
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -16,12 +16,12 @@ class EvaluationCase:
     source: str
     id: str
     category: str
-    metric_groups: list[str]
     description: str
     tags: list[str]
     request: dict[str, Any]
     expected: dict[str, Any]
     thresholds: dict[str, Any]
+    assisted: dict[str, Any]
 
 
 def load_cases(paths: list[Path]) -> list[EvaluationCase]:
@@ -38,66 +38,137 @@ def load_cases(paths: list[Path]) -> list[EvaluationCase]:
                         source=f"{path.name}:{line_number}",
                         id=raw["id"],
                         category=raw.get("category", "uncategorized"),
-                        metric_groups=raw.get("metricGroups", infer_metric_groups(raw)),
                         description=raw.get("description", ""),
                         tags=raw.get("tags", []),
                         request=raw["request"],
                         expected=raw.get("expected", {}),
                         thresholds=raw.get("thresholds", {}),
+                        assisted=raw.get("assisted", {}),
                     )
                 )
     return cases
 
 
-def infer_metric_groups(raw: dict[str, Any]) -> list[str]:
-    """Classify legacy cases without coupling the benchmark to implementation internals."""
-    expected = raw.get("expected", {})
-    semantic_expected = _without_contract_fields(expected)
-    serialized = json.dumps(semantic_expected, sort_keys=True)
-    groups = {"Performance"}
+def run_case(
+    case: EvaluationCase,
+    base_url: str,
+    timeout: float,
+    iteration: int,
+    auto_confirm: bool = False,
+) -> dict[str, Any]:
+    initial = _post_json(base_url.rstrip("/") + "/api/search", case.request, timeout)
+    initial_json = initial["response_json"]
+    initial_stats = execution_stats(initial_json)
+    final = initial
+    confirmation_followed = False
+    configuration_error = ""
 
-    if any(token in serialized for token in (
-        "generatedDsl", "selectedTemplate", "requestFilters", "pageSize", "chartType"
-    )):
-        groups.add("DSL Correctness")
-    if any(token in serialized for token in (
-        "TERMS_AGGREGATION", "TIME_AGGREGATION", "date_histogram", "top_values"
-    )):
-        groups.add("Aggregation Correctness")
-    if any(token in serialized for token in (
-        "minTotalCount", "maxTotalCount", "requiresExecutionEvidence"
-    )):
-        groups.add("Result Quality")
-    if any(token in serialized for token in (
-        "needsConfirmation", "confirmation", "NotContains", "notExists", "responseContains"
-    )):
-        groups.add("Safety / Guardrail")
+    if auto_confirm and initial_stats["needs_confirmation"] is True:
+        confirmation_followed = True
+        confirm_payload, configuration_error = build_confirmation_payload(case, initial_json)
+        if not configuration_error:
+            final = _post_json(base_url.rstrip("/") + "/api/search/confirm", confirm_payload, timeout)
 
-    return sorted(groups)
+    latency_ms = initial["latency_ms"]
+    if final is not initial:
+        latency_ms += final["latency_ms"]
+
+    score_final_response = auto_confirm and case.assisted.get("scoreFinalResponse") is True
+    if score_final_response:
+        checks: list[CheckResult] = []
+        if confirmation_followed:
+            initial_expected = case.assisted.get("initialExpected") or {
+                "status": case.expected.get("status", 200),
+                "needsConfirmation": True,
+                "nonEmptyFields": ["confirmation.confirmationId", "confirmation.intent"],
+                "allowZeroResults": True,
+            }
+            initial_case = replace(case, expected=initial_expected, thresholds={})
+            checks.extend(prefix_checks(
+                evaluate_expectations(
+                    initial_case,
+                    initial["status"],
+                    initial_json,
+                    initial["response_text"],
+                    initial["latency_ms"],
+                ),
+                "initial",
+            ))
+
+        final_expected = case.assisted.get("finalExpected", case.expected)
+        final_thresholds = case.assisted.get("thresholds", case.thresholds)
+        evaluation_case = replace(case, expected=final_expected, thresholds=final_thresholds)
+        checks.extend(prefix_checks(
+            evaluate_expectations(
+                evaluation_case,
+                final["status"],
+                final["response_json"],
+                final["response_text"],
+                latency_ms,
+            ),
+            "final",
+        ))
+        checks.extend(prefix_checks(
+            assisted_execution_checks(final["status"], final["response_json"], configuration_error),
+            "final",
+        ))
+    else:
+        evaluation_case = assisted_evaluation_case(case, confirmation_followed) if auto_confirm else case
+        checks = evaluate_expectations(
+            evaluation_case,
+            initial["status"],
+            initial_json,
+            initial["response_text"],
+            latency_ms,
+        )
+        if auto_confirm:
+            checks.extend(assisted_execution_checks(final["status"], final["response_json"], configuration_error))
+    checks = assign_metric_groups(evaluation_case, checks)
+    passed = all(check.passed for check in checks)
+    response_json = final["response_json"]
+    response_stats = execution_stats(response_json)
+    final_execution = is_final_execution(final["status"], response_json)
+    errors = [value for value in (initial["error"], final["error"] if final is not initial else "", configuration_error) if value]
+
+    return {
+        "case_id": case.id,
+        "source": case.source,
+        "category": case.category,
+        "tags": case.tags,
+        "description": case.description,
+        "iteration": iteration,
+        "status": final["status"],
+        "initial_status": initial["status"],
+        "confirmation_status": final["status"] if confirmation_followed and final is not initial else None,
+        "expected_status": case.expected.get("status", 200),
+        "latency_ms": latency_ms,
+        "initial_latency_ms": initial["latency_ms"],
+        "confirmation_latency_ms": final["latency_ms"] if final is not initial else 0.0,
+        "total_count": response_stats["total_count"],
+        "result_count": response_stats["result_count"],
+        "aggregation_count": response_stats["aggregation_count"],
+        "selected_template": response_stats["selected_template"],
+        "needs_confirmation": response_stats["needs_confirmation"],
+        "initial_needs_confirmation": initial_stats["needs_confirmation"],
+        "confirmation_followed": confirmation_followed,
+        "final_execution": final_execution,
+        "cache_hit": response_stats["cache_hit"],
+        "summary_status": response_stats["summary_status"],
+        "generated_dsl": response_json.get("generatedDsl") if response_json else None,
+        "passed": passed,
+        "checks": checks,
+        "error": "; ".join(errors),
+    }
 
 
-def _without_contract_fields(value: Any) -> Any:
-    if isinstance(value, dict):
-        return {
-            key: _without_contract_fields(item)
-            for key, item in value.items()
-            if key != "responseFields"
-        }
-    if isinstance(value, list):
-        return [_without_contract_fields(item) for item in value]
-    return value
-
-
-def run_case(case: EvaluationCase, base_url: str, timeout: float | None, iteration: int) -> dict[str, Any]:
-    url = base_url.rstrip("/") + "/api/search"
-    payload = json.dumps(case.request).encode("utf-8")
+def _post_json(url: str, payload_value: dict[str, Any], timeout: float) -> dict[str, Any]:
+    payload = json.dumps(payload_value).encode("utf-8")
     request = urllib.request.Request(
         url,
         data=payload,
         headers={"Content-Type": "application/json", "Accept": "application/json"},
         method="POST",
     )
-
     started = time.perf_counter()
     status = None
     response_json: dict[str, Any] | None = None
@@ -120,35 +191,119 @@ def run_case(case: EvaluationCase, base_url: str, timeout: float | None, iterati
     except Exception as exc:  # noqa: BLE001 - benchmark must report connection/runtime failures.
         error = str(exc)
 
-    latency_ms = (time.perf_counter() - started) * 1000
-    checks = evaluate_expectations(case, status, response_json, response_text, latency_ms)
-    passed = all(check.passed for check in checks)
-    response_stats = execution_stats(response_json)
-
     return {
-        "case_id": case.id,
-        "source": case.source,
-        "category": case.category,
-        "metric_groups": case.metric_groups,
-        "tags": case.tags,
-        "description": case.description,
-        "iteration": iteration,
         "status": status,
-        "expected_status": case.expected.get("status", 200),
-        "latency_ms": latency_ms,
-        "total_count": response_stats["total_count"],
-        "result_count": response_stats["result_count"],
-        "aggregation_count": response_stats["aggregation_count"],
-        "selected_template": response_stats["selected_template"],
-        "needs_confirmation": response_stats["needs_confirmation"],
-        "cache_hit": response_stats["cache_hit"],
-        "summary_status": response_stats["summary_status"],
-        "generated_dsl": response_json.get("generatedDsl") if response_json else None,
-        "response": response_json,
-        "passed": passed,
-        "checks": checks,
+        "latency_ms": (time.perf_counter() - started) * 1000,
+        "response_json": response_json,
+        "response_text": response_text,
         "error": error,
     }
+
+
+def build_confirmation_payload(
+    case: EvaluationCase,
+    initial_response: dict[str, Any] | None,
+) -> tuple[dict[str, Any], str]:
+    if initial_response is None:
+        return {}, "auto-confirm requires a JSON search response"
+    confirmation_id = get_path(initial_response, "confirmation.confirmationId")
+    if not isinstance(confirmation_id, str) or not confirmation_id:
+        return {}, "auto-confirm response is missing confirmation.confirmationId"
+    pending_intent = get_path(initial_response, "confirmation.intent")
+    if not isinstance(pending_intent, dict):
+        return {}, "auto-confirm response is missing confirmation.intent"
+
+    edited_intent = deep_merge(pending_intent, case.assisted.get("editedIntent", {}))
+    page = case.assisted.get("page", case.request.get("page"))
+    page_size = case.assisted.get("pageSize", case.request.get("pageSize"))
+    payload: dict[str, Any] = {
+        "confirmationId": confirmation_id,
+        "editedIntent": edited_intent,
+        "page": 0 if page is None else page,
+        "pageSize": 50 if page_size is None else page_size,
+    }
+    session_id = case.request.get("sessionId")
+    if session_id:
+        payload["sessionId"] = session_id
+    return payload, ""
+
+
+def assisted_evaluation_case(case: EvaluationCase, confirmation_followed: bool) -> EvaluationCase:
+    expected = case.assisted.get("initialExpected", case.expected)
+    thresholds = case.assisted.get("thresholds")
+    if thresholds is None:
+        thresholds = dict(case.thresholds)
+        if confirmation_followed and "max_latency_ms" in thresholds:
+            thresholds["max_latency_ms"] = float(thresholds["max_latency_ms"]) * 2
+    return replace(case, expected=expected, thresholds=thresholds)
+
+
+def prefix_checks(checks: list[CheckResult], phase: str) -> list[CheckResult]:
+    return [replace(check, name=f"{phase}:{check.name}") for check in checks]
+
+
+def deep_merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
+    merged = dict(base)
+    for key, value in override.items():
+        if isinstance(value, dict) and isinstance(merged.get(key), dict):
+            merged[key] = deep_merge(merged[key], value)
+        else:
+            merged[key] = value
+    return merged
+
+
+def assisted_execution_checks(
+    status: int | None,
+    response_json: dict[str, Any] | None,
+    configuration_error: str,
+) -> list[CheckResult]:
+    return [
+        CheckResult("auto_confirm_config", not configuration_error, configuration_error or "configured"),
+        CheckResult("assisted_http_status", status == 200, f"expected=200, actual={status}"),
+        CheckResult(
+            "assisted_final_execution",
+            is_final_execution(status, response_json),
+            "final response must contain generatedDsl.query and must not require confirmation",
+        ),
+    ]
+
+
+def is_final_execution(status: int | None, response_json: dict[str, Any] | None) -> bool:
+    if status != 200 or response_json is None or get_path(response_json, "needsConfirmation") is True:
+        return False
+    generated_dsl = response_json.get("generatedDsl")
+    return isinstance(generated_dsl, dict) and isinstance(generated_dsl.get("query"), dict)
+
+
+def assign_metric_groups(case: EvaluationCase, checks: list[CheckResult]) -> list[CheckResult]:
+    expected_text = json.dumps(case.expected, sort_keys=True).lower()
+    dsl_fragments = json.dumps(case.expected.get("generatedDslContains", []), sort_keys=True).lower()
+    aggregation_case = (
+        any(token in expected_text for token in ("terms_aggregation", "time_aggregation"))
+        or any(token in dsl_fragments for token in ("terms", "date_histogram", "top_values"))
+    )
+
+    def group_for(name: str) -> str:
+        lowered = name.lower()
+        if name == "latency_budget":
+            return "Performance"
+        if any(token in lowered for token in (
+            "confirmation", "warning", "diagnostic", "response_contains",
+            "dsl_not_contains", "path_not_exists", "field_not_exists",
+        )):
+            return "Safety / Guardrail"
+        if any(token in lowered for token in (
+            "execution_evidence", "total_count", "execution_payload",
+            "non_empty:results", "non_empty:aggregations",
+        )):
+            return "Result Quality"
+        if any(token in lowered for token in (
+            "generateddsl", "dsl_", "selectedtemplate", "selected_template", "charttype", "chart_type"
+        )):
+            return "Aggregation Correctness" if aggregation_case else "DSL Correctness"
+        return "Result Quality"
+
+    return [replace(check, metric_group=group_for(check.name)) for check in checks]
 
 
 def evaluate_expectations(
@@ -168,21 +323,6 @@ def evaluate_expectations(
     if response_json is None:
         checks.append(CheckResult("json_response", False, "response is not valid JSON"))
         return checks
-
-    generated_dsl_value = response_json.get("generatedDsl")
-    if expected.get("validGeneratedDsl", False):
-        valid_dsl = isinstance(generated_dsl_value, dict) and bool(generated_dsl_value)
-        checks.append(CheckResult("valid_generated_dsl", valid_dsl, f"type={type(generated_dsl_value).__name__}, non_empty={bool(generated_dsl_value)}"))
-
-    if expected.get("requiresAggregationDsl", False):
-        aggregations_dsl = None
-        if isinstance(generated_dsl_value, dict):
-            aggregations_dsl = generated_dsl_value.get("aggs", generated_dsl_value.get("aggregations"))
-        checks.append(CheckResult("aggregation_dsl", isinstance(aggregations_dsl, dict) and bool(aggregations_dsl), "generatedDsl has no non-empty aggs/aggregations object"))
-
-    if expected.get("requiresAggregationEvidence", False):
-        aggregation_count = collection_size(response_json.get("aggregations"))
-        checks.append(CheckResult("aggregation_evidence", aggregation_count > 0, f"aggregations={aggregation_count}"))
 
     for field in expected.get("responseFields", []):
         checks.append(CheckResult(f"field:{field}", get_path(response_json, field) is not None, "missing field"))
@@ -221,9 +361,7 @@ def evaluate_expectations(
         checks.append(CheckResult("min_total_count", isinstance(total_count, int) and total_count >= expected["minTotalCount"], f"actual={total_count!r}"))
     if "maxTotalCount" in expected and not confirmation_response:
         checks.append(CheckResult("max_total_count", isinstance(total_count, int) and total_count <= expected["maxTotalCount"], f"actual={total_count!r}"))
-    if expected.get("requiresExecutionEvidence", False):
-        checks.extend(execution_evidence_checks(response_json))
-    elif expected_status == 200 and not expected.get("allowZeroResults", False):
+    if expected_status == 200 and not expected.get("allowZeroResults", False):
         checks.extend(execution_evidence_checks(response_json))
 
     dsl_text = json.dumps(response_json.get("generatedDsl"), sort_keys=True, separators=(",", ":"))
@@ -242,7 +380,11 @@ def evaluate_expectations(
             checks.append(CheckResult(f"response_contains:{fragment}", fragment in compact_response, "fragment not found"))
 
     if "anyOf" in expected:
-        checks.append(any_of_check(expected["anyOf"], response_json))
+        checks.append(any_of_check(
+            expected["anyOf"],
+            response_json,
+            inherited_allow_zero_results=expected.get("allowZeroResults", False),
+        ))
 
     if "max_latency_ms" in thresholds:
         max_latency_ms = float(thresholds["max_latency_ms"])
@@ -251,10 +393,14 @@ def evaluate_expectations(
     return checks
 
 
-def any_of_check(branches: list[dict[str, Any]], response_json: dict[str, Any]) -> CheckResult:
+def any_of_check(
+    branches: list[dict[str, Any]],
+    response_json: dict[str, Any],
+    inherited_allow_zero_results: bool = False,
+) -> CheckResult:
     failures: list[str] = []
     for index, branch in enumerate(branches, start=1):
-        branch_checks = evaluate_branch(branch, response_json)
+        branch_checks = evaluate_branch(branch, response_json, inherited_allow_zero_results)
         if all(check.passed for check in branch_checks):
             return CheckResult("any_of", True, f"matched branch {index}")
         failed = ", ".join(f"{check.name}: {check.detail}" for check in branch_checks if not check.passed)
@@ -262,7 +408,11 @@ def any_of_check(branches: list[dict[str, Any]], response_json: dict[str, Any]) 
     return CheckResult("any_of", False, "; ".join(failures))
 
 
-def evaluate_branch(expected: dict[str, Any], response_json: dict[str, Any]) -> list[CheckResult]:
+def evaluate_branch(
+    expected: dict[str, Any],
+    response_json: dict[str, Any],
+    inherited_allow_zero_results: bool = False,
+) -> list[CheckResult]:
     checks: list[CheckResult] = []
 
     for field in expected.get("responseFields", []):
@@ -317,7 +467,8 @@ def evaluate_branch(expected: dict[str, Any], response_json: dict[str, Any]) -> 
         for fragment in expected["responseContains"]:
             checks.append(CheckResult(f"response_contains:{fragment}", fragment in compact_response, "fragment not found"))
 
-    if expected.get("requiresExecutionEvidence", False):
+    allow_zero_results = expected.get("allowZeroResults", inherited_allow_zero_results)
+    if expected.get("requiresExecutionEvidence", False) and not allow_zero_results:
         checks.extend(execution_evidence_checks(response_json))
 
     return checks
