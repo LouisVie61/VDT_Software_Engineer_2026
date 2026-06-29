@@ -13,7 +13,7 @@ public class GroupByResolver {
         if (containsAny(text, "event type", "event_type", "loai event")) {
             return Optional.of(SocEventSchema.EVENT_TYPE);
         }
-        if (containsAny(query, "location", "locations", "city", "country", "province", "region", "địa điểm", "vị trí")) {
+        if (containsAny(text, "location", "locations", "city", "country", "province", "region", "dia diem", "vi tri")) {
             return Optional.of(SocEventSchema.GEO_LOCATION);
         }
         if (containsAny(text, "user agent", "user_agent", "browser", "trinh duyet")) {
@@ -30,6 +30,9 @@ public class GroupByResolver {
     }
 
     private boolean containsAny(String text, String... values) {
+        if (text == null) {
+            return false;
+        }
         for (String value : values) {
             if (text.contains(value)) {
                 return true;

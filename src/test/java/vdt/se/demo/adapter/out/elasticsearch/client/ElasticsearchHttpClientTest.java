@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class ElasticsearchHttpClientTest {
@@ -32,5 +33,20 @@ class ElasticsearchHttpClientTest {
         JsonNode response = client.search(new ObjectMapper().readTree("{\"query\":{\"match_all\":{}}}"));
 
         assertThat(response.get("hits")).isNotNull();
+    }
+
+    @Test
+    void updatesMappingForAnExistingIndex() {
+        RestTemplate restTemplate = mock(RestTemplate.class);
+        ElasticsearchHttpClient client = new ElasticsearchHttpClient(
+                new ObjectMapper(), restTemplate, new AppProperties(), "http://localhost:9200/"
+        );
+
+        client.updateMapping("custom-events", "{\"properties\":{}}");
+
+        verify(restTemplate).put(
+                eq("http://localhost:9200/custom-events/_mapping"),
+                any(HttpEntity.class)
+        );
     }
 }

@@ -5,7 +5,9 @@ import org.slf4j.LoggerFactory;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import vdt.se.demo.application.port.outboundPort.history.QueryHistoryPort;
+import vdt.se.demo.application.port.outboundPort.execution.QueryExecutorPort;
 import vdt.se.demo.domain.exception.BadQueryException;
+import vdt.se.demo.domain.model.ExecutionResult;
 import vdt.se.demo.domain.model.QueryHistory;
 
 import java.util.LinkedHashSet;
@@ -18,10 +20,13 @@ public class QueryCsvExportService {
 
     private final QueryHistoryPort queryHistoryPort;
     private final ObjectMapper objectMapper;
+    private final QueryExecutorPort queryExecutorPort;
 
-    public QueryCsvExportService(QueryHistoryPort queryHistoryPort, ObjectMapper objectMapper) {
+    public QueryCsvExportService(QueryHistoryPort queryHistoryPort, ObjectMapper objectMapper,
+                                 QueryExecutorPort queryExecutorPort) {
         this.queryHistoryPort = queryHistoryPort;
         this.objectMapper = objectMapper;
+        this.queryExecutorPort = queryExecutorPort;
     }
 
     public String exportCsv(UUID queryId) {
@@ -29,9 +34,11 @@ public class QueryCsvExportService {
         QueryHistory history = queryHistoryPort.findById(queryId)
                 .orElseThrow(() -> new BadQueryException("Query history not found: " + queryId));
         try {
-            JsonNode rows = objectMapper.readTree(history.resultSnapshot());
+            JsonNode dsl = objectMapper.readTree(history.generatedDsl());
+            ExecutionResult executionResult = queryExecutorPort.execute(dsl);
+            JsonNode rows = objectMapper.readTree(objectMapper.writeValueAsString(executionResult.results()));
             if (!rows.isArray() || rows.isEmpty()) {
-                log.debug("CSV export completed with empty snapshot: queryId={}", queryId);
+                log.debug("CSV export completed with no rows after DSL re-execution: queryId={}", queryId);
                 return "";
             }
             Set<String> headers = headers(rows);

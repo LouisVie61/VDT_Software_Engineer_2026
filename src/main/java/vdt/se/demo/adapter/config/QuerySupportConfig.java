@@ -63,14 +63,14 @@ public class QuerySupportConfig {
 
     @Bean
     QueryResultPersistenceService queryResultPersistenceService(QueryHistoryPort queryHistoryPort,
-                                                                ObjectMapper objectMapper,
                                                                 AppProperties properties) {
-        return new QueryResultPersistenceService(queryHistoryPort, objectMapper, properties);
+        return new QueryResultPersistenceService(queryHistoryPort, properties);
     }
 
     @Bean
-    QueryCsvExportService queryCsvExportService(QueryHistoryPort queryHistoryPort, ObjectMapper objectMapper) {
-        return new QueryCsvExportService(queryHistoryPort, objectMapper);
+    QueryCsvExportService queryCsvExportService(QueryHistoryPort queryHistoryPort, ObjectMapper objectMapper,
+                                                QueryExecutorPort queryExecutorPort) {
+        return new QueryCsvExportService(queryHistoryPort, objectMapper, queryExecutorPort);
     }
 
     @Bean

@@ -20,6 +20,8 @@ import vdt.se.demo.application.service.cache.QueryHashService;
 import vdt.se.demo.application.service.context.ContextRetrievalService;
 import vdt.se.demo.application.service.execution.SearchExecutionService;
 import vdt.se.demo.application.service.intent.IntentMergeService;
+import vdt.se.demo.application.service.intent.ConfirmationIntentValidator;
+import vdt.se.demo.application.service.intent.SearchSchemaRegistry;
 import vdt.se.demo.application.service.intent.SearchIntentNormalizer;
 import vdt.se.demo.application.service.query.FinalizedSearchService;
 import vdt.se.demo.application.service.query.DiagnosticDslVariantFactory;
@@ -78,13 +80,14 @@ class QueryUseCaseServiceTest {
         assertThat(result.getSummary()).isEmpty();
         assertThat(history.rows).hasSize(1);
         assertThat(history.rows.getFirst().generatedDsl()).contains("\"match_all\"");
+        assertThat(history.rows.getFirst().resultSnapshot()).isNull();
     }
 
     @Test
-    void exportsHistorySnapshotAsCsv() {
+    void reExecutesHistoryDslAndExportsRowsAsCsv() {
         MemoryHistoryPort history = new MemoryHistoryPort();
         UUID id = UUID.randomUUID();
-        history.rows.add(new QueryHistory(id, "soc-analyst-demo", "q", "{}", "s",
+        history.rows.add(new QueryHistory(id, "soc-analyst-demo", "session-1", "q", "{}",
                 null,
                 vdt.se.demo.domain.valueObjects.ChartType.TABLE, 1,
                 "[{\"user\":\"alice\",\"ip\":\"10.0.0.1\"}]", java.time.LocalDateTime.now()));
@@ -92,8 +95,10 @@ class QueryUseCaseServiceTest {
 
         String csv = service.exportCsv(id);
 
-        assertThat(csv).contains("user,ip");
-        assertThat(csv).contains("\"alice\",\"10.0.0.1\"");
+        assertThat(csv.lines().findFirst().orElse("").split(","))
+                .containsExactlyInAnyOrder("user", "ip");
+        assertThat(csv).contains("\"alice\"");
+        assertThat(csv).contains("\"10.0.0.1\"");
     }
 
     private QueryUseCaseService service(MemoryHistoryPort history) {
@@ -110,7 +115,7 @@ class QueryUseCaseServiceTest {
         AuditLogPort audit = auditLog -> {
         };
         QueryAuditService auditService = new QueryAuditService(audit, properties);
-        QueryResultPersistenceService persistenceService = new QueryResultPersistenceService(history, objectMapper, properties);
+        QueryResultPersistenceService persistenceService = new QueryResultPersistenceService(history, properties);
         QuerySummaryService summaryService = new QuerySummaryService(new StubSummary(), Runnable::run);
         QueryDiagnosticService diagnosticService = new QueryDiagnosticService(
                 countDsl -> 0,
@@ -151,7 +156,8 @@ class QueryUseCaseServiceTest {
         QuerySearchWorkflow searchWorkflow = new QuerySearchWorkflow(
                 cacheContextService,
                 planPreparationService,
-                new SearchDslCacheLookupService(dslCache, executionService, persistenceService, auditService, objectMapper, summaryService),
+                new SearchDslCacheLookupService(dslCache, executionService, persistenceService, auditService,
+                        objectMapper, summaryService, diagnosticService),
                 new PendingConfirmationResultFactory(intentCache, objectMapper),
                 finalizedSearchService,
                 auditService
@@ -159,6 +165,7 @@ class QueryUseCaseServiceTest {
         QueryConfirmationWorkflow confirmationWorkflow = new QueryConfirmationWorkflow(
                 intentCache,
                 new SearchIntentNormalizer(),
+                new ConfirmationIntentValidator(new SearchSchemaRegistry()),
                 canonicalPlanBuilder,
                 finalizedSearchService,
                 queryHashService,
@@ -167,7 +174,7 @@ class QueryUseCaseServiceTest {
         return new QueryUseCaseService(
                 searchWorkflow,
                 confirmationWorkflow,
-                new QueryCsvExportService(history, objectMapper),
+                new QueryCsvExportService(history, objectMapper, new StubExecutor()),
                 history,
                 summaryService,
                 properties
@@ -214,7 +221,7 @@ class QueryUseCaseServiceTest {
         @Override
         public ExecutionResult execute(JsonNode generatedDsl) {
             return ExecutionResult.builder()
-                    .results(List.of(Map.of("user", "alice")))
+                    .results(List.of(Map.of("user", "alice", "ip", "10.0.0.1")))
                     .aggregations(List.of())
                     .totalCount(1)
                     .build();

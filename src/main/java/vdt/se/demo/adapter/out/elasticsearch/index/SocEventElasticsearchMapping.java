@@ -10,6 +10,7 @@ final class SocEventElasticsearchMapping {
             Map.entry(SocEventSchema.SOURCE, "{ \"type\": \"keyword\" }"),
             Map.entry(SocEventSchema.SEVERITY, "{ \"type\": \"keyword\" }"),
             Map.entry(SocEventSchema.EVENT_TYPE, "{ \"type\": \"keyword\" }"),
+            Map.entry(SocEventSchema.ACTION, "{ \"type\": \"keyword\" }"),
             Map.entry(SocEventSchema.USER, "{ \"type\": \"keyword\" }"),
             Map.entry(SocEventSchema.HOST, "{ \"type\": \"keyword\" }"),
             Map.entry(SocEventSchema.IP, "{ \"type\": \"ip\", \"ignore_malformed\": true }"),

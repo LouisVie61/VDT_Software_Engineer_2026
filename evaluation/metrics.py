@@ -47,14 +47,18 @@ def summarize_runs(results: list[dict[str, Any]]) -> dict[str, Any]:
     failed = total - passed
     latencies = [result["latency_ms"] for result in results if result.get("latency_ms") is not None]
     status_errors = sum(1 for result in results if result.get("status") != result.get("expected_status"))
-    executed = [result for result in results if result.get("status") == 200 and result.get("needs_confirmation") is not True]
+    executed = [result for result in results if result.get("final_execution") is True]
     zero_result_runs = sum(
         1
         for result in executed
         if result.get("total_count") == 0
         or (result.get("result_count", 0) == 0 and result.get("aggregation_count", 0) == 0)
     )
-    confirmation_runs = sum(1 for result in results if result.get("needs_confirmation") is True)
+    confirmation_runs = sum(
+        1 for result in results
+        if result.get("initial_needs_confirmation", result.get("needs_confirmation")) is True
+    )
+    confirmation_followed_runs = sum(1 for result in results if result.get("confirmation_followed") is True)
     cache_hits = sum(1 for result in results if result.get("cache_hit") is True)
     template_counts = Counter(str(result.get("selected_template") or "none") for result in results)
     category_counts = Counter(str(result.get("category") or "uncategorized") for result in results)
@@ -90,6 +94,7 @@ def summarize_runs(results: list[dict[str, Any]]) -> dict[str, Any]:
         "executed_runs": len(executed),
         "confirmation_runs": confirmation_runs,
         "confirmation_rate": confirmation_runs / total if total else 0.0,
+        "confirmation_followed_runs": confirmation_followed_runs,
         "cache_hits": cache_hits,
         "cache_hit_rate": cache_hits / total if total else 0.0,
         "zero_result_runs": zero_result_runs,

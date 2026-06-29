@@ -33,4 +33,5 @@ public class AuditLog {
     private String selectedTemplate;
     private String confidenceScores;
     private Boolean cacheHit;
+    private String diagnosticClassification;
 }

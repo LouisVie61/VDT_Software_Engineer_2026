@@ -1,5 +1,7 @@
 package vdt.se.demo.application.dto;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,8 +16,11 @@ public class ConfirmSearchRequest {
     private String confirmationId;
     private String sessionId;
     private SearchIntent editedIntent;
+    @Min(0)
     @Builder.Default
     private Integer page = 0;
+    @Min(1)
+    @Max(500)
     @Builder.Default
     private Integer pageSize = 50;
 

@@ -28,16 +28,16 @@ public final class SocEventSchema {
     );
 
     public static final List<String> INDEX_FIELDS = List.of(
-            TIMESTAMP, SOURCE, SEVERITY, EVENT_TYPE, USER, HOST, IP,
+            TIMESTAMP, SOURCE, SEVERITY, EVENT_TYPE, ACTION, USER, HOST, IP,
             GEO_LOCATION, USER_AGENT, MESSAGE, RAW, METADATA
     );
 
     public static final List<String> CSV_HEADER_FIELDS = List.of(
-            TIMESTAMP, SOURCE, SEVERITY, EVENT_TYPE, USER, HOST, IP, MESSAGE, RAW, ADVANCED_METADATA
+            TIMESTAMP, SOURCE, SEVERITY, EVENT_TYPE, ACTION, USER, HOST, IP, MESSAGE, RAW, ADVANCED_METADATA
     );
 
     public static final Set<String> FIELD_WHITELIST = Set.of(
-            TIMESTAMP, SOURCE, SEVERITY, EVENT_TYPE, USER, HOST, IP,
+            TIMESTAMP, SOURCE, SEVERITY, EVENT_TYPE, ACTION, USER, HOST, IP,
             GEO_LOCATION, USER_AGENT, MESSAGE, RAW
     );
 
@@ -49,10 +49,11 @@ public final class SocEventSchema {
             SOURCE, SEVERITY, EVENT_TYPE, ACTION, USER, HOST, IP, GEO_LOCATION, USER_AGENT
     );
 
-    public static final List<String> FULL_TEXT_FIELDS = List.of(MESSAGE, USER_AGENT);
+    public static final List<String> FULL_TEXT_FIELDS = List.of(MESSAGE, RAW, USER_AGENT);
 
     public static final List<String> RESPONSE_FIELDS = List.of(
-            TIMESTAMP, SOURCE, SEVERITY, EVENT_TYPE, USER, HOST, IP, GEO_LOCATION, USER_AGENT, MESSAGE, RAW
+            TIMESTAMP, SOURCE, SEVERITY, EVENT_TYPE, ACTION, USER, HOST, IP,
+            GEO_LOCATION, USER_AGENT, MESSAGE, RAW
     );
 
     private SocEventSchema() {

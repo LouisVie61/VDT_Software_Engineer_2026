@@ -248,6 +248,25 @@ class SearchEndToEndIntegrationTest {
                 .contains("\"lte\":\"2026-06-15T00:00:00Z\"");
     }
 
+    @Test
+    void confirmationRejectsPaginationOutsideTheSearchContract() throws Exception {
+        for (String payload : List.of(
+                """
+                {"confirmationId":"pending-id","page":-1,"pageSize":50}
+                """,
+                """
+                {"confirmationId":"pending-id","page":0,"pageSize":0}
+                """,
+                """
+                {"confirmationId":"pending-id","page":0,"pageSize":501}
+                """)) {
+            mockMvc.perform(post("/api/search/confirm")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(payload))
+                    .andExpect(status().isBadRequest());
+        }
+    }
+
     @TestConfiguration
     static class TestPorts {
 
