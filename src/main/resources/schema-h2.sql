@@ -36,7 +36,8 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     override_intent VARCHAR(60),
     selected_template VARCHAR(60),
     confidence_scores TEXT,
-    cache_hit BOOLEAN NOT NULL DEFAULT FALSE
+    cache_hit BOOLEAN NOT NULL DEFAULT FALSE,
+    diagnostic_classification VARCHAR(100)
 );
 
 ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS session_id VARCHAR(120);
@@ -45,6 +46,7 @@ ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS override_intent VARCHAR(60);
 ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS selected_template VARCHAR(60);
 ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS confidence_scores TEXT;
 ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS cache_hit BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS diagnostic_classification VARCHAR(100);
 
 MERGE INTO app_users KEY(id)
 VALUES ('soc-analyst-demo', 'SOC Analyst Demo', 'SOC_ANALYST', CURRENT_TIMESTAMP);

@@ -15,4 +15,14 @@ public class SocEventIndexDefinition {
                 }
                 """.formatted(SocEventElasticsearchMapping.propertiesJson());
     }
+
+    public String mappingJson() {
+        return """
+                {
+                  "properties": {
+                %s
+                  }
+                }
+                """.formatted(SocEventElasticsearchMapping.propertiesJson());
+    }
 }

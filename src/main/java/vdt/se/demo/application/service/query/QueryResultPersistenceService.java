@@ -2,7 +2,6 @@ package vdt.se.demo.application.service.query;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tools.jackson.databind.ObjectMapper;
 import vdt.se.demo.adapter.config.AppProperties;
 import vdt.se.demo.application.dto.SearchRequest;
 import vdt.se.demo.application.port.outboundPort.history.QueryHistoryPort;
@@ -17,13 +16,10 @@ public class QueryResultPersistenceService {
     private static final Logger log = LoggerFactory.getLogger(QueryResultPersistenceService.class);
 
     private final QueryHistoryPort queryHistoryPort;
-    private final ObjectMapper objectMapper;
     private final AppProperties properties;
 
-    public QueryResultPersistenceService(QueryHistoryPort queryHistoryPort, ObjectMapper objectMapper,
-                                         AppProperties properties) {
+    public QueryResultPersistenceService(QueryHistoryPort queryHistoryPort, AppProperties properties) {
         this.queryHistoryPort = queryHistoryPort;
-        this.objectMapper = objectMapper;
         this.properties = properties;
     }
 
@@ -40,7 +36,7 @@ public class QueryResultPersistenceService {
                 result.getSummary(),
                 result.getChartType(),
                 result.getTotalCount(),
-                objectMapper.writeValueAsString(result.getResults()),
+                null,
                 LocalDateTime.now()
         ));
         log.debug("Query result persisted: queryId={}", queryId);

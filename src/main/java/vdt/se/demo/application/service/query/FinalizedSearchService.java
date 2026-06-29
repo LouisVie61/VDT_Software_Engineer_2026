@@ -65,7 +65,8 @@ public class FinalizedSearchService {
         summaryService.schedule(queryId, request, executed.dsl(), executed.executionResult(), result.getChartType());
         persistenceService.save(queryId, request, executed.result(), generatedDsl);
         log.debug("Search history persisted: queryId={}, totalCount={}", queryId, executed.result().getTotalCount());
-        auditService.success(queryId, request, generatedDsl, executed.result().getTotalCount(), started, plan, false);
+        auditService.success(queryId, request, generatedDsl, executed.result().getTotalCount(), started, plan, false,
+                result.getDiagnostic());
         log.debug("Audit success submitted: queryId={}, provider={}, elapsedMs={}",
                 queryId, plan.provider(), TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt));
         return executed.result();

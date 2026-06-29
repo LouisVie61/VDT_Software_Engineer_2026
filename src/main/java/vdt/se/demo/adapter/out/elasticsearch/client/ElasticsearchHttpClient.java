@@ -62,6 +62,10 @@ public class ElasticsearchHttpClient {
         restTemplate.put(url, new HttpEntity<>(definition, jsonHeaders()));
     }
 
+    public void updateMapping(String indexName, String mapping) {
+        restTemplate.put(indexUrl(indexName) + "/_mapping", new HttpEntity<>(mapping, jsonHeaders()));
+    }
+
     private HttpHeaders jsonHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

@@ -9,10 +9,13 @@ import vdt.se.demo.application.dto.SearchRequest;
 import vdt.se.demo.application.port.outboundPort.execution.QueryExecutionRefiner;
 import vdt.se.demo.application.port.outboundPort.execution.QueryExecutorPort;
 import vdt.se.demo.domain.model.ExecutionResult;
+import vdt.se.demo.domain.model.SearchWarning;
 import vdt.se.demo.domain.service.RelativeTimeWindowParser;
 import vdt.se.demo.domain.valueObjects.RelativeTimeWindow;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -56,9 +59,7 @@ public class ElasticsearchRelativeTimeQueryExecutionRefiner implements QueryExec
             return new QueryExecution(filteredDsl, filteredExecutionResult);
         }
 
-        Instant from = latestTimestamp.minus(relativeWindow.get().duration());
-        JsonNode rewrittenDsl = timeRangeEditor.withTimestampRange(filteredDsl, from, latestTimestamp);
-        return new QueryExecution(rewrittenDsl, queryExecutorPort.execute(rewrittenDsl));
+        return new QueryExecution(filteredDsl, withLatestDataWarning(filteredExecutionResult, latestTimestamp));
     }
 
     private Optional<RelativeTimeWindow> relativeWindow(SearchRequest request, JsonNode generatedDsl,
@@ -71,6 +72,21 @@ public class ElasticsearchRelativeTimeQueryExecutionRefiner implements QueryExec
 
     private boolean hasExplicitTimeBounds(SearchRequest request) {
         return hasText(request.getFrom()) || hasText(request.getTo());
+    }
+
+    private ExecutionResult withLatestDataWarning(ExecutionResult executionResult, Instant latestTimestamp) {
+        List<SearchWarning> warnings = new ArrayList<>(executionResult.warnings());
+        warnings.add(SearchWarning.builder()
+                .code("RELATIVE_TIME_WINDOW_EMPTY")
+                .message("No data matched the requested relative time window. The latest matching data timestamp is "
+                        + latestTimestamp + ". Review the zero-result diagnostic before widening the time range.")
+                .build());
+        return new ExecutionResult(
+                executionResult.results(),
+                executionResult.aggregations(),
+                executionResult.totalCount(),
+                warnings
+        );
     }
 
     private boolean hasText(String value) {

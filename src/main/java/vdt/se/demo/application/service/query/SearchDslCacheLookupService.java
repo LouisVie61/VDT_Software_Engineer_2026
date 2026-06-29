@@ -24,16 +24,19 @@ public class SearchDslCacheLookupService {
     private final QueryAuditService auditService;
     private final ObjectMapper objectMapper;
     private final QuerySummaryService summaryService;
+    private final QueryDiagnosticService diagnosticService;
 
     public SearchDslCacheLookupService(DslCachePort dslCachePort, SearchExecutionService searchExecutionService,
                                        QueryResultPersistenceService persistenceService, QueryAuditService auditService,
-                                       ObjectMapper objectMapper, QuerySummaryService summaryService) {
+                                       ObjectMapper objectMapper, QuerySummaryService summaryService,
+                                       QueryDiagnosticService diagnosticService) {
         this.dslCachePort = dslCachePort;
         this.searchExecutionService = searchExecutionService;
         this.persistenceService = persistenceService;
         this.auditService = auditService;
         this.objectMapper = objectMapper;
         this.summaryService = summaryService;
+        this.diagnosticService = diagnosticService;
     }
 
     public Optional<QueryResult> executeCached(UUID queryId, SearchRequest request,
@@ -53,10 +56,14 @@ public class SearchDslCacheLookupService {
         SearchExecutionService.ExecutedSearch executed = searchExecutionService.executeDsl(queryId, request, dsl, cachedPlan);
         QueryResult result = executed.result();
         result.setCacheHit(true);
+        if (result.getTotalCount() == 0) {
+            result.setDiagnostic(diagnosticService.diagnose(request, cachedPlan, executed.dsl()));
+        }
         result.setSummaryStatus(hasSummaryPayload(executed) ? SummaryStatus.PENDING : SummaryStatus.NOT_REQUIRED);
         summaryService.schedule(queryId, request, executed.dsl(), executed.executionResult(), result.getChartType());
         persistenceService.save(queryId, request, result, cachedDsl.get());
-        auditService.success(queryId, request, cachedDsl.get(), result.getTotalCount(), started, cachedPlan, true);
+        auditService.success(queryId, request, cachedDsl.get(), result.getTotalCount(), started, cachedPlan, true,
+                result.getDiagnostic());
         return Optional.of(result);
     }
 

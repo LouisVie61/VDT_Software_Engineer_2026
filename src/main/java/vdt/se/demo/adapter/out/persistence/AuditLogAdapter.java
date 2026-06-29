@@ -31,9 +31,9 @@ public class AuditLogAdapter implements AuditLogPort {
                             id, user_identity, event_timestamp, nl_query, generated_dsl,
                             results_count, execution_time_ms, status, llm_provider, error_message,
                             session_id, predicted_intent, override_intent, selected_template,
-                            confidence_scores, cache_hit
+                            confidence_scores, cache_hit, diagnostic_classification
                         )
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """,
                 value(auditLog.getId(), UUID.randomUUID()),
                 auditLog.getUserIdentity(),
@@ -50,7 +50,8 @@ public class AuditLogAdapter implements AuditLogPort {
                 auditLog.getOverrideIntent(),
                 auditLog.getSelectedTemplate(),
                 auditLog.getConfidenceScores(),
-                Boolean.TRUE.equals(auditLog.getCacheHit())
+                Boolean.TRUE.equals(auditLog.getCacheHit()),
+                auditLog.getDiagnosticClassification()
         );
         log.debug("Audit log write completed: auditId={}", auditLog.getId());
     }

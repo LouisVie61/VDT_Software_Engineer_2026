@@ -6,6 +6,7 @@ import vdt.se.demo.application.dto.ConfirmSearchRequest;
 import vdt.se.demo.application.dto.SearchRequest;
 import vdt.se.demo.application.port.outboundPort.cache.IntentCachePort;
 import vdt.se.demo.application.service.cache.QueryHashService;
+import vdt.se.demo.application.service.intent.ConfirmationIntentValidator;
 import vdt.se.demo.application.service.intent.SearchIntentNormalizer;
 import vdt.se.demo.application.service.template.CanonicalPlanBuilder;
 import vdt.se.demo.domain.exception.BadQueryException;
@@ -24,17 +25,20 @@ public class QueryConfirmationWorkflow {
 
     private final IntentCachePort intentCachePort;
     private final SearchIntentNormalizer searchIntentNormalizer;
+    private final ConfirmationIntentValidator confirmationIntentValidator;
     private final CanonicalPlanBuilder canonicalPlanBuilder;
     private final FinalizedSearchService finalizedSearchService;
     private final QueryHashService queryHashService;
     private final QueryAuditService auditService;
 
     public QueryConfirmationWorkflow(IntentCachePort intentCachePort, SearchIntentNormalizer searchIntentNormalizer,
+                                     ConfirmationIntentValidator confirmationIntentValidator,
                                      CanonicalPlanBuilder canonicalPlanBuilder,
                                      FinalizedSearchService finalizedSearchService, QueryHashService queryHashService,
                                      QueryAuditService auditService) {
         this.intentCachePort = intentCachePort;
         this.searchIntentNormalizer = searchIntentNormalizer;
+        this.confirmationIntentValidator = confirmationIntentValidator;
         this.canonicalPlanBuilder = canonicalPlanBuilder;
         this.finalizedSearchService = finalizedSearchService;
         this.queryHashService = queryHashService;
@@ -56,6 +60,7 @@ public class QueryConfirmationWorkflow {
         SearchRequest searchRequest = searchRequest(request, pending);
         SearchIntent intent = searchIntentNormalizer.normalize(searchRequest,
                 request.getEditedIntent() == null ? pending.intent() : request.getEditedIntent());
+        confirmationIntentValidator.validate(intent);
         RoutingHint routingHint = RoutingHint.builder()
                 .templateType(pending.templateSelection().type())
                 .confidence(1.0d)

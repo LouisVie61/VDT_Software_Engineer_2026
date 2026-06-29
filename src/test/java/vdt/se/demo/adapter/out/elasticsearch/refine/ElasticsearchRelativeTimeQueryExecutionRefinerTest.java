@@ -23,7 +23,7 @@ class ElasticsearchRelativeTimeQueryExecutionRefinerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    void rewritesEmptyRelativeNowWindowToLatestMatchingDataWindow() throws Exception {
+    void keepsEmptyRelativeNowWindowAndReturnsLatestDataWarning() throws Exception {
         RelativeWindowExecutor executor = new RelativeWindowExecutor();
         ElasticsearchRelativeTimeQueryExecutionRefiner refiner =
                 refiner(executor);
@@ -33,14 +33,18 @@ class ElasticsearchRelativeTimeQueryExecutionRefinerTest {
 
         QueryExecution refined = refiner.refine(request, relativeWindowDsl(), executionResult(List.of(), List.of(), 0));
 
-        assertThat(refined.executionResult().totalCount()).isEqualTo(1);
-        assertThat(refined.generatedDsl().toString()).contains("2030-06-17T21:15:05Z");
-        assertThat(refined.generatedDsl().toString()).contains("2030-06-24T21:15:05Z");
-        assertThat(executor.executedDsl).hasSize(2);
+        assertThat(refined.executionResult().totalCount()).isZero();
+        assertThat(refined.generatedDsl().toString()).contains("now-7d");
+        assertThat(refined.generatedDsl().toString()).doesNotContain("2030-06-17T21:15:05Z");
+        assertThat(refined.executionResult().warnings()).singleElement().satisfies(warning -> {
+            assertThat(warning.code()).isEqualTo("RELATIVE_TIME_WINDOW_EMPTY");
+            assertThat(warning.message()).contains("2030-06-24T21:15:05Z");
+        });
+        assertThat(executor.executedDsl).hasSize(1);
     }
 
     @Test
-    void rewritesLast24hToLatestMatchingDataWindow() throws Exception {
+    void doesNotSilentlyRewriteLast24hToLatestMatchingDataWindow() throws Exception {
         RelativeWindowExecutor executor = new RelativeWindowExecutor();
         ElasticsearchRelativeTimeQueryExecutionRefiner refiner =
                 refiner(executor);
@@ -50,10 +54,12 @@ class ElasticsearchRelativeTimeQueryExecutionRefinerTest {
 
         QueryExecution refined = refiner.refine(request, relativeWindowDsl(), executionResult(List.of(), List.of(), 0));
 
-        assertThat(refined.executionResult().totalCount()).isEqualTo(1);
-        assertThat(refined.generatedDsl().toString()).contains("2030-06-23T21:15:05Z");
-        assertThat(refined.generatedDsl().toString()).contains("2030-06-24T21:15:05Z");
-        assertThat(executor.executedDsl).hasSize(2);
+        assertThat(refined.executionResult().totalCount()).isZero();
+        assertThat(refined.generatedDsl().toString()).contains("now-7d");
+        assertThat(refined.generatedDsl().toString()).doesNotContain("2030-06-23T21:15:05Z");
+        assertThat(refined.executionResult().warnings()).singleElement().satisfies(warning ->
+                assertThat(warning.message()).contains("2030-06-24T21:15:05Z"));
+        assertThat(executor.executedDsl).hasSize(1);
     }
 
     @Test

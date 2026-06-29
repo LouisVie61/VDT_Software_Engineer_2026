@@ -110,8 +110,7 @@ class ElasticsearchSearchDslBuilderTest {
         JsonNode fields = dsl.path("query").path("bool").path("must").path(0)
                 .path("simple_query_string").path("fields");
 
-        assertThat(fields.toString()).isEqualTo("[\"message\",\"user_agent\"]");
-        assertThat(dsl.toString()).doesNotContain("\"raw\"");
+        assertThat(fields.toString()).isEqualTo("[\"message\",\"raw\",\"user_agent\"]");
     }
 
     @Test

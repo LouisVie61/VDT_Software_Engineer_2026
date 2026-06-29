@@ -3,6 +3,7 @@ package vdt.se.demo.adapter.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import vdt.se.demo.application.service.intent.FieldValueRegistry;
+import vdt.se.demo.application.service.intent.ConfirmationIntentValidator;
 import vdt.se.demo.application.service.intent.SearchFilterValidator;
 import vdt.se.demo.application.service.intent.SearchIntentNormalizer;
 import vdt.se.demo.application.service.intent.SearchSchemaRegistry;
@@ -30,6 +31,11 @@ public class IntentTemplateConfig {
     @Bean
     SearchSchemaRegistry searchSchemaRegistry() {
         return new SearchSchemaRegistry();
+    }
+
+    @Bean
+    ConfirmationIntentValidator confirmationIntentValidator(SearchSchemaRegistry searchSchemaRegistry) {
+        return new ConfirmationIntentValidator(searchSchemaRegistry);
     }
 
     @Bean

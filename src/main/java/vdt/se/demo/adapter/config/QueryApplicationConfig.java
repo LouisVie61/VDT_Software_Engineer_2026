@@ -12,6 +12,7 @@ import vdt.se.demo.application.port.outboundPort.semantic.MitreEnrichmentPort;
 import vdt.se.demo.application.service.context.ContextRetrievalService;
 import vdt.se.demo.application.service.execution.SearchExecutionService;
 import vdt.se.demo.application.service.intent.IntentMergeService;
+import vdt.se.demo.application.service.intent.ConfirmationIntentValidator;
 import vdt.se.demo.application.service.intent.SearchIntentNormalizer;
 import vdt.se.demo.application.service.query.FinalizedSearchService;
 import vdt.se.demo.application.service.query.PendingConfirmationResultFactory;
@@ -19,6 +20,7 @@ import vdt.se.demo.application.service.query.QueryAuditService;
 import vdt.se.demo.application.service.query.QueryConfirmationWorkflow;
 import vdt.se.demo.application.service.query.QueryCsvExportService;
 import vdt.se.demo.application.service.query.QueryResultPersistenceService;
+import vdt.se.demo.application.service.query.QueryDiagnosticService;
 import vdt.se.demo.application.service.query.QuerySearchWorkflow;
 import vdt.se.demo.application.service.query.QuerySummaryService;
 import vdt.se.demo.application.service.query.QueryUseCaseService;
@@ -77,9 +79,10 @@ public class QueryApplicationConfig {
                                                             QueryResultPersistenceService persistenceService,
                                                             QueryAuditService auditService,
                                                             ObjectMapper objectMapper,
-                                                            QuerySummaryService summaryService) {
+                                                            QuerySummaryService summaryService,
+                                                            QueryDiagnosticService diagnosticService) {
         return new SearchDslCacheLookupService(dslCachePort, searchExecutionService, persistenceService,
-                auditService, objectMapper, summaryService);
+                auditService, objectMapper, summaryService, diagnosticService);
     }
 
     @Bean
@@ -91,11 +94,13 @@ public class QueryApplicationConfig {
     @Bean
     QueryConfirmationWorkflow queryConfirmationWorkflow(IntentCachePort intentCachePort,
                                                         SearchIntentNormalizer searchIntentNormalizer,
+                                                        ConfirmationIntentValidator confirmationIntentValidator,
                                                         CanonicalPlanBuilder canonicalPlanBuilder,
                                                         FinalizedSearchService finalizedSearchService,
                                                         QueryHashService queryHashService,
                                                         QueryAuditService auditService) {
-        return new QueryConfirmationWorkflow(intentCachePort, searchIntentNormalizer, canonicalPlanBuilder,
+        return new QueryConfirmationWorkflow(intentCachePort, searchIntentNormalizer, confirmationIntentValidator,
+                canonicalPlanBuilder,
                 finalizedSearchService, queryHashService, auditService);
     }
 }
