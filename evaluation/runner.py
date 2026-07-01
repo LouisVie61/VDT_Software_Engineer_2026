@@ -13,11 +13,7 @@ from metrics import format_ms, format_rate, summarize_runs
 
 
 DEFAULT_CASES = [
-    Path("evaluation/cases/workflow/soc_nl2plan_v1.jsonl"),
-    Path("evaluation/cases/workflow/ambiguity_cases.jsonl"),
-    Path("evaluation/cases/workflow/llm_language_cases.jsonl"),
-    Path("evaluation/cases/workflow/temporal_cases.jsonl"),
-    Path("evaluation/cases/regression/residual_cases.jsonl"),
+    Path("evaluation/cases/v2_cases.jsonl"),
 ]
 
 
@@ -35,7 +31,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--data-snapshot", default="unspecified", help="Shared Elasticsearch snapshot/version label for A/B validation.")
     parser.add_argument("--provider-config", default="unspecified", help="Shared provider/model/config label for A/B validation.")
     parser.add_argument("--cache-regime", choices=("unspecified", "cold", "warm", "mixed"), default="unspecified", help="Cache state used by this run.")
-    parser.add_argument("--auto-confirm", action="store_true", help="Follow needsConfirmation responses through /api/search/confirm.")
+    parser.add_argument("--auto-confirm", action=argparse.BooleanOptionalAction, default=True, help="Follow needsConfirmation responses through /api/search/confirm (default: enabled).")
     parser.add_argument("--require-executions", type=int, default=None, help="Require exactly this many finalized executions.")
     return parser.parse_args()
 

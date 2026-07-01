@@ -1,0 +1,3371 @@
+{
+  "base_url": "http://localhost:8080",
+  "cache_regime": "cold",
+  "cases": 28,
+  "data_snapshot": "soc-events-fixed",
+  "evaluation_fingerprint": "84a3146ecb2accbd60ad2aa669e6ea2ed310863bd5061e18f2de8bffc8b143c3",
+  "min_pass_rate": 0.9,
+  "provider_config": "gemini-2.5-flash",
+  "repeat": 1,
+  "request_fingerprint": "4b78e1053d2e30d997558e7079cd19e5b6297824320b202a8de5d272657dda8d",
+  "results": [
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "soc-001",
+      "category": "soc_nl2plan",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"severity\":\"high\"",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_any_contains:['\"event_type\":\"auth\"', 'auth']",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "severity": "high"
+                }
+              },
+              {
+                "term": {
+                  "event_type": "auth"
+                }
+              }
+            ],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 12797.134599997662,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 12797.134599997662,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:1",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 3142
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "soc-002",
+      "category": "soc_nl2plan",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:alice",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:host-1",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "user": "alice"
+                }
+              },
+              {
+                "term": {
+                  "host": "host-1"
+                }
+              }
+            ],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 25,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 8153.274000011152,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 8153.274000011152,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 2,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:2",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 2
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "soc-003",
+      "category": "api_contract",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 11392.099599994253,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 11392.099599994253,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:3",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "soc-004",
+      "category": "api_contract",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:endpoint",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"severity\":\"critical\"",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "severity": "critical"
+                }
+              }
+            ],
+            "must": [
+              {
+                "simple_query_string": {
+                  "default_operator": "and",
+                  "fields": [
+                    "message",
+                    "raw",
+                    "user",
+                    "host",
+                    "source",
+                    "event_type",
+                    "severity",
+                    "action"
+                  ],
+                  "query": "endpoint"
+                }
+              }
+            ]
+          }
+        },
+        "size": 30,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 12730.271100008395,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 12730.271100008395,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 30,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:4",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 2618
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "soc-005",
+      "category": "api_contract",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:alice",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 20,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "user": "alice"
+                }
+              }
+            ],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 10,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 27241.75520002609,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 27241.75520002609,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:5",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 2
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "soc-006",
+      "category": "api_contract",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:10.0.0.1",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "bool": {
+                  "minimum_should_match": 1,
+                  "should": [
+                    {
+                      "term": {
+                        "ip": "10.0.0.1"
+                      }
+                    },
+                    {
+                      "term": {
+                        "src_ip": "10.0.0.1"
+                      }
+                    },
+                    {
+                      "term": {
+                        "dst_ip": "10.0.0.1"
+                      }
+                    }
+                  ]
+                }
+              }
+            ],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 7504.835100000491,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 7504.835100000491,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 2,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:6",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 2
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "amb-001",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:\"script\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:delete",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:update_by_query",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [],
+            "must": [
+              {
+                "simple_query_string": {
+                  "default_operator": "and",
+                  "fields": [
+                    "message",
+                    "raw",
+                    "user",
+                    "host",
+                    "source",
+                    "event_type",
+                    "severity",
+                    "action"
+                  ],
+                  "query": "suspicious activity"
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 9257.149699988076,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 9257.149699988076,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:7",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 10,
+      "cache_hit": null,
+      "case_id": "amb-002",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"terms\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"field\":\"ip\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"size\":10",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "aggs": {
+          "top_values": {
+            "terms": {
+              "field": "ip",
+              "size": 10
+            }
+          }
+        },
+        "query": {
+          "bool": {
+            "filter": [],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 0
+      },
+      "initial_latency_ms": 33206.07789998758,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 33206.07789998758,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 500,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:8",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "amb-003",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"terms\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"field\":\"event_type\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"size\":10",
+          "passed": false
+        },
+        {
+          "detail": "branch 1 failed [generatedDsl_path_exists:aggs: missing path]; branch 2 failed [generatedDsl_path_exists:aggregations: missing path]",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": false
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [],
+            "must": [
+              {
+                "simple_query_string": {
+                  "default_operator": "and",
+                  "fields": [
+                    "message",
+                    "raw",
+                    "user",
+                    "host",
+                    "source",
+                    "event_type",
+                    "severity",
+                    "action"
+                  ],
+                  "query": "loi"
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 35253.40159999905,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 35253.40159999905,
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 0,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:9",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "amb-004",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:\"script\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:delete",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:update_by_query",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [],
+            "must": [
+              {
+                "simple_query_string": {
+                  "default_operator": "and",
+                  "fields": [
+                    "message",
+                    "raw",
+                    "user",
+                    "host",
+                    "source",
+                    "event_type",
+                    "severity",
+                    "action"
+                  ],
+                  "query": "loi"
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 54934.805299999425,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 54934.805299999425,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:10",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "amb-005",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"date_histogram\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"calendar_interval\":\"quarter\"",
+          "passed": false
+        },
+        {
+          "detail": "branch 1 failed [generatedDsl_path_exists:aggs: missing path]; branch 2 failed [generatedDsl_path_exists:aggregations: missing path]",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": false
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [],
+            "must": [
+              {
+                "simple_query_string": {
+                  "default_operator": "and",
+                  "fields": [
+                    "message",
+                    "raw",
+                    "user",
+                    "host",
+                    "source",
+                    "event_type",
+                    "severity",
+                    "action"
+                  ],
+                  "query": "loi"
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 56749.547300016275,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 56749.547300016275,
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 0,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:11",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 5,
+      "cache_hit": null,
+      "case_id": "amb-006",
+      "category": "perception_prefilter",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"terms\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"field\":\"user\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"size\":5",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "aggs": {
+          "top_users": {
+            "terms": {
+              "field": "user",
+              "size": 5
+            }
+          }
+        },
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 100,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 68456.74389999476,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 68456.74389999476,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 100,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:12",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 23,
+      "cache_hit": null,
+      "case_id": "amb-007",
+      "category": "perception_prefilter",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"terms\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"field\":\"source\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"size\":10",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "aggs": {
+          "events_by_source": {
+            "terms": {
+              "field": "source",
+              "size": 100
+            }
+          }
+        },
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 0,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 77037.87500000908,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 77037.87500000908,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 100,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:13",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "amb-008",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"terms\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"field\":\"event_type\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"size\":10",
+          "passed": false
+        },
+        {
+          "detail": "branch 1 failed [generatedDsl_path_exists:aggs: missing path]; branch 2 failed [generatedDsl_path_exists:aggregations: missing path]",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": false
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "severity": "error"
+                }
+              }
+            ],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 73379.89500002004,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 73379.89500002004,
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 0,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:14",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "amb-009",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"severity\":\"critical\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:\"script\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:delete",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:update_by_query",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "severity": "critical"
+                }
+              }
+            ],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 78072.2914999933,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 78072.2914999933,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:15",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "llm-001",
+      "category": "llm_language",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"range\":{\"timestamp\"",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_any_contains:['\"event_type\":\"auth\"', '\"event_type\":\"failed_login\"']",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_any_contains:['failed', 'failure']",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "event_type": "auth"
+                }
+              },
+              {
+                "term": {
+                  "action": "failed"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "now-24h",
+                    "lte": "now"
+                  }
+                }
+              }
+            ],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 74049.79129999992,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 74049.79129999992,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:16",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 3,
+      "cache_hit": null,
+      "case_id": "llm-002",
+      "category": "llm_language",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"terms\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"field\":\"host\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"size\":3",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_any_contains:['error', 'failure']",
+          "passed": false
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "aggs": {
+          "top_hosts": {
+            "terms": {
+              "field": "host",
+              "size": 3
+            }
+          }
+        },
+        "query": {
+          "bool": {
+            "filter": [],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 0
+      },
+      "initial_latency_ms": 65606.92729998846,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 65606.92729998846,
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 100,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:17",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "llm-003",
+      "category": "llm_language",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"date_histogram\"",
+          "passed": false
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_any_contains:['\"fixed_interval\":\"1d\"', '\"calendar_interval\":\"1d\"', '\"calendar_interval\":\"day\"']",
+          "passed": false
+        },
+        {
+          "detail": "branch 1 failed [generatedDsl_path_exists:aggs: missing path]; branch 2 failed [generatedDsl_path_exists:aggregations: missing path]",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": false
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "now/M"
+                  }
+                }
+              }
+            ],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 100,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 52816.852799995104,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 52816.852799995104,
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 100,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:18",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 2475
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "llm-004",
+      "category": "llm_language",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:connection timeout error",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:\"script\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:delete",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:update_by_query",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [],
+            "must": [
+              {
+                "simple_query_string": {
+                  "default_operator": "and",
+                  "fields": [
+                    "message",
+                    "raw",
+                    "user",
+                    "host",
+                    "source",
+                    "event_type",
+                    "severity",
+                    "action"
+                  ],
+                  "query": "connection timeout error"
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 66892.66679997672,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 66892.66679997672,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:19",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "llm-005",
+      "category": "llm_language",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:lateral movement",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:\"script\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:delete",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:update_by_query",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [],
+            "must": [
+              {
+                "simple_query_string": {
+                  "default_operator": "and",
+                  "fields": [
+                    "message",
+                    "raw",
+                    "user",
+                    "host",
+                    "source",
+                    "event_type",
+                    "severity",
+                    "action"
+                  ],
+                  "query": "lateral movement"
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 77742.38089998835,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 77742.38089998835,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:20",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "llm-006",
+      "category": "llm_language",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"severity\":\"critical\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"event_type\":\"auth\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:\"severity\":\"low\"",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "severity": "critical"
+                }
+              },
+              {
+                "term": {
+                  "event_type": "auth"
+                }
+              }
+            ],
+            "must": [
+              {
+                "simple_query_string": {
+                  "default_operator": "and",
+                  "fields": [
+                    "message",
+                    "raw",
+                    "user",
+                    "host",
+                    "source",
+                    "event_type",
+                    "severity",
+                    "action"
+                  ],
+                  "query": "low priority auth problems"
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 59213.228100008564,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 59213.228100008564,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:21",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "tmp-001",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"range\":{\"timestamp\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:2025-06-01",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_any_contains:['2025-06-15', '2025-06-16']",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2025-06-01T00:00:00Z",
+                    "lte": "2025-06-15T23:59:59Z"
+                  }
+                }
+              }
+            ],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 47294.94959997828,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 47294.94959997828,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:22",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 7878
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "tmp-002",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"severity\":\"high\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"range\":{\"timestamp\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:2025-06-01",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_any_contains:['2025-06-07', '2025-06-08']",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "severity": "high"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2025-06-01T00:00:00Z",
+                    "lte": "2025-06-07T23:59:59Z"
+                  }
+                }
+              }
+            ],
+            "must": [
+              {
+                "simple_query_string": {
+                  "default_operator": "and",
+                  "fields": [
+                    "message",
+                    "raw",
+                    "user",
+                    "host",
+                    "source",
+                    "event_type",
+                    "severity",
+                    "action"
+                  ],
+                  "query": ""
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 57153.18860000116,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 57153.18860000116,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:23",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 359,
+      "cache_hit": null,
+      "case_id": "tmp-003",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"date_histogram\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"range\":{\"timestamp\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:2025-06-01",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_any_contains:['\"event_type\":\"auth\"', 'auth']",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_any_contains:['2025-06-15', '2025-06-16']",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "aggs": {
+          "events_over_time": {
+            "date_histogram": {
+              "field": "timestamp",
+              "fixed_interval": "1h"
+            }
+          }
+        },
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "event_type": "auth"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2025-06-01T00:00:00Z",
+                    "lte": "2025-06-15T23:59:59Z"
+                  }
+                }
+              }
+            ],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 0
+      },
+      "initial_latency_ms": 68681.1863000039,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 68681.1863000039,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 100,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:24",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 980
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "tmp-004",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:endpoint",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"range\":{\"timestamp\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:2025-06-01",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2025-06-01T00:00:00Z"
+                  }
+                }
+              }
+            ],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 55000.148599996464,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 55000.148599996464,
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 50,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:25",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 10000
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "tmp-005",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:firewall",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"range\":{\"timestamp\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:2025-06",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 15,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "event_type": "firewall"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2025-06-01T00:00:00Z",
+                    "lte": "2025-06-30T23:59:59Z"
+                  }
+                }
+              }
+            ],
+            "must": [
+              {
+                "simple_query_string": {
+                  "default_operator": "and",
+                  "fields": [
+                    "message",
+                    "raw",
+                    "user",
+                    "host",
+                    "source",
+                    "event_type",
+                    "severity",
+                    "action"
+                  ],
+                  "query": "firewall"
+                }
+              }
+            ]
+          }
+        },
+        "size": 15,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 82655.61109999544,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 82655.61109999544,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 15,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:26",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 1937
+    },
+    {
+      "aggregation_count": 15,
+      "cache_hit": null,
+      "case_id": "tmp-006",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"date_histogram\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"range\":{\"timestamp\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:2025-06-01",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_any_contains:['\"fixed_interval\":\"1d\"', '\"calendar_interval\":\"1d\"', '\"calendar_interval\":\"day\"']",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_any_contains:['2025-06-15', '2025-06-16']",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "aggs": {
+          "events_per_day": {
+            "date_histogram": {
+              "field": "timestamp",
+              "fixed_interval": "1d"
+            }
+          }
+        },
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2025-06-01T00:00:00Z",
+                    "lte": "2025-06-15T23:59:59Z"
+                  }
+                }
+              }
+            ],
+            "must": [
+              {
+                "match_all": {}
+              }
+            ]
+          }
+        },
+        "size": 100,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc"
+            }
+          }
+        ]
+      },
+      "initial_latency_ms": 39019.940099999076,
+      "initial_needs_confirmation": null,
+      "initial_status": 200,
+      "iteration": 1,
+      "latency_ms": 39019.940099999076,
+      "needs_confirmation": null,
+      "passed": true,
+      "result_count": 100,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:27",
+      "status": 200,
+      "summary_status": null,
+      "tags": [],
+      "total_count": 7878
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": null,
+      "case_id": "tmp-007",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=400",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": false
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": false
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": false
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": false
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": false
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"date_histogram\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"calendar_interval\":\"quarter\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:2023-01-01",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:2024-01-01",
+          "passed": false
+        },
+        {
+          "detail": "branch 1 failed [generatedDsl_path_exists:aggs: missing path]; branch 2 failed [generatedDsl_path_exists:aggregations: missing path]",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": false
+        }
+      ],
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
+      "description": "",
+      "error": "HTTP Error 400: ",
+      "expected_status": 200,
+      "final_execution": false,
+      "generated_dsl": null,
+      "initial_latency_ms": 36877.28759998572,
+      "initial_needs_confirmation": null,
+      "initial_status": 400,
+      "iteration": 1,
+      "latency_ms": 36877.28759998572,
+      "needs_confirmation": null,
+      "passed": false,
+      "result_count": 0,
+      "selected_template": null,
+      "source": "llm_cases.jsonl:28",
+      "status": 400,
+      "summary_status": null,
+      "tags": [],
+      "total_count": null
+    }
+  ],
+  "summary": {
+    "cache_hit_rate": 0.0,
+    "cache_hits": 0,
+    "category_counts": {
+      "ambiguity": 7,
+      "api_contract": 4,
+      "llm_language": 6,
+      "perception_prefilter": 2,
+      "soc_nl2plan": 2,
+      "temporal": 7
+    },
+    "category_latency_p95_ms": {
+      "ambiguity": 76664.57255000132,
+      "api_contract": 25065.03258502343,
+      "llm_language": 76819.23349999124,
+      "perception_prefilter": 76608.81844500836,
+      "soc_nl2plan": 12564.941569998336,
+      "temporal": 78463.28365999796
+    },
+    "category_pass_rates": {
+      "ambiguity": 0.5714285714285714,
+      "api_contract": 1.0,
+      "llm_language": 0.6666666666666666,
+      "perception_prefilter": 1.0,
+      "soc_nl2plan": 1.0,
+      "temporal": 0.7142857142857143
+    },
+    "confirmation_followed_runs": 0,
+    "confirmation_rate": 0.0,
+    "confirmation_runs": 0,
+    "evaluation_fingerprint": "84a3146ecb2accbd60ad2aa669e6ea2ed310863bd5061e18f2de8bffc8b143c3",
+    "executed_runs": 27,
+    "execution_target_met": false,
+    "failed": 7,
+    "latency_max_ms": 82655.61109999544,
+    "latency_median_ms": 54967.476949997945,
+    "latency_min_ms": 7504.835100000491,
+    "latency_p95_ms": 77956.82278999157,
+    "metric_group_check_counts": {
+      "Aggregation Correctness": 59,
+      "DSL Correctness": 63,
+      "Result Quality": 123,
+      "Safety / Guardrail": 16
+    },
+    "metric_group_check_pass_rates": {
+      "Aggregation Correctness": 0.711864406779661,
+      "DSL Correctness": 0.9841269841269841,
+      "Result Quality": 0.926829268292683,
+      "Safety / Guardrail": 1.0
+    },
+    "metric_group_latency_p95_ms": {
+      "Aggregation Correctness": 75208.88500001456,
+      "DSL Correctness": 78988.95541999373,
+      "Result Quality": 77956.82278999157,
+      "Safety / Guardrail": 77989.81384999206
+    },
+    "metric_group_run_counts": {
+      "Aggregation Correctness": 11,
+      "DSL Correctness": 17,
+      "Result Quality": 28,
+      "Safety / Guardrail": 6
+    },
+    "metric_group_run_pass_rates": {
+      "Aggregation Correctness": 0.45454545454545453,
+      "DSL Correctness": 0.9411764705882353,
+      "Result Quality": 0.8214285714285714,
+      "Safety / Guardrail": 1.0
+    },
+    "pass_rate": 0.75,
+    "passed": 21,
+    "request_fingerprint": "4b78e1053d2e30d997558e7079cd19e5b6297824320b202a8de5d272657dda8d",
+    "required_executions": 28,
+    "status_error_rate": 0.03571428571428571,
+    "template_counts": {
+      "none": 28
+    },
+    "total": 28,
+    "variant": "llm-only-v1",
+    "zero_result_rate": 0.4074074074074074,
+    "zero_result_runs": 11
+  },
+  "variant": "llm-only-v1",
+  "warmup": 0
+}
