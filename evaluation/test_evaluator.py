@@ -88,25 +88,25 @@ class AssistedExecutionTest(unittest.TestCase):
         self.assertEqual(1, summary["confirmation_runs"])
         self.assertEqual(1, summary["confirmation_followed_runs"])
 
-    def test_workflow_dataset_has_assisted_overrides_for_incomplete_intents(self) -> None:
-        cases = load_cases([Path("evaluation/cases/ablation/workflow_comparison_cases.jsonl")])
+    def test_v2_dataset_has_assisted_overrides_for_incomplete_intents(self) -> None:
+        cases = load_cases([Path("evaluation/cases/v2_cases.jsonl")])
         by_id = {case.id: case for case in cases}
 
         self.assertEqual(28, len(cases))
         self.assertEqual("event_type", by_id["amb-003"].assisted["editedIntent"]["groupBy"])
-        self.assertTrue(by_id["amb-003"].assisted["initialExpected"]["needsConfirmation"])
+        self.assertTrue(by_id["amb-003"].assisted["scoreFinalResponse"])
         self.assertEqual(10, by_id["amb-007"].assisted["editedIntent"]["topN"])
         self.assertEqual("event_type", by_id["amb-008"].assisted["editedIntent"]["groupBy"])
         self.assertEqual("TIME_AGGREGATION", by_id["llm-003"].assisted["editedIntent"]["intent"])
 
-    def test_ab_dataset_uses_shared_workflow_payload_and_final_scoring(self) -> None:
-        cases = load_cases([Path("evaluation/cases/ablation/ab_execution_cases.jsonl")])
-        workflow_cases = load_cases([Path("evaluation/cases/ablation/workflow_comparison_cases.jsonl")])
-        workflow_requests = {case.id: case.request for case in workflow_cases}
+    def test_v2_dataset_preserves_source_payload_and_final_scoring(self) -> None:
+        cases = load_cases([Path("evaluation/cases/v2_cases.jsonl")])
+        source_cases = load_cases([Path("evaluation/cases/llm_cases.jsonl")])
+        source_requests = {case.id: case.request for case in source_cases}
 
         self.assertEqual(28, len(cases))
         self.assertEqual(28, len({case.id for case in cases}))
-        self.assertTrue(all(case.request == workflow_requests[case.id] for case in cases))
+        self.assertTrue(all(case.request == source_requests[case.id] for case in cases))
         self.assertTrue(all(case.assisted.get("scoreFinalResponse") is True for case in cases))
 
     def test_benchmark_fails_when_execution_target_is_not_met(self) -> None:

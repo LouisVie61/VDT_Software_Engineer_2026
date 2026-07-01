@@ -1,245 +1,89 @@
-# Backend Evaluation Benchmark
+# V2 controlled-workflow benchmark
 
-Benchmark nay dung de do backend theo contract hien tai: LLM chiu trach nhiem xu ly ngon ngu/ambiguity, Perception Layer chi la soft prior va optimization, con application layer validate/build canonical plan/DSL.
+Benchmark này đánh giá V2 bằng workload Y′ được sinh xác định từ bộ case nguồn X.
 
-## Muc tieu
+- X: `evaluation/cases/llm_cases.jsonl` (28 case nguồn, giữ cố định).
+- Y′: `evaluation/cases/v2_cases.jsonl` (workload dùng để chạy V2).
+- Quy trình sinh: `evaluation/generate_v2_cases.py`.
+- Corpus thực thi: Elasticsearch index `soc-events`; phải giữ cùng snapshot trong một đợt đo.
 
-- **Correctness**: HTTP response thanh cong, template/DSL/filter/pagination khop expectation, va query da execute co evidence khi case yeu cau.
-- **LLM language quality**: prompt phai xu ly Vietnamese/English/mixed-language, command-word noise, temporal expression, ambiguous SOC wording.
-- **Perception optimization**: cac case ro rang co the di fast prefilter; case ambiguous phai quay ve LLM/confirmation thay vi phu thuoc router dung.
-- **Stability**: chay lap lai nhieu vong, co warmup, latency p95 theo category, status error rate va zero-result rate.
-- **Auditability**: report markdown va optional JSON co case-level checks, failed checks, template distribution, confirmation/cache rate.
+Y′ giữ nguyên toàn bộ `id`, `category`, `request`, `expected` và `assisted.editedIntent` của X. Script chỉ bật `scoreFinalResponse` và thêm provenance/hash. Không dùng LLM, random, dữ liệu ngoài, hay giá trị được viết thêm trong lúc sinh. Controlled workflow nằm ở evaluator: gọi `/api/search`, theo confirmation qua `/api/search/confirm` khi cần, rồi chấm response cuối.
 
-## Cau truc
+## Sinh và kiểm tra Y′
 
-```text
-evaluation/
-+-- README.md
-+-- annotation_guideline.md
-+-- cases/
-|   +-- workflow/
-|   |   +-- soc_nl2plan_v1.jsonl
-|   |   +-- ambiguity_cases.jsonl
-|   |   +-- llm_language_cases.jsonl
-|   |   +-- temporal_cases.jsonl
-|   +-- regression/
-|   |   +-- residual_cases.jsonl
-|   +-- ablation/
-|   |   +-- ab_execution_cases.jsonl
-|   |   +-- workflow_comparison_cases.jsonl
-|   |   +-- llm_cases.jsonl
-+-- reports/
-|   +-- .gitkeep
-+-- evaluator.py
-+-- compare_ab.py
-+-- metrics.py
-+-- runner.py
-```
-
-## Chay benchmark
-
-1. Start backend:
+Chạy từ thư mục `demo`:
 
 ```powershell
-cd demo
-.\mvnw spring-boot:run
+python evaluation\generate_v2_cases.py
+python evaluation\generate_v2_cases.py --check
+python -m unittest discover -s evaluation -p "test_*.py"
 ```
 
-2. Chay evaluation trong terminal khac:
+`--check` phải chạy trong CI để phát hiện Y′ bị sửa tay hoặc không còn khớp X.
 
-```powershell
-cd demo
-python evaluation\runner.py --base-url http://localhost:8080 --warmup 1 --repeat 3
-```
-
-Mac/Linux:
-
-```bash
-cd demo
-python3 evaluation/runner.py --base-url http://localhost:8080 --warmup 1 --repeat 3
-```
-
-Report mac dinh duoc ghi vao:
-
-```text
-demo/evaluation/reports/backend_evaluation_report.md
-```
-
-## Tuy chon
-
-```powershell
-python evaluation\runner.py `
-  --base-url http://localhost:8080 `
-  --cases evaluation\cases\workflow\soc_nl2plan_v1.jsonl evaluation\cases\workflow\temporal_cases.jsonl `
-  --repeat 5 `
-  --warmup 1 `
-  --timeout 10 `
-  --output evaluation\reports\custom_report.md `
-  --json-output evaluation\reports\custom_report.json
-```
-
-## Benchmark profiles
-
-### Ablation metric scorecard
-
-Suite `workflow_comparison_cases.jsonl` duoc cham black-box theo 5 nhom:
-
-- `DSL Correctness`: template, generated DSL, filter, pagination va time range.
-- `Aggregation Correctness`: terms/time aggregation, bucket va chart contract.
-- `Result Quality`: HTTP/JSON contract, execution evidence, result va total count.
-- `Safety / Guardrail`: confirmation, warning, ambiguity va prohibited DSL behavior.
-- `Performance`: latency budget cua tung case va latency p95.
-
-Moi assertion trong JSON report co field `metric_group`. Scorecard Markdown va
-JSON cung bao cao ca run pass rate va check pass rate, nen loi cua mot nhom
-khong lam sai diem cua nhom khac.
-
-```powershell
-python evaluation\runner.py `
-  --base-url http://localhost:8080 `
-  --cases evaluation\cases\ablation\workflow_comparison_cases.jsonl `
-  --repeat 1 `
-  --timeout 30 `
-  --output evaluation\reports\ablation_report.md `
-  --json-output evaluation\reports\ablation_report.json
-```
-
-### LLM baseline
-
-Suite `llm_cases.jsonl` gom 28 cau hoi baseline, duoc tach khoi workflow contract
-de danh gia luong LLM truc tiep theo DSL correctness, aggregation evidence,
-result quality, safety va latency thuc do.
-
-```powershell
-python evaluation\runner.py `
-  --base-url http://localhost:8080 `
-  --cases evaluation\cases\ablation\llm_cases.jsonl `
-  --repeat 1 `
-  --warmup 0 `
-  --output evaluation\reports\llm_baseline_benchmark.md
-```
-
-### Fair version comparison protocol
-
-Dung `ab_execution_cases.jsonl` cho ca hai nhanh. File nay giu cung case ID,
-request payload va final expectation. Khong dung `llm_cases.jsonl` cho baseline
-roi `workflow_comparison_cases.jsonl` cho V2 trong mot controlled A/B, vi payload
-va semantics cua `pass` khac nhau.
-
-V2 chay voi `--auto-confirm`: response `needsConfirmation=true` duoc follow qua
-`POST /api/search/confirm`, sau do evaluator cham toan bo final expectation tren
-response cuoi. Initial confirmation van duoc cham rieng ve confirmation ID/intent.
-`--require-executions 28` lam benchmark fail neu khong du 28 final execution.
-
-Truoc moi nhanh, khoi phuc cung Elasticsearch snapshot va dua Redis ve cung cache
-state. Hai lenh phai khai bao cung `--data-snapshot`, `--provider-config` va
-`--cache-regime`; cac label nay la audit metadata, nguoi chay van phai dam bao
-external state thuc su trung khop.
-
-Baseline:
-
-```powershell
-python evaluation\runner.py `
-  --variant llm-baseline `
-  --base-url http://localhost:8081 `
-  --cases evaluation\cases\ablation\ab_execution_cases.jsonl `
-  --require-executions 28 `
-  --repeat 1 `
-  --warmup 0 `
-  --timeout 120 `
-  --data-snapshot soc-events-<snapshot-id> `
-  --provider-config <provider-model-config-hash> `
-  --cache-regime cold `
-  --output evaluation\reports\ab_baseline.md `
-  --json-output evaluation\reports\ab_baseline.json
-```
-
-Workflow V2:
+## Chạy benchmark V2
 
 ```powershell
 python evaluation\runner.py `
   --variant workflow-v2 `
   --base-url http://localhost:8080 `
-  --cases evaluation\cases\ablation\ab_execution_cases.jsonl `
-  --auto-confirm `
+  --cases evaluation\cases\v2_cases.jsonl `
   --require-executions 28 `
   --repeat 1 `
   --warmup 0 `
   --timeout 120 `
-  --data-snapshot soc-events-<snapshot-id> `
+  --data-snapshot <soc-events-snapshot-id> `
   --provider-config <provider-model-config-hash> `
   --cache-regime cold `
-  --output evaluation\reports\report_v2.md `
-  --json-output evaluation\reports\report_v2.json
+  --output evaluation\reports\v2_report.md `
+  --json-output evaluation\reports\v2_report.json
 ```
 
-Tao bao cao A/B ghep cap:
+Auto-confirm được bật mặc định. Có thể dùng `--no-auto-confirm` chỉ khi cần debug response đầu; chế độ đó không phải protocol benchmark V2.
 
-```powershell
-python evaluation\compare_ab.py `
-  --baseline evaluation\reports\ab_baseline.json `
-  --candidate evaluation\reports\report_v2.json `
-  --output evaluation\reports\ab_comparison.md
+## EDA tối thiểu trước khi sửa X
+
+EDA chỉ dùng để xác nhận case có thể thực thi trên `soc-events`: schema/mapping, giá trị phổ biến của field filter/group-by, phân phối thời gian, và số lượng hit khác 0. Nếu cần đổi X, thay đổi phải có lý do từ các thống kê này; sau đó sinh lại Y′. Không thêm case hoặc giá trị chỉ dựa trên phỏng đoán.
+
+## File được giữ
+
+```text
+evaluation/
+├── cases/
+│   ├── llm_cases.jsonl       # X, source of truth
+│   └── v2_cases.jsonl        # Y′, generated artifact
+├── reports/.gitkeep
+├── generate_v2_cases.py
+├── evaluator.py
+├── metrics.py
+├── runner.py
+├── test_evaluator.py
+└── README.md
 ```
 
-`compare_ab.py` chi ghi nhan `Controlled paired A/B` khi request/evaluation
-fingerprint, case count, repeat, warmup, data snapshot, provider config, cache
-regime va full-execution parity deu dat. Bao cao kem transition theo case va
-McNemar exact p-value cho outcome pass/fail ghep cap.
 
-Default suite chay cac case `workflow/` va `regression/` de test mot version backend binh thuong. Nhom `ablation/` khong nam trong default suite; dung rieng de black-box compare hai phien ban.
+cd D:\VDT_SE_WEB_2026_Main\demo
 
-Neu muon benchmark backend contract ma khong phu thuoc LLM provider/API key, chay subset on dinh:
+# Sinh Y′ từ X
+python evaluation\generate_v2_cases.py
 
-```powershell
+# Kiểm tra Y′ có tái lập đúng không
+python evaluation\generate_v2_cases.py --check
+
+# Chạy test
+python -m unittest discover -s evaluation -p "test_*.py"
+
+# Chạy benchmark V2
 python evaluation\runner.py `
-  --cases evaluation\cases\workflow\soc_nl2plan_v1.jsonl evaluation\cases\workflow\temporal_cases.jsonl evaluation\cases\regression\residual_cases.jsonl evaluation\cases\workflow\ambiguity_cases.jsonl `
-  --repeat 3
-```
-
-Neu muon benchmark prompt/LLM language quality rieng:
-
-```powershell
-python evaluation\runner.py `
-  --cases evaluation\cases\workflow\llm_language_cases.jsonl `
-  --repeat 3 `
-  --timeout 15
-```
-
-Neu muon black-box compare nhanh hai phien ban backend ma khong can ket luan nhan qua, co the chay `workflow_comparison_cases.jsonl` tren tung version. De ket luan A/B, dung protocol `ab_execution_cases.jsonl` o tren.
-
-```powershell
-python evaluation\runner.py `
+  --variant workflow-v2 `
   --base-url http://localhost:8080 `
-  --cases evaluation\cases\ablation\workflow_comparison_cases.jsonl `
-  --repeat 3 `
-  --output evaluation\reports\ablation_v1_report.md `
-  --json-output evaluation\reports\ablation_v1_report.json
-
-python evaluation\runner.py `
-  --base-url http://localhost:8081 `
-  --cases evaluation\cases\ablation\workflow_comparison_cases.jsonl `
-  --repeat 3 `
-  --output evaluation\reports\ablation_v2_report.md `
-  --json-output evaluation\reports\ablation_v2_report.json
-```
-
-## Tieu chuan pass mac dinh
-
-- HTTP status phai la `200`, tru khi case khai bao status khac.
-- Moi expectation trong case phai pass.
-- Neu response khong phai confirmation, `totalCount` phai lon hon `0` va `results` hoac `aggregations` phai khac rong, tru khi case khai bao `expected.allowZeroResults=true`.
-- Response confirmation la first-class contract: case confidence thap nen assert `needsConfirmation=true` va `confirmation.confirmationId`, khong assert DSL execution.
-- Aggregation execution tra ve bucket aggregation kem hits page de phuc vu results/export, nen benchmark aggregation ro rang co the ky vong `generatedDsl.size`, `sort`, `results`, va `aggregations` cung ton tai.
-- Latency moi request phai nho hon `thresholds.max_latency_ms` neu case co khai bao.
-- Benchmark tong hop pass khi case pass rate dat toi thieu `90%`.
-
-## Expectation helpers
-
-- `equals`, `notEquals`, `fieldIn`, `fieldExists`, `fieldNotExists`: kiem tra path tren response.
-- `generatedDslContains`, `generatedDslNotContains`, `generatedDslAnyContains`: kiem tra compact JSON DSL.
-- `generatedDslPath.equals`, `generatedDslPath.exists`, `generatedDslPath.notExists`, `generatedDslPath.fieldIn`: kiem tra path truc tiep tren `generatedDsl`.
-- `anyOf`: cho phep nhieu response hop le, vi ambiguous query co the confirmation hoac execute neu du confidence.
-- `tags`: gan nhan benchmark case de doc report nhanh hon.
-
-Day la benchmark nhe, phu hop CI/manual audit. Neu can benchmark tai nang, nen tach thanh load test rieng vi muc tieu o day la correctness/stability cua backend contract.
+  --cases evaluation\cases\v2_cases.jsonl `
+  --require-executions 28 `
+  --repeat 1 `
+  --warmup 0 `
+  --timeout 120 `
+  --data-snapshot soc-events-fixed `
+  --provider-config current-model-config `
+  --cache-regime cold `
+  --output evaluation\reports\v2_report.md `
+  --json-output evaluation\reports\v2_report.json
