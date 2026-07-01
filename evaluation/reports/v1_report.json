@@ -2,7 +2,7 @@
   "base_url": "http://localhost:8080",
   "cache_regime": "cold",
   "cases": 28,
-  "data_snapshot": "soc-events-gP5CmfSDQcmg0NgqorwMqA-docs100003",
+  "data_snapshot": "soc-events-fixed",
   "evaluation_fingerprint": "84a3146ecb2accbd60ad2aa669e6ea2ed310863bd5061e18f2de8bffc8b143c3",
   "min_pass_rate": 0.9,
   "provider_config": "gemini-2.5-flash",
@@ -103,16 +103,16 @@
           }
         ]
       },
-      "initial_latency_ms": 18444.10810000045,
+      "initial_latency_ms": 12797.134599997662,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 18444.10810000045,
+      "latency_ms": 12797.134599997662,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 50,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:1",
+      "source": "llm_cases.jsonl:1",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -212,16 +212,16 @@
           }
         ]
       },
-      "initial_latency_ms": 32051.458099998854,
+      "initial_latency_ms": 8153.274000011152,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 32051.458099998854,
+      "latency_ms": 8153.274000011152,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 2,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:2",
+      "source": "llm_cases.jsonl:2",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -298,16 +298,16 @@
           }
         ]
       },
-      "initial_latency_ms": 42671.92150000119,
+      "initial_latency_ms": 11392.099599994253,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 42671.92150000119,
+      "latency_ms": 11392.099599994253,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 50,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:3",
+      "source": "llm_cases.jsonl:3",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -415,16 +415,16 @@
           }
         ]
       },
-      "initial_latency_ms": 42796.164999999746,
+      "initial_latency_ms": 12730.271100008395,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 42796.164999999746,
+      "latency_ms": 12730.271100008395,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 30,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:4",
+      "source": "llm_cases.jsonl:4",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -487,7 +487,7 @@
       "expected_status": 200,
       "final_execution": true,
       "generated_dsl": {
-        "from": 10,
+        "from": 20,
         "query": {
           "bool": {
             "filter": [
@@ -513,16 +513,16 @@
           }
         ]
       },
-      "initial_latency_ms": 79239.56120000003,
+      "initial_latency_ms": 27241.75520002609,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 79239.56120000003,
+      "latency_ms": 27241.75520002609,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 0,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:5",
+      "source": "llm_cases.jsonl:5",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -614,20 +614,7 @@
             ],
             "must": [
               {
-                "simple_query_string": {
-                  "default_operator": "and",
-                  "fields": [
-                    "message",
-                    "raw",
-                    "user",
-                    "host",
-                    "source",
-                    "event_type",
-                    "severity",
-                    "action"
-                  ],
-                  "query": ""
-                }
+                "match_all": {}
               }
             ]
           }
@@ -641,20 +628,20 @@
           }
         ]
       },
-      "initial_latency_ms": 53924.86260000078,
+      "initial_latency_ms": 7504.835100000491,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 53924.86260000078,
+      "latency_ms": 7504.835100000491,
       "needs_confirmation": null,
       "passed": true,
-      "result_count": 0,
+      "result_count": 2,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:6",
+      "source": "llm_cases.jsonl:6",
       "status": 200,
       "summary_status": null,
       "tags": [],
-      "total_count": 0
+      "total_count": 2
     },
     {
       "aggregation_count": 0,
@@ -758,16 +745,16 @@
           }
         ]
       },
-      "initial_latency_ms": 59122.17760000203,
+      "initial_latency_ms": 9257.149699988076,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 59122.17760000203,
+      "latency_ms": 9257.149699988076,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 0,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:7",
+      "source": "llm_cases.jsonl:7",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -868,16 +855,16 @@
         },
         "size": 0
       },
-      "initial_latency_ms": 64952.97730000311,
+      "initial_latency_ms": 33206.07789998758,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 64952.97730000311,
+      "latency_ms": 33206.07789998758,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 500,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:8",
+      "source": "llm_cases.jsonl:8",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -991,16 +978,16 @@
           }
         ]
       },
-      "initial_latency_ms": 66063.2958999995,
+      "initial_latency_ms": 35253.40159999905,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 66063.2958999995,
+      "latency_ms": 35253.40159999905,
       "needs_confirmation": null,
       "passed": false,
       "result_count": 0,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:9",
+      "source": "llm_cases.jsonl:9",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -1108,16 +1095,16 @@
           }
         ]
       },
-      "initial_latency_ms": 49947.22200000251,
+      "initial_latency_ms": 54934.805299999425,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 49947.22200000251,
+      "latency_ms": 54934.805299999425,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 0,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:10",
+      "source": "llm_cases.jsonl:10",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -1195,21 +1182,23 @@
         "from": 0,
         "query": {
           "bool": {
-            "filter": [
-              {
-                "term": {
-                  "event_type": "auth"
-                }
-              },
-              {
-                "term": {
-                  "action": "failed"
-                }
-              }
-            ],
+            "filter": [],
             "must": [
               {
-                "match_all": {}
+                "simple_query_string": {
+                  "default_operator": "and",
+                  "fields": [
+                    "message",
+                    "raw",
+                    "user",
+                    "host",
+                    "source",
+                    "event_type",
+                    "severity",
+                    "action"
+                  ],
+                  "query": "loi"
+                }
               }
             ]
           }
@@ -1223,20 +1212,20 @@
           }
         ]
       },
-      "initial_latency_ms": 50816.92320000002,
+      "initial_latency_ms": 56749.547300016275,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 50816.92320000002,
+      "latency_ms": 56749.547300016275,
       "needs_confirmation": null,
       "passed": false,
-      "result_count": 50,
+      "result_count": 0,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:11",
+      "source": "llm_cases.jsonl:11",
       "status": 200,
       "summary_status": null,
       "tags": [],
-      "total_count": 2087
+      "total_count": 0
     },
     {
       "aggregation_count": 5,
@@ -1341,16 +1330,16 @@
           }
         ]
       },
-      "initial_latency_ms": 77789.25119999985,
+      "initial_latency_ms": 68456.74389999476,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 77789.25119999985,
+      "latency_ms": 68456.74389999476,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 100,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:12",
+      "source": "llm_cases.jsonl:12",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -1432,7 +1421,7 @@
       "final_execution": true,
       "generated_dsl": {
         "aggs": {
-          "top_values": {
+          "events_by_source": {
             "terms": {
               "field": "source",
               "size": 100
@@ -1459,16 +1448,16 @@
           }
         ]
       },
-      "initial_latency_ms": 92034.64860000167,
+      "initial_latency_ms": 77037.87500000908,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 92034.64860000167,
+      "latency_ms": 77037.87500000908,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 100,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:13",
+      "source": "llm_cases.jsonl:13",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -1575,16 +1564,16 @@
           }
         ]
       },
-      "initial_latency_ms": 79410.75590000037,
+      "initial_latency_ms": 73379.89500002004,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 79410.75590000037,
+      "latency_ms": 73379.89500002004,
       "needs_confirmation": null,
       "passed": false,
       "result_count": 0,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:14",
+      "source": "llm_cases.jsonl:14",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -1691,16 +1680,16 @@
           }
         ]
       },
-      "initial_latency_ms": 57720.286799998576,
+      "initial_latency_ms": 78072.2914999933,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 57720.286799998576,
+      "latency_ms": 78072.2914999933,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 50,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:15",
+      "source": "llm_cases.jsonl:15",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -1814,16 +1803,16 @@
           }
         ]
       },
-      "initial_latency_ms": 94509.09400000091,
+      "initial_latency_ms": 74049.79129999992,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 94509.09400000091,
+      "latency_ms": 74049.79129999992,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 0,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:16",
+      "source": "llm_cases.jsonl:16",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -1893,7 +1882,7 @@
           "detail": "no alternative fragment found",
           "metric_group": "Aggregation Correctness",
           "name": "dsl_any_contains:['error', 'failure']",
-          "passed": true
+          "passed": false
         },
         {
           "detail": "matched branch 1",
@@ -1912,20 +1901,8 @@
       "generated_dsl": {
         "aggs": {
           "top_hosts": {
-            "aggs": {
-              "errors": {
-                "filter": {
-                  "term": {
-                    "severity": "error"
-                  }
-                }
-              }
-            },
             "terms": {
               "field": "host",
-              "order": {
-                "_count": "desc"
-              },
               "size": 3
             }
           }
@@ -1942,16 +1919,16 @@
         },
         "size": 0
       },
-      "initial_latency_ms": 50934.28700000004,
+      "initial_latency_ms": 65606.92729998846,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 50934.28700000004,
+      "latency_ms": 65606.92729998846,
       "needs_confirmation": null,
-      "passed": true,
+      "passed": false,
       "result_count": 100,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:17",
+      "source": "llm_cases.jsonl:17",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -2033,28 +2010,14 @@
               {
                 "range": {
                   "timestamp": {
-                    "gte": "now-1M/M",
-                    "lte": "now"
+                    "gte": "now/M"
                   }
                 }
               }
             ],
             "must": [
               {
-                "simple_query_string": {
-                  "default_operator": "and",
-                  "fields": [
-                    "message",
-                    "raw",
-                    "user",
-                    "host",
-                    "source",
-                    "event_type",
-                    "severity",
-                    "action"
-                  ],
-                  "query": "xu huong alert"
-                }
+                "match_all": {}
               }
             ]
           }
@@ -2068,20 +2031,20 @@
           }
         ]
       },
-      "initial_latency_ms": 67401.48709999994,
+      "initial_latency_ms": 52816.852799995104,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 67401.48709999994,
+      "latency_ms": 52816.852799995104,
       "needs_confirmation": null,
       "passed": false,
-      "result_count": 0,
+      "result_count": 100,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:18",
+      "source": "llm_cases.jsonl:18",
       "status": 200,
       "summary_status": null,
       "tags": [],
-      "total_count": 0
+      "total_count": 2475
     },
     {
       "aggregation_count": 0,
@@ -2191,16 +2154,16 @@
           }
         ]
       },
-      "initial_latency_ms": 78403.94339999693,
+      "initial_latency_ms": 66892.66679997672,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 78403.94339999693,
+      "latency_ms": 66892.66679997672,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 0,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:19",
+      "source": "llm_cases.jsonl:19",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -2314,16 +2277,16 @@
           }
         ]
       },
-      "initial_latency_ms": 86978.07130000001,
+      "initial_latency_ms": 77742.38089998835,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 86978.07130000001,
+      "latency_ms": 77742.38089998835,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 0,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:20",
+      "source": "llm_cases.jsonl:20",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -2442,16 +2405,16 @@
           }
         ]
       },
-      "initial_latency_ms": 33732.94100000203,
+      "initial_latency_ms": 59213.228100008564,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 33732.94100000203,
+      "latency_ms": 59213.228100008564,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 0,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:21",
+      "source": "llm_cases.jsonl:21",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -2555,16 +2518,16 @@
           }
         ]
       },
-      "initial_latency_ms": 54493.250100000296,
+      "initial_latency_ms": 47294.94959997828,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 54493.250100000296,
+      "latency_ms": 47294.94959997828,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 50,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:22",
+      "source": "llm_cases.jsonl:22",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -2692,16 +2655,16 @@
           }
         ]
       },
-      "initial_latency_ms": 49511.12690000082,
+      "initial_latency_ms": 57153.18860000116,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 49511.12690000082,
+      "latency_ms": 57153.18860000116,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 0,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:23",
+      "source": "llm_cases.jsonl:23",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -2828,16 +2791,16 @@
         },
         "size": 0
       },
-      "initial_latency_ms": 88219.12970000267,
+      "initial_latency_ms": 68681.1863000039,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 88219.12970000267,
+      "latency_ms": 68681.1863000039,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 100,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:24",
+      "source": "llm_cases.jsonl:24",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -2940,16 +2903,16 @@
           }
         ]
       },
-      "initial_latency_ms": 96273.39369999754,
+      "initial_latency_ms": 55000.148599996464,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 96273.39369999754,
+      "latency_ms": 55000.148599996464,
       "needs_confirmation": null,
       "passed": false,
       "result_count": 50,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:25",
+      "source": "llm_cases.jsonl:25",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -3071,16 +3034,16 @@
           }
         ]
       },
-      "initial_latency_ms": 43301.69949999981,
+      "initial_latency_ms": 82655.61109999544,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 43301.69949999981,
+      "latency_ms": 82655.61109999544,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 15,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:26",
+      "source": "llm_cases.jsonl:26",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -3210,16 +3173,16 @@
           }
         ]
       },
-      "initial_latency_ms": 70148.19340000031,
+      "initial_latency_ms": 39019.940099999076,
       "initial_needs_confirmation": null,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 70148.19340000031,
+      "latency_ms": 39019.940099999076,
       "needs_confirmation": null,
       "passed": true,
       "result_count": 100,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:27",
+      "source": "llm_cases.jsonl:27",
       "status": 200,
       "summary_status": null,
       "tags": [],
@@ -3306,16 +3269,16 @@
       "expected_status": 200,
       "final_execution": false,
       "generated_dsl": null,
-      "initial_latency_ms": 30487.880399999995,
+      "initial_latency_ms": 36877.28759998572,
       "initial_needs_confirmation": null,
       "initial_status": 400,
       "iteration": 1,
-      "latency_ms": 30487.880399999995,
+      "latency_ms": 36877.28759998572,
       "needs_confirmation": null,
       "passed": false,
       "result_count": 0,
       "selected_template": null,
-      "source": "ablation_cases.jsonl:28",
+      "source": "llm_cases.jsonl:28",
       "status": 400,
       "summary_status": null,
       "tags": [],
@@ -3334,17 +3297,17 @@
       "temporal": 7
     },
     "category_latency_p95_ms": {
-      "ambiguity": 75406.5179000001,
-      "api_contract": 75442.35641000014,
-      "llm_language": 92626.33832500069,
-      "perception_prefilter": 91322.37873000158,
-      "soc_nl2plan": 31371.090599998934,
-      "temporal": 93857.11449999906
+      "ambiguity": 76664.57255000132,
+      "api_contract": 25065.03258502343,
+      "llm_language": 76819.23349999124,
+      "perception_prefilter": 76608.81844500836,
+      "soc_nl2plan": 12564.941569998336,
+      "temporal": 78463.28365999796
     },
     "category_pass_rates": {
       "ambiguity": 0.5714285714285714,
       "api_contract": 1.0,
-      "llm_language": 0.8333333333333334,
+      "llm_language": 0.6666666666666666,
       "perception_prefilter": 1.0,
       "soc_nl2plan": 1.0,
       "temporal": 0.7142857142857143
@@ -3355,11 +3318,11 @@
     "evaluation_fingerprint": "84a3146ecb2accbd60ad2aa669e6ea2ed310863bd5061e18f2de8bffc8b143c3",
     "executed_runs": 27,
     "execution_target_met": false,
-    "failed": 6,
-    "latency_max_ms": 96273.39369999754,
-    "latency_median_ms": 58421.232200000304,
-    "latency_min_ms": 18444.10810000045,
-    "latency_p95_ms": 93643.03811000119,
+    "failed": 7,
+    "latency_max_ms": 82655.61109999544,
+    "latency_median_ms": 54967.476949997945,
+    "latency_min_ms": 7504.835100000491,
+    "latency_p95_ms": 77956.82278999157,
     "metric_group_check_counts": {
       "Aggregation Correctness": 59,
       "DSL Correctness": 63,
@@ -3367,16 +3330,16 @@
       "Safety / Guardrail": 16
     },
     "metric_group_check_pass_rates": {
-      "Aggregation Correctness": 0.7288135593220338,
+      "Aggregation Correctness": 0.711864406779661,
       "DSL Correctness": 0.9841269841269841,
       "Result Quality": 0.926829268292683,
       "Safety / Guardrail": 1.0
     },
     "metric_group_latency_p95_ms": {
-      "Aggregation Correctness": 90126.88915000217,
-      "DSL Correctness": 94861.95394000024,
-      "Result Quality": 93643.03811000119,
-      "Safety / Guardrail": 84834.53932499923
+      "Aggregation Correctness": 75208.88500001456,
+      "DSL Correctness": 78988.95541999373,
+      "Result Quality": 77956.82278999157,
+      "Safety / Guardrail": 77989.81384999206
     },
     "metric_group_run_counts": {
       "Aggregation Correctness": 11,
@@ -3385,13 +3348,13 @@
       "Safety / Guardrail": 6
     },
     "metric_group_run_pass_rates": {
-      "Aggregation Correctness": 0.5454545454545454,
+      "Aggregation Correctness": 0.45454545454545453,
       "DSL Correctness": 0.9411764705882353,
       "Result Quality": 0.8214285714285714,
       "Safety / Guardrail": 1.0
     },
-    "pass_rate": 0.7857142857142857,
-    "passed": 22,
+    "pass_rate": 0.75,
+    "passed": 21,
     "request_fingerprint": "4b78e1053d2e30d997558e7079cd19e5b6297824320b202a8de5d272657dda8d",
     "required_executions": 28,
     "status_error_rate": 0.03571428571428571,
@@ -3399,10 +3362,10 @@
       "none": 28
     },
     "total": 28,
-    "variant": "llm-baseline",
-    "zero_result_rate": 0.4444444444444444,
-    "zero_result_runs": 12
+    "variant": "llm-only-v1",
+    "zero_result_rate": 0.4074074074074074,
+    "zero_result_runs": 11
   },
-  "variant": "llm-baseline",
+  "variant": "llm-only-v1",
   "warmup": 0
 }

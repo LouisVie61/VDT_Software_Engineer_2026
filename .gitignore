@@ -45,3 +45,4 @@ data/ingest/incoming/*
 
 **/__pycache__/ 
 *.pyc
+/demo_report.md
