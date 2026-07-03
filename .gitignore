@@ -34,5 +34,18 @@ build/
 
 src/main/resources/application.properties
 src/main/resources/application-dev.yml
+src/main/resources/application-postgres.yml
 .claude/
+docs/
 
+data/ingest/incoming/*
+
+!data/ingest/incoming/csv/.gitkeep
+!data/ingest/incoming/jsonl/.gitkeep\
+
+**/__pycache__/ 
+*.pycdemo_report.md
+
+
+
+/demo_report.md
