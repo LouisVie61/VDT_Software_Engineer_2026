@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import vdt.se.demo.domain.model.SearchIntent;
+import vdt.se.demo.domain.iql.IqlQuery;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,7 +15,7 @@ public class ConfirmSearchRequest {
     @NotBlank
     private String confirmationId;
     private String sessionId;
-    private SearchIntent editedIntent;
+    private IqlQuery editedQuery;
     @Min(0)
     @Builder.Default
     private Integer page = 0;
@@ -40,12 +40,12 @@ public class ConfirmSearchRequest {
         this.sessionId = sessionId;
     }
 
-    public SearchIntent getEditedIntent() {
-        return editedIntent;
+    public IqlQuery getEditedQuery() {
+        return editedQuery;
     }
 
-    public void setEditedIntent(SearchIntent editedIntent) {
-        this.editedIntent = editedIntent;
+    public void setEditedQuery(IqlQuery editedQuery) {
+        this.editedQuery = editedQuery;
     }
 
     public int getPage() {

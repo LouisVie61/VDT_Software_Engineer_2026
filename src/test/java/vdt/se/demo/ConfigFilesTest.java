@@ -38,7 +38,8 @@ class ConfigFilesTest {
     void fluentdPromotesActionAndNormalizesDatasetTextFields() throws Exception {
         String fluentd = Files.readString(Path.of("fluentd/fluent.conf"));
 
-        assertThat(fluentd).contains("keys timestamp,source,severity,event_type,action,user,host,ip,message,raw,advanced_metadata");
+        assertThat(fluentd).contains("keys event_id,timestamp,source,severity,event_type,action,user,host,ip,message,raw,advanced_metadata");
+        assertThat(fluentd).contains("event_id ${record['event_id']}");
         assertThat(fluentd).contains("action ${record['action']}");
         assertThat(fluentd).contains("record['raw_log']");
         assertThat(fluentd).contains("record['description']");

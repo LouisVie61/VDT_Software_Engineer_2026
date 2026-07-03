@@ -33,14 +33,14 @@ public class QueryResult {
     private Integer page;
     private Integer pageSize;
     private boolean needsConfirmation;
-    private QueryConfirmation confirmation;
+    private Object confirmation;
     @Builder.Default
     private List<SearchWarning> warnings = List.of();
     private String selectedTemplate;
     private boolean cacheHit;
     @Builder.Default
     private SummaryStatus summaryStatus = SummaryStatus.NOT_REQUIRED;
-    private ZeroResultDiagnostic diagnostic;
+    private Object diagnostic;
     private String overrideIntent;
     private String overrideReason;
     private java.util.Map<String, Double> confidenceScores;

@@ -1,6 +1,5 @@
 package vdt.se.demo.application.service.query;
 
-import vdt.se.demo.adapter.config.AppProperties;
 import vdt.se.demo.application.dto.ConfirmSearchRequest;
 import vdt.se.demo.application.dto.SearchRequest;
 import vdt.se.demo.application.port.inboundPort.QueryUseCase;
@@ -13,25 +12,22 @@ import java.util.List;
 import java.util.UUID;
 
 public class QueryUseCaseService implements QueryUseCase {
-    private final QuerySearchWorkflow searchWorkflow;
-    private final QueryConfirmationWorkflow confirmationWorkflow;
+    private final IqlSearchWorkflow searchWorkflow;
     private final QueryCsvExportService csvExportService;
     private final QueryHistoryPort queryHistoryPort;
     private final QuerySummaryService summaryService;
-    private final AppProperties properties;
+    private final String defaultUserId;
 
-    public QueryUseCaseService(QuerySearchWorkflow searchWorkflow,
-                               QueryConfirmationWorkflow confirmationWorkflow,
+    public QueryUseCaseService(IqlSearchWorkflow searchWorkflow,
                                QueryCsvExportService csvExportService,
                                QueryHistoryPort queryHistoryPort,
                                QuerySummaryService summaryService,
-                               AppProperties properties) {
+                               String defaultUserId) {
         this.searchWorkflow = searchWorkflow;
-        this.confirmationWorkflow = confirmationWorkflow;
         this.csvExportService = csvExportService;
         this.queryHistoryPort = queryHistoryPort;
         this.summaryService = summaryService;
-        this.properties = properties;
+        this.defaultUserId = defaultUserId;
     }
 
     @Override
@@ -41,7 +37,7 @@ public class QueryUseCaseService implements QueryUseCase {
 
     @Override
     public QueryResult confirm(ConfirmSearchRequest request) {
-        return confirmationWorkflow.confirm(request);
+        throw new vdt.se.demo.domain.exception.BadQueryException("No pending IQL confirmation was found");
     }
 
     @Override
@@ -51,7 +47,7 @@ public class QueryUseCaseService implements QueryUseCase {
 
     @Override
     public List<QueryHistory> history(String userIdentity, String sessionId, int limit) {
-        String user = userIdentity == null || userIdentity.isBlank() ? properties.getUser().getDefaultId() : userIdentity;
+        String user = userIdentity == null || userIdentity.isBlank() ? defaultUserId : userIdentity;
         return sessionId == null || sessionId.isBlank()
                 ? queryHistoryPort.findRecent(user, limit)
                 : queryHistoryPort.findRecent(user, sessionId, limit);

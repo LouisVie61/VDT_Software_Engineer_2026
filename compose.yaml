@@ -46,16 +46,20 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=postgres
+      - SPRING_PROFILES_ACTIVE=dev
       - POSTGRES_URL=jdbc:postgresql://postgres:5432/demo_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - ELASTICSEARCH_URIS=http://elasticsearch:9200
+      - APP_EVENTS_INDEX=${APP_EVENTS_INDEX:-soc-events-v6}
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
       - APP_INGEST_SPOOL_ROOT=/app/data/ingest
-      - GOOGLE_API_KEY
-      - GROQ_API_KEY
+      - APP_SCHEMA_VERSION=${APP_SCHEMA_VERSION:-v6}
+      - APP_LLM_PROVIDER_ORDER=${APP_LLM_PROVIDER_ORDER:-GEMINI,GROQ}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.5-flash}
+      - GROQ_MODEL=${GROQ_MODEL:-llama-3.3-70b-versatile}
+      - GROQ_BASE_URL=${GROQ_BASE_URL:-https://api.groq.com/openai/v1/chat/completions}
     volumes:
       - ./data/ingest:/app/data/ingest
     depends_on:
@@ -72,7 +76,7 @@ services:
       - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST:-elasticsearch}
       - ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT:-9200}
       - ELASTICSEARCH_SCHEME=${ELASTICSEARCH_SCHEME:-http}
-      - APP_EVENTS_INDEX=${APP_EVENTS_INDEX:-soc-events}
+      - APP_EVENTS_INDEX=${APP_EVENTS_INDEX:-soc-events-v6}
     volumes:
       - ./data/ingest/incoming:/fluentd/incoming
       - fluentd-buffer:/fluentd/buffer

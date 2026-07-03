@@ -6,6 +6,7 @@ import java.util.Map;
 
 final class SocEventElasticsearchMapping {
     private static final Map<String, String> FIELD_MAPPINGS = Map.ofEntries(
+            Map.entry(SocEventSchema.EVENT_ID, "{ \"type\": \"keyword\" }"),
             Map.entry(SocEventSchema.TIMESTAMP, "{ \"type\": \"date\" }"),
             Map.entry(SocEventSchema.SOURCE, "{ \"type\": \"keyword\" }"),
             Map.entry(SocEventSchema.SEVERITY, "{ \"type\": \"keyword\" }"),
@@ -17,8 +18,9 @@ final class SocEventElasticsearchMapping {
             Map.entry(SocEventSchema.GEO_LOCATION, "{ \"type\": \"keyword\" }"),
             Map.entry(SocEventSchema.USER_AGENT, "{ \"type\": \"keyword\" }"),
             Map.entry(SocEventSchema.MESSAGE, "{ \"type\": \"text\" }"),
-            Map.entry(SocEventSchema.RAW, "{ \"type\": \"text\" }"),
-            Map.entry(SocEventSchema.METADATA, "{ \"type\": \"flattened\" }")
+            Map.entry(SocEventSchema.RAW, "{ \"type\": \"object\", \"enabled\": false }"),
+            Map.entry(SocEventSchema.METADATA, "{ \"type\": \"flattened\" }"),
+            Map.entry(SocEventSchema.ADVANCED_METADATA, "{ \"type\": \"flattened\" }")
     );
 
     private SocEventElasticsearchMapping() {

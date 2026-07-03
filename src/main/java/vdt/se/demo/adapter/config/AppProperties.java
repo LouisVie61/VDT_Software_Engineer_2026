@@ -115,7 +115,6 @@ public class AppProperties {
 
     public static class Llm {
         private String providerOrder = "GEMINI,GROQ";
-        private boolean summaryEnabled = true;
         private int connectTimeoutSeconds = 2;
         private int readTimeoutSeconds = 20;
         private final Gemini gemini = new Gemini();
@@ -127,14 +126,6 @@ public class AppProperties {
 
         public void setProviderOrder(String providerOrder) {
             this.providerOrder = providerOrder;
-        }
-
-        public boolean isSummaryEnabled() {
-            return summaryEnabled;
-        }
-
-        public void setSummaryEnabled(boolean summaryEnabled) {
-            this.summaryEnabled = summaryEnabled;
         }
 
         public int getConnectTimeoutSeconds() {
