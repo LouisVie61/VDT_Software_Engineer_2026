@@ -21,6 +21,8 @@ python -m unittest discover -s evaluation -p "test_*.py"
 
 `--check` phải chạy trong CI để phát hiện Y′ bị sửa tay hoặc không còn khớp X.
 
+Regression test cũng kiểm tra V1 và V2 có cùng denominator theo ground truth: 17 case `DSL Correctness` và 11 case `Aggregation Correctness`. Nhóm aggregation gồm cả sáu terms aggregation và năm time aggregation; việc backend chọn route/template khác không được làm thay đổi nhóm chấm của case.
+
 ## Chạy benchmark V2
 
 ```powershell

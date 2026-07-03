@@ -276,10 +276,7 @@ def is_final_execution(status: int | None, response_json: dict[str, Any] | None)
 
 
 def assign_metric_groups(case: EvaluationCase, checks: list[CheckResult]) -> list[CheckResult]:
-    expected_text = json.dumps(case.expected, sort_keys=True).lower()
-    aggregation_case = any(token in expected_text for token in (
-        "terms_aggregation", "time_aggregation", "date_histogram", "top_values"
-    ))
+    aggregation_case = is_aggregation_case(case)
 
     def group_for(name: str) -> str:
         lowered = name.lower()
@@ -302,6 +299,20 @@ def assign_metric_groups(case: EvaluationCase, checks: list[CheckResult]) -> lis
         return "Result Quality"
 
     return [replace(check, metric_group=group_for(check.name)) for check in checks]
+
+
+def is_aggregation_case(case: EvaluationCase) -> bool:
+    """Classify the case from its ground truth, independently of backend output."""
+    expected_text = json.dumps(case.expected, sort_keys=True).lower()
+    assisted_text = json.dumps(case.assisted, sort_keys=True).lower()
+    aggregation_markers = (
+        "terms_aggregation",
+        "time_aggregation",
+        "date_histogram",
+        "top_values",
+        '\\"terms\\"',
+    )
+    return any(marker in expected_text or marker in assisted_text for marker in aggregation_markers)
 
 
 def evaluate_expectations(
