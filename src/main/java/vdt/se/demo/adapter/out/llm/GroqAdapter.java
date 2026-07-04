@@ -55,6 +55,10 @@ public class GroqAdapter implements LlmProviderPort {
         return completeRequest(systemPrompt, userPrompt, tools);
     }
 
+    public String completeText(String systemPrompt, String userPrompt) {
+        return completeRequest(systemPrompt, userPrompt, null);
+    }
+
     private String completeRequest(String systemPrompt, String userPrompt, List<JsonNode> tools) {
         String apiKey = properties.getLlm().getGroq().getApiKey();
         if (apiKey == null || apiKey.isBlank()) {
@@ -110,8 +114,9 @@ public class GroqAdapter implements LlmProviderPort {
         body.put("model", properties.getLlm().getGroq().getModel());
         body.put("temperature", 0.1d);
         body.put("messages", messages(systemPrompt, userPrompt));
-        if (definitions == null || definitions.isEmpty()) body.put("response_format", Map.of("type", "json_object"));
+        if (definitions != null && definitions.isEmpty()) body.put("response_format", Map.of("type", "json_object"));
         else {
+            if (definitions == null) return body;
             body.put("tools", definitions.stream().map(definition -> Map.of("type", "function", "function", Map.of(
                     "name", definition.path("name").asString(),
                     "description", definition.path("description").asString(),

@@ -116,12 +116,13 @@ public class AppProperties {
     public static class Llm {
         private String mode = "real";
         private String mockFixture = "classpath:llm/mock-search-events.json";
-        private String providerOrder = "GPT,GEMINI,GROQ";
+        private String providerOrder = "GPT,GEMINI,GROQ,OPENROUTER";
         private int connectTimeoutSeconds = 2;
         private int readTimeoutSeconds = 20;
         private final Gemini gemini = new Gemini();
         private final Groq groq = new Groq();
         private final Gpt gpt = new Gpt();
+        private final OpenRouter openrouter = new OpenRouter();
         private final CircuitBreaker circuitBreaker = new CircuitBreaker();
 
         public String getMode() { return mode; }
@@ -164,6 +165,8 @@ public class AppProperties {
         public Gpt getGpt() {
             return gpt;
         }
+
+        public OpenRouter getOpenrouter() { return openrouter; }
 
         public CircuitBreaker getCircuitBreaker() { return circuitBreaker; }
     }
@@ -268,5 +271,21 @@ public class AppProperties {
         public void setApiKey(String apiKey) { this.apiKey = apiKey; }
         public String getBaseUrl() { return baseUrl; }
         public void setBaseUrl(String baseUrl) { this.baseUrl = baseUrl; }
+    }
+
+    public static class OpenRouter {
+        private String model = "openrouter/free";
+        private String apiKey;
+        private String baseUrl = "https://openrouter.ai/api/v1/chat/completions";
+        private Path credentialsFile = Path.of(".claude", "settings.json");
+
+        public String getModel() { return model; }
+        public void setModel(String model) { this.model = model; }
+        public String getApiKey() { return apiKey; }
+        public void setApiKey(String apiKey) { this.apiKey = apiKey; }
+        public String getBaseUrl() { return baseUrl; }
+        public void setBaseUrl(String baseUrl) { this.baseUrl = baseUrl; }
+        public Path getCredentialsFile() { return credentialsFile; }
+        public void setCredentialsFile(Path credentialsFile) { this.credentialsFile = credentialsFile; }
     }
 }

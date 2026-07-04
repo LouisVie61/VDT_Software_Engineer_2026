@@ -20,21 +20,39 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class LlmProviderChainTest {
     @Test
-    void oneLogicalCallCanFailOverFromGptToGemini() {
+    void outboundCallBudgetCapsProviderFailoverAttempts() {
         AppProperties properties = new AppProperties();
         properties.getLlm().setProviderOrder("GPT,GEMINI,GROQ");
         List<LlmProvider> calls = new ArrayList<>();
         var chain = new LlmProviderChain(List.of(
                 provider(LlmProvider.GEMINI), provider(LlmProvider.GROQ), provider(LlmProvider.GPT)), properties);
 
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> chain.firstSuccessful(provider -> {
+                    calls.add(provider.provider());
+                    throw new LlmException("invalid tool call");
+                }, new LlmCallBudget(1)))
+                .isInstanceOf(LlmException.class);
+
+        assertThat(calls).containsExactly(LlmProvider.GPT);
+    }
+
+    @Test
+    void fallsBackToOpenRouterLast() {
+        AppProperties properties = new AppProperties();
+        properties.getLlm().setProviderOrder("GPT,GEMINI,GROQ,OPENROUTER");
+        List<LlmProvider> calls = new ArrayList<>();
+        var chain = new LlmProviderChain(List.of(
+                provider(LlmProvider.OPENROUTER), provider(LlmProvider.GROQ),
+                provider(LlmProvider.GEMINI), provider(LlmProvider.GPT)), properties);
+
         String result = chain.firstSuccessful(provider -> {
             calls.add(provider.provider());
-            if (provider.provider() != LlmProvider.GEMINI) throw new LlmException("invalid tool call");
-            return "gemini-result";
-        }, new LlmCallBudget(1));
+            if (provider.provider() != LlmProvider.OPENROUTER) throw new LlmException("unavailable");
+            return "openrouter";
+        });
 
-        assertThat(result).isEqualTo("gemini-result");
-        assertThat(calls).containsExactly(LlmProvider.GPT, LlmProvider.GEMINI);
+        assertThat(result).isEqualTo("openrouter");
+        assertThat(calls).containsExactly(LlmProvider.GPT, LlmProvider.GEMINI, LlmProvider.GROQ, LlmProvider.OPENROUTER);
     }
 
     @Test

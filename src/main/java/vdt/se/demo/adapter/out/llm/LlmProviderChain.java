@@ -45,15 +45,17 @@ final class LlmProviderChain {
     }
 
     <T> T firstSuccessful(Function<LlmProviderPort, T> call, LlmCallBudget budget) {
-        if (!budget.tryConsume()) {
-            log.warn("LLM logical-call budget exhausted before provider selection");
-            throw new LlmException("LLM call budget exhausted before provider selection");
-        }
         RuntimeException last = null;
         for (LlmProviderPort provider : providers) {
             if (!rateLimits.permits(provider.provider())) {
                 log.info("Skipping rate-limited LLM provider during cooldown: provider={}", provider.provider());
                 continue;
+            }
+            // Count actual outbound requests, not logical correction rounds. Otherwise one
+            // round can consume every configured provider while only charging the budget once.
+            if (!budget.tryConsume()) {
+                log.warn("LLM HTTP-call budget exhausted before provider={}", provider.provider());
+                break;
             }
             try { T result = call.apply(provider); log.info("LLM provider succeeded: provider={}", provider.provider()); return result; }
             catch (LlmRateLimitException failure) {
@@ -74,6 +76,9 @@ final class LlmProviderChain {
                 providers.stream().map(provider -> provider.provider().name()).toList(),
                 last == null ? "none" : last.getClass().getSimpleName(),
                 last == null ? "none" : last.getMessage());
+        if (last == null && !budget.hasRemaining()) {
+            throw new LlmException("LLM HTTP-call budget exhausted before provider selection");
+        }
         throw new LlmException("No LLM provider produced a valid IQL tool call", last);
     }
 

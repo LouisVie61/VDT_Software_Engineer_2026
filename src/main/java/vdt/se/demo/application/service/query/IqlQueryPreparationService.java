@@ -32,7 +32,7 @@ public final class IqlQueryPreparationService {
     public IqlQuery prepare(String text, SessionState previous, SearchConstraints constraints) {
         SearchConstraints authoritative = constraints == null ? SearchConstraints.empty() : constraints;
         String llmInput = text + "\n\nAuthoritative structured constraints (do not contradict): " + authoritative;
-        LlmCallBudget budget = new LlmCallBudget(2);
+        LlmCallBudget budget = new LlmCallBudget(4);
         java.util.List<String> correctionErrors = java.util.List.of();
         BadQueryException last = null;
         while (budget.hasRemaining()) {

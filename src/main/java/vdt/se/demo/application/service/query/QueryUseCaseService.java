@@ -6,6 +6,8 @@ import vdt.se.demo.application.port.outboundPort.history.QueryHistoryPort;
 import vdt.se.demo.domain.model.QueryHistory;
 import vdt.se.demo.domain.model.QueryResult;
 import vdt.se.demo.domain.model.SummaryResult;
+import vdt.se.demo.domain.model.ExecutionResult;
+import vdt.se.demo.domain.valueObjects.SummaryStatus;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +33,19 @@ public class QueryUseCaseService implements QueryUseCase {
 
     @Override
     public QueryResult search(SearchRequest request) {
-        return searchWorkflow.search(request);
+        QueryResult result = searchWorkflow.search(request);
+        ExecutionResult execution = new ExecutionResult(rows(result.getResults()), rows(result.getAggregations()),
+                result.getTotalCount(), result.getWarnings());
+        summaryService.schedule(result.getId(), request, result.getGeneratedDSL(), execution, result.getChartType());
+        result.setSummaryStatus(SummaryStatus.PENDING);
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<java.util.Map<String, Object>> rows(Object value) {
+        return value instanceof List<?> list
+                ? (List<java.util.Map<String, Object>>) (List<?>) list
+                : List.of();
     }
 
     @Override
