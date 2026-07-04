@@ -44,7 +44,9 @@ app:
       window-seconds: ${APP_LLM_429_WINDOW_SECONDS:60}
       cooldown-seconds: ${APP_LLM_429_COOLDOWN_SECONDS:60}
     gemini:
-      model: ${GEMINI_MODEL:gemini-2.5-flash}
+      model: ${GEMINI_MODEL:gemini-3.1-flash-lite}
+      complex-model: ${GEMINI_COMPLEX_MODEL:gemini-2.5-flash}
+      complex-query-length: ${GEMINI_COMPLEX_QUERY_LENGTH:300}
       api-key: ${GEMINI_API_KEY:${GOOGLE_API_KEY:}}
     groq:
       model: ${GROQ_MODEL:llama-3.3-70b-versatile}

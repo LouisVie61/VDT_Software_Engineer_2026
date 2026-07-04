@@ -185,7 +185,9 @@ public class AppProperties {
     }
 
     public static class Gemini {
-        private String model = "gemini-2.5-flash";
+        private String model = "gemini-3.1-flash-lite";
+        private String complexModel = "gemini-2.5-flash";
+        private int complexQueryLength = 300;
         private String apiKey;
 
         public String getModel() {
@@ -195,6 +197,11 @@ public class AppProperties {
         public void setModel(String model) {
             this.model = model;
         }
+
+        public String getComplexModel() { return complexModel; }
+        public void setComplexModel(String complexModel) { this.complexModel = complexModel; }
+        public int getComplexQueryLength() { return complexQueryLength; }
+        public void setComplexQueryLength(int complexQueryLength) { this.complexQueryLength = complexQueryLength; }
 
         public String getApiKey() {
             return apiKey;

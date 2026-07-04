@@ -20,5 +20,10 @@ public interface LlmProviderPort {
     default String completeWithTools(String systemPrompt, String userPrompt, List<JsonNode> toolDefinitions) {
         return complete(systemPrompt, userPrompt);
     }
+
+    default String completeWithTools(String systemPrompt, String userPrompt, List<JsonNode> toolDefinitions,
+                                     String queryText, boolean forceComplexModel) {
+        return completeWithTools(systemPrompt, userPrompt, toolDefinitions);
+    }
 }
 

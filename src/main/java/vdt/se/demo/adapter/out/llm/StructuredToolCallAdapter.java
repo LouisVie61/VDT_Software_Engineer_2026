@@ -42,7 +42,9 @@ public final class StructuredToolCallAdapter implements LlmToolCallPort {
         String user = prompts.userPrompt(text, state, correctionErrors);
         log.info("LLM_INPUT requestId={} text={} correctionErrors={}", requestId(), text, correctionErrors);
         return chain.firstSuccessful(provider -> {
-            String raw = provider.completeWithTools(system, user, definitions);
+            boolean forceComplex = correctionErrors.stream().anyMatch("EMPTY_DSL"::equals);
+            String routingText = text.split("\\n\\nAuthoritative structured constraints", 2)[0];
+            String raw = provider.completeWithTools(system, user, definitions, routingText, forceComplex);
             log.info("LLM_OUTPUT requestId={} provider={} output={}", requestId(), provider.provider(), raw);
             return parser.parse(raw);
         }, budget);

@@ -52,17 +52,30 @@ public class GeminiAdapter implements LlmProviderPort {
 
     @Override
     public String completeWithTools(String systemPrompt, String userPrompt, List<JsonNode> tools) {
-        return completeRequest(systemPrompt, userPrompt, tools);
+        return completeRequest(systemPrompt, userPrompt, tools, properties.getLlm().getGemini().getModel());
+    }
+
+    @Override
+    public String completeWithTools(String systemPrompt, String userPrompt, List<JsonNode> tools,
+                                    String queryText, boolean forceComplexModel) {
+        AppProperties.Gemini config = properties.getLlm().getGemini();
+        boolean complex = forceComplexModel || (queryText != null
+                && queryText.codePointCount(0, queryText.length()) > config.getComplexQueryLength());
+        return completeRequest(systemPrompt, userPrompt, tools, complex ? config.getComplexModel() : config.getModel());
     }
 
     private String completeRequest(String systemPrompt, String userPrompt, List<JsonNode> tools) {
+        return completeRequest(systemPrompt, userPrompt, tools, properties.getLlm().getGemini().getModel());
+    }
+
+    private String completeRequest(String systemPrompt, String userPrompt, List<JsonNode> tools, String model) {
         String apiKey = properties.getLlm().getGemini().getApiKey();
         if (apiKey == null || apiKey.isBlank()) {
             throw new LlmRetryableException("Gemini API key is not configured");
         }
         try {
             String response = restClient.post()
-                    .uri(GEMINI_BASE_URL + properties.getLlm().getGemini().getModel()
+                    .uri(GEMINI_BASE_URL + model
                             + ":generateContent?key=" + apiKey)
                     .body(body(systemPrompt, userPrompt, tools))
                     .retrieve()
