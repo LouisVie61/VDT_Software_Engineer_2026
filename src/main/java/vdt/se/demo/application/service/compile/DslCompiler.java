@@ -99,6 +99,8 @@ public final class DslCompiler {
         }
         ObjectNode subAggs = bucket.putObject("aggs");
         addMetrics(subAggs, query);
+        query.groupBy().stream().map(IqlQuery.GroupBy::sampleHits).filter(java.util.Objects::nonNull)
+                .findFirst().ifPresent(sample -> addSampleHits(subAggs, sample));
         if (composite && query.orderBy() != null && query.orderBy().target() == IqlQuery.OrderTarget.METRIC) {
             ObjectNode sort = subAggs.putObject("ordered_buckets").putObject("bucket_sort");
             String metric = metricName(query.orderBy().metricIndex() == null ? 0 : query.orderBy().metricIndex());
@@ -197,6 +199,16 @@ public final class DslCompiler {
     private String metricName(int index) {
         if (index < 0) throw new BadQueryException("metric_index cannot be negative");
         return "metric_" + index;
+    }
+
+    private void addSampleHits(ObjectNode subAggs, IqlQuery.SampleHits sample) {
+        ObjectNode topHits = subAggs.putObject("sample_hits").putObject("top_hits");
+        topHits.put("size", sample.effectiveSize());
+        if (!sample.sort().isEmpty()) {
+            ArrayNode sort = topHits.putArray("sort");
+            sample.sort().forEach(item -> sort.addObject().putObject(item.field())
+                    .put("order", direction(item.order())));
+        }
     }
     private String direction(IqlQuery.Direction direction) { return direction == IqlQuery.Direction.ASC ? "asc" : "desc"; }
 }

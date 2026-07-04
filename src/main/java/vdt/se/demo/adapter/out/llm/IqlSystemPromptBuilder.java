@@ -153,6 +153,12 @@ final class IqlSystemPromptBuilder {
                   baseline_deviation, entropy, src_port, dst_port, bytes, duration. cardinality may use any
                   queryable scalar field.
                 - order_by controls buckets. sort controls event hits and is valid only when group_by is absent.
+                - When a request asks for both ranking/grouping and a preview of underlying events per group
+                  (for example, "top 5 hosts and their alerts" or "for each severity, show recent events"), add
+                  sample_hits to the relevant group_by entry. sample_hits.size defaults to 5 and is at most 20.
+                  It is a preview, not the complete event list for the bucket.
+                - Use a two-turn flow (aggregate first, then filter by returned bucket values via $ref) only when
+                  the analyst explicitly requests the full, potentially large or paginated event list per bucket.
                 - Map time grouping explicitly: year/năm=>timestamp_year, month/tháng=>timestamp_month,
                   day/ngày=>timestamp_day, hour/giờ=>timestamp_hour, minute/phút=>timestamp_minute,
                   second/giây=>timestamp_second. Never put timestamp itself in group_by.

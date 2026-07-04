@@ -49,7 +49,7 @@ final class ToolCallResponseParser {
         node.path("filters").forEach(item -> filters.add(new IqlQuery.FilterCondition(requiredText(item,"id"),
                 requiredText(item,"field"), enumValue(IqlQuery.Operator.class, requiredText(item,"op")), decodedValue(item.get("value")))));
         List<IqlQuery.GroupBy> groups = new ArrayList<>();
-        node.path("group_by").forEach(item -> groups.add(new IqlQuery.GroupBy(requiredText(item,"field"), integer(item,"size"))));
+        node.path("group_by").forEach(item -> groups.add(new IqlQuery.GroupBy(requiredText(item,"field"), integer(item,"size"), sampleHits(item.path("sample_hits")))));
         List<IqlQuery.Metric> metrics = new ArrayList<>();
         node.path("metrics").forEach(item -> metrics.add(new IqlQuery.Metric(enumValue(IqlQuery.MetricType.class,
                 requiredText(item,"type")), text(item,"field"))));
@@ -84,6 +84,14 @@ final class ToolCallResponseParser {
         if(value==null||!value.isString())return value;
         String raw=value.asString();
         try{return mapper.readTree(raw);}catch(RuntimeException ignored){return value;}
+    }
+
+    private IqlQuery.SampleHits sampleHits(JsonNode node) {
+        if (!node.isObject()) return null;
+        List<IqlQuery.Sort> sorts = new ArrayList<>();
+        node.path("sort").forEach(item -> sorts.add(new IqlQuery.Sort(requiredText(item,"field"),
+                enumValue(IqlQuery.Direction.class, requiredText(item,"order")))));
+        return new IqlQuery.SampleHits(integer(node, "size"), sorts);
     }
     private <E extends Enum<E>> E enumValue(Class<E> type,String value){return Enum.valueOf(type,value.toUpperCase(Locale.ROOT));}
     private String stripFence(String value){if(value==null)throw new LlmException("Empty LLM response");return value.strip().replaceFirst("(?s)^```(?:json)?\\s*","").replaceFirst("\\s*```$","");}

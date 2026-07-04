@@ -34,7 +34,13 @@ public final class LlmToolDefinitions {
 
                   "group_by":{"type":"array","description":"EN: Bucket dimensions such as source or timestamp_day. VI: Chiều nhóm như nguồn hoặc ngày.","items":{"type":"object","required":["field"],"properties":{
                     "field":{"type":"string"},
-                    "size":{"type":"integer","minimum":1,"maximum":1000}
+                    "size":{"type":"integer","minimum":1,"maximum":1000},
+                    "sample_hits":{"type":"object","description":"EN: Optional preview of matching events per bucket. VI: Xem trước sự kiện mẫu trong mỗi nhóm.","properties":{
+                      "size":{"type":"integer","minimum":1,"maximum":20},
+                      "sort":{"type":"array","items":{"type":"object","required":["field","order"],"properties":{
+                        "field":{"type":"string"},"order":{"type":"string","enum":["asc","desc"]}
+                      }}}
+                    }}
                   }}},
 
                   "metrics":{"type":"array","description":"EN: Aggregated measurements. VI: Các phép đo tổng hợp.","items":{"type":"object","required":["type"],"properties":{
@@ -61,7 +67,7 @@ public final class LlmToolDefinitions {
                     "value":{"type":"string","description":"JSON-encoded patch value"}
                   }}}
                 }}}
-                """);
+                """.replace('\u01af', ','));
     }
 
     public JsonNode askClarification() {
