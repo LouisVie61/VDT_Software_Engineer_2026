@@ -117,11 +117,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 5203.342300024815,
+      "initial_latency_ms": 5089.518300010241,
       "initial_needs_confirmation": false,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 5203.342300024815,
+      "latency_ms": 5089.518300010241,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 50,
@@ -240,11 +240,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 2972.2904000082053,
+      "initial_latency_ms": 3190.2987000066787,
       "initial_needs_confirmation": false,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 2972.2904000082053,
+      "latency_ms": 3190.2987000066787,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 0,
@@ -261,30 +261,6 @@
       "case_id": "soc-003",
       "category": "api_contract",
       "checks": [
-        {
-          "detail": "expected=200, actual=200",
-          "metric_group": "Result Quality",
-          "name": "initial:http_status",
-          "passed": true
-        },
-        {
-          "detail": "actual='8ed83107-5567-431b-b8b3-9288ad59546b'",
-          "metric_group": "Safety / Guardrail",
-          "name": "initial:non_empty:confirmation.confirmationId",
-          "passed": true
-        },
-        {
-          "detail": "actual={'intent': 'SIMPLE_SEARCH', 'textQuery': None, 'filters': {}, 'groupBy': None, 'metric': 'COUNT', 'topN': None, 'timeBucket': None, 'timeFrom': None, 'timeTo': None, 'recurringTime': None, 'overrideIntent': None, 'overrideReason': None, 'semanticSpans': [], 'confidenceScores': {'intent': 0.5, 'textQuery': 0.0, 'filters': 0.0, 'groupBy': 0.0, 'timeRange': 0.0}}",
-          "metric_group": "Safety / Guardrail",
-          "name": "initial:non_empty:confirmation.intent",
-          "passed": true
-        },
-        {
-          "detail": "expected=True, actual=True",
-          "metric_group": "Safety / Guardrail",
-          "name": "initial:equals:needsConfirmation",
-          "passed": true
-        },
         {
           "detail": "expected=200, actual=200",
           "metric_group": "Result Quality",
@@ -340,9 +316,9 @@
           "passed": true
         }
       ],
-      "confirmation_followed": true,
-      "confirmation_latency_ms": 154.1848999913782,
-      "confirmation_status": 200,
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
       "description": "",
       "error": "",
       "expected_status": 200,
@@ -369,11 +345,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 2999.6058999968227,
-      "initial_needs_confirmation": true,
+      "initial_latency_ms": 2753.9389000012306,
+      "initial_needs_confirmation": false,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 3153.790799988201,
+      "latency_ms": 2753.9389000012306,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 50,
@@ -470,25 +446,17 @@
             "filter": [
               {
                 "term": {
+                  "source": "endpoint"
+                }
+              },
+              {
+                "term": {
                   "event_type": "alert"
                 }
               },
               {
                 "term": {
                   "severity": "critical"
-                }
-              }
-            ],
-            "must": [
-              {
-                "simple_query_string": {
-                  "default_operator": "and",
-                  "fields": [
-                    "message",
-                    "raw",
-                    "user_agent"
-                  ],
-                  "query": "endpoint"
                 }
               }
             ]
@@ -505,11 +473,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 6610.902999993414,
+      "initial_latency_ms": 3829.599499993492,
       "initial_needs_confirmation": false,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 6610.902999993414,
+      "latency_ms": 3829.599499993492,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 0,
@@ -618,11 +586,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 3233.1465000170283,
+      "initial_latency_ms": 3276.2451999878976,
       "initial_needs_confirmation": false,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 3233.1465000170283,
+      "latency_ms": 3276.2451999878976,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 0,
@@ -730,11 +698,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 3414.555299998028,
+      "initial_latency_ms": 3116.7249999998603,
       "initial_needs_confirmation": false,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 3414.555299998028,
+      "latency_ms": 3116.7249999998603,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 0,
@@ -758,13 +726,13 @@
           "passed": true
         },
         {
-          "detail": "actual='8339696b-7d5a-4c02-a484-84d516c64411'",
+          "detail": "actual='b0a6ce65-716d-4418-848e-74d366cd33a0'",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.confirmationId",
           "passed": true
         },
         {
-          "detail": "actual={'intent': 'SIMPLE_SEARCH', 'textQuery': 'suspicious activity', 'filters': {}, 'groupBy': None, 'metric': 'COUNT', 'topN': None, 'timeBucket': None, 'timeFrom': None, 'timeTo': None, 'recurringTime': None, 'overrideIntent': None, 'overrideReason': None, 'semanticSpans': [], 'confidenceScores': {'intent': 1.0, 'textQuery': 0.9, 'filters': 0.0, 'groupBy': 0.0, 'timeRange': 0.0}}",
+          "detail": "actual={'intent': 'SIMPLE_SEARCH', 'textQuery': 'suspicious activity', 'filters': {}, 'groupBy': None, 'metric': 'COUNT', 'topN': None, 'timeBucket': None, 'timeFrom': None, 'timeTo': None, 'recurringTime': None, 'overrideIntent': None, 'overrideReason': None, 'semanticSpans': [], 'confidenceScores': {'intent': 0.8, 'textQuery': 0.8, 'filters': 0.0, 'groupBy': 0.0, 'timeRange': 0.0}}",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.intent",
           "passed": true
@@ -849,7 +817,7 @@
         }
       ],
       "confirmation_followed": true,
-      "confirmation_latency_ms": 76.35449999361299,
+      "confirmation_latency_ms": 103.85670000687242,
       "confirmation_status": 200,
       "description": "",
       "error": "",
@@ -885,11 +853,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 2691.3236000109464,
+      "initial_latency_ms": 976.6273999994155,
       "initial_needs_confirmation": true,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 2767.6781000045594,
+      "latency_ms": 1080.484100006288,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 0,
@@ -914,7 +882,7 @@
         },
         {
           "detail": "missing field",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:field:generatedDsl",
           "passed": true
         },
@@ -938,25 +906,25 @@
         },
         {
           "detail": "missing path",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:generatedDsl_path_exists:query",
           "passed": true
         },
         {
           "detail": "fragment not found",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:dsl_contains:\"terms\"",
           "passed": true
         },
         {
           "detail": "fragment not found",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:dsl_contains:\"field\":\"ip\"",
           "passed": true
         },
         {
           "detail": "fragment not found",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:dsl_contains:\"size\":10",
           "passed": true
         },
@@ -1022,11 +990,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 275.4885000176728,
+      "initial_latency_ms": 153.61660000053234,
       "initial_needs_confirmation": false,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 275.4885000176728,
+      "latency_ms": 153.61660000053234,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 500,
@@ -1050,7 +1018,7 @@
           "passed": true
         },
         {
-          "detail": "actual='147aa497-8f12-4798-a9ea-6243652c31bd'",
+          "detail": "actual='4a992d22-1f23-42f9-9095-c4bf877b16f0'",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.confirmationId",
           "passed": true
@@ -1075,7 +1043,7 @@
         },
         {
           "detail": "missing field",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:field:generatedDsl",
           "passed": true
         },
@@ -1099,25 +1067,25 @@
         },
         {
           "detail": "missing path",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:generatedDsl_path_exists:query",
           "passed": true
         },
         {
           "detail": "fragment not found",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:dsl_contains:\"terms\"",
           "passed": true
         },
         {
           "detail": "fragment not found",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:dsl_contains:\"field\":\"event_type\"",
           "passed": true
         },
         {
           "detail": "fragment not found",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:dsl_contains:\"size\":10",
           "passed": true
         },
@@ -1147,7 +1115,7 @@
         }
       ],
       "confirmation_followed": true,
-      "confirmation_latency_ms": 51.00680000032298,
+      "confirmation_latency_ms": 56.53349999920465,
       "confirmation_status": 200,
       "description": "",
       "error": "",
@@ -1183,11 +1151,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 1559.840100002475,
+      "initial_latency_ms": 928.5638999863295,
       "initial_needs_confirmation": true,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 1610.846900002798,
+      "latency_ms": 985.0973999855341,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 50,
@@ -1204,30 +1172,6 @@
       "case_id": "amb-004",
       "category": "ambiguity",
       "checks": [
-        {
-          "detail": "expected=200, actual=200",
-          "metric_group": "Result Quality",
-          "name": "initial:http_status",
-          "passed": true
-        },
-        {
-          "detail": "actual='b018de9d-4baa-4bf3-9edf-5f7b3c2237b3'",
-          "metric_group": "Safety / Guardrail",
-          "name": "initial:non_empty:confirmation.confirmationId",
-          "passed": true
-        },
-        {
-          "detail": "actual={'intent': 'SIMPLE_SEARCH', 'textQuery': None, 'filters': {}, 'groupBy': None, 'metric': 'COUNT', 'topN': None, 'timeBucket': None, 'timeFrom': '2026-04-01T00:00:00Z', 'timeTo': '2026-06-30T23:59:59Z', 'recurringTime': None, 'overrideIntent': None, 'overrideReason': None, 'semanticSpans': [{'kind': 'TEMPORAL', 'status': 'RESOLVED', 'text': 'quy 2', 'canonical': '2026-04-01T00:00:00Z/2026-06-30T23:59:59Z', 'start': 10, 'end': 14}], 'confidenceScores': {'intent': 0.8, 'textQuery': 0.7, 'filters': 0.0, 'groupBy': 0.0, 'timeRange': 0.9}}",
-          "metric_group": "Safety / Guardrail",
-          "name": "initial:non_empty:confirmation.intent",
-          "passed": true
-        },
-        {
-          "detail": "expected=True, actual=True",
-          "metric_group": "Safety / Guardrail",
-          "name": "initial:equals:needsConfirmation",
-          "passed": true
-        },
         {
           "detail": "expected=200, actual=200",
           "metric_group": "Result Quality",
@@ -1301,9 +1245,9 @@
           "passed": true
         }
       ],
-      "confirmation_followed": true,
-      "confirmation_latency_ms": 68.55529997847043,
-      "confirmation_status": 200,
+      "confirmation_followed": false,
+      "confirmation_latency_ms": 0.0,
+      "confirmation_status": null,
       "description": "",
       "error": "",
       "expected_status": 200,
@@ -1316,7 +1260,7 @@
                 "range": {
                   "timestamp": {
                     "gte": "2026-04-01T00:00:00Z",
-                    "lt": "2026-06-30T23:59:59Z"
+                    "lt": "2026-06-30T23:59:59.999Z"
                   }
                 }
               }
@@ -1334,11 +1278,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 1217.7248999942094,
-      "initial_needs_confirmation": true,
+      "initial_latency_ms": 4595.081000006758,
+      "initial_needs_confirmation": false,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 1286.2801999726798,
+      "latency_ms": 4595.081000006758,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 1,
@@ -1362,7 +1306,7 @@
           "passed": true
         },
         {
-          "detail": "actual='d4cd24f5-fa0d-4470-9898-959bc5ffafff'",
+          "detail": "actual='9fb2e806-ba17-464e-bd36-72631d132825'",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.confirmationId",
           "passed": true
@@ -1453,7 +1397,7 @@
         }
       ],
       "confirmation_followed": true,
-      "confirmation_latency_ms": 95.28809998300858,
+      "confirmation_latency_ms": 113.65489999298006,
       "confirmation_status": 200,
       "description": "",
       "error": "",
@@ -1489,11 +1433,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 1736.8482000019867,
+      "initial_latency_ms": 2821.124399997643,
       "initial_needs_confirmation": true,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 1832.1362999849953,
+      "latency_ms": 2934.7792999906233,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 50,
@@ -1518,7 +1462,7 @@
         },
         {
           "detail": "missing field",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:field:generatedDsl",
           "passed": true
         },
@@ -1542,25 +1486,25 @@
         },
         {
           "detail": "missing path",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:generatedDsl_path_exists:query",
           "passed": true
         },
         {
           "detail": "fragment not found",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:dsl_contains:\"terms\"",
           "passed": true
         },
         {
           "detail": "fragment not found",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:dsl_contains:\"field\":\"user\"",
           "passed": true
         },
         {
           "detail": "fragment not found",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:dsl_contains:\"size\":5",
           "passed": true
         },
@@ -1626,11 +1570,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 221.88480000477284,
+      "initial_latency_ms": 320.13319998804945,
       "initial_needs_confirmation": false,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 221.88480000477284,
+      "latency_ms": 320.13319998804945,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 100,
@@ -1654,7 +1598,7 @@
           "passed": true
         },
         {
-          "detail": "actual='1a823dc8-330b-4939-a339-ad87b74f90d6'",
+          "detail": "actual='2874615e-9e4f-4e7e-84d4-31155f68f178'",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.confirmationId",
           "passed": true
@@ -1679,7 +1623,7 @@
         },
         {
           "detail": "missing field",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:field:generatedDsl",
           "passed": true
         },
@@ -1703,25 +1647,25 @@
         },
         {
           "detail": "missing path",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:generatedDsl_path_exists:query",
           "passed": true
         },
         {
           "detail": "fragment not found",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:dsl_contains:\"terms\"",
           "passed": true
         },
         {
           "detail": "fragment not found",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:dsl_contains:\"field\":\"source\"",
           "passed": true
         },
         {
           "detail": "fragment not found",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:dsl_contains:\"size\":10",
           "passed": true
         },
@@ -1751,7 +1695,7 @@
         }
       ],
       "confirmation_followed": true,
-      "confirmation_latency_ms": 114.34390000067651,
+      "confirmation_latency_ms": 122.04360000032466,
       "confirmation_status": 200,
       "description": "",
       "error": "",
@@ -1787,11 +1731,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 13.887999986764044,
+      "initial_latency_ms": 27.82909999950789,
       "initial_needs_confirmation": true,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 128.23189998744056,
+      "latency_ms": 149.87269999983255,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 100,
@@ -1815,7 +1759,7 @@
           "passed": true
         },
         {
-          "detail": "actual='95b5af07-843d-4175-8b96-33dae2395eaa'",
+          "detail": "actual='f3c21b48-8f85-4f31-b270-c8af37b31d3b'",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.confirmationId",
           "passed": true
@@ -1840,7 +1784,7 @@
         },
         {
           "detail": "missing field",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:field:generatedDsl",
           "passed": true
         },
@@ -1864,25 +1808,25 @@
         },
         {
           "detail": "missing path",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:generatedDsl_path_exists:query",
           "passed": true
         },
         {
           "detail": "fragment not found",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:dsl_contains:\"terms\"",
           "passed": true
         },
         {
           "detail": "fragment not found",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:dsl_contains:\"field\":\"event_type\"",
           "passed": true
         },
         {
           "detail": "fragment not found",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:dsl_contains:\"size\":10",
           "passed": true
         },
@@ -1912,7 +1856,7 @@
         }
       ],
       "confirmation_followed": true,
-      "confirmation_latency_ms": 58.17810000735335,
+      "confirmation_latency_ms": 77.21580000361428,
       "confirmation_status": 200,
       "description": "",
       "error": "",
@@ -1948,11 +1892,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 299.347599997418,
+      "initial_latency_ms": 252.57570001122076,
       "initial_needs_confirmation": true,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 357.52570000477135,
+      "latency_ms": 329.79150001483504,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 50,
@@ -1976,13 +1920,13 @@
           "passed": true
         },
         {
-          "detail": "actual='c2f2ea17-a839-4580-ac3e-6371c8775080'",
+          "detail": "actual='e103e7ce-7fc2-4339-8f3c-b9e373a15ad5'",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.confirmationId",
           "passed": true
         },
         {
-          "detail": "actual={'intent': 'SIMPLE_SEARCH', 'textQuery': 'only critical', 'filters': {'severity': 'critical'}, 'groupBy': None, 'metric': 'COUNT', 'topN': None, 'timeBucket': None, 'timeFrom': None, 'timeTo': None, 'recurringTime': None, 'overrideIntent': None, 'overrideReason': None, 'semanticSpans': [], 'confidenceScores': {'intent': 0.6, 'textQuery': 0.55, 'filters': 0.65, 'groupBy': 0.55, 'timeRange': 0.5}}",
+          "detail": "actual={'intent': 'SIMPLE_SEARCH', 'textQuery': None, 'filters': {'severity': 'critical'}, 'groupBy': None, 'metric': 'COUNT', 'topN': None, 'timeBucket': None, 'timeFrom': None, 'timeTo': None, 'recurringTime': None, 'overrideIntent': None, 'overrideReason': None, 'semanticSpans': [], 'confidenceScores': {'intent': 1.0, 'textQuery': 0.0, 'filters': 1.0, 'groupBy': 0.0, 'timeRange': 0.0}}",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.intent",
           "passed": true
@@ -2073,7 +2017,7 @@
         }
       ],
       "confirmation_followed": true,
-      "confirmation_latency_ms": 95.79040002427064,
+      "confirmation_latency_ms": 83.10329999949317,
       "confirmation_status": 200,
       "description": "",
       "error": "",
@@ -2086,19 +2030,6 @@
               {
                 "term": {
                   "severity": "critical"
-                }
-              }
-            ],
-            "must": [
-              {
-                "simple_query_string": {
-                  "default_operator": "and",
-                  "fields": [
-                    "message",
-                    "raw",
-                    "user_agent"
-                  ],
-                  "query": "only critical"
                 }
               }
             ]
@@ -2115,20 +2046,20 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 288.161400007084,
+      "initial_latency_ms": 3220.479700001306,
       "initial_needs_confirmation": true,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 383.95180003135465,
+      "latency_ms": 3303.583000000799,
       "needs_confirmation": false,
       "passed": true,
-      "result_count": 0,
+      "result_count": 50,
       "selected_template": "SIMPLE_SEARCH",
       "source": "v2_cases.jsonl:15",
       "status": 200,
-      "summary_status": "NOT_REQUIRED",
+      "summary_status": "PENDING",
       "tags": [],
-      "total_count": 0
+      "total_count": 17711
     },
     {
       "aggregation_count": 0,
@@ -2143,13 +2074,13 @@
           "passed": true
         },
         {
-          "detail": "actual='0b9d94c8-9cce-408f-a955-9d555e5d40ea'",
+          "detail": "actual='c8c0f2db-e2d0-49ac-be05-45b7ee0a5d87'",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.confirmationId",
           "passed": true
         },
         {
-          "detail": "actual={'intent': 'SIMPLE_SEARCH', 'textQuery': 'failed', 'filters': {'event_type': 'auth'}, 'groupBy': None, 'metric': 'COUNT', 'topN': None, 'timeBucket': None, 'timeFrom': '2026-06-30T12:40:00Z', 'timeTo': '2026-07-01T12:40:00Z', 'recurringTime': None, 'overrideIntent': None, 'overrideReason': None, 'semanticSpans': [{'kind': 'TEMPORAL', 'status': 'RESOLVED', 'text': '24h qua', 'canonical': None, 'start': 37, 'end': 44}], 'confidenceScores': {'intent': 0.6, 'textQuery': 0.55, 'filters': 0.65, 'groupBy': 0.55, 'timeRange': 0.5}}",
+          "detail": "actual={'intent': 'SIMPLE_SEARCH', 'textQuery': None, 'filters': {'event_type': 'failed_login'}, 'groupBy': None, 'metric': 'COUNT', 'topN': None, 'timeBucket': None, 'timeFrom': '2026-07-02T04:37:02.117292600Z', 'timeTo': '2026-07-03T04:37:02.117292600Z', 'recurringTime': None, 'overrideIntent': None, 'overrideReason': None, 'semanticSpans': [{'kind': 'TEMPORAL', 'status': 'RESOLVED', 'text': '24h qua', 'canonical': '2026-07-02T04:37:02.117292600Z/2026-07-03T04:37:02.117292600Z', 'start': 17, 'end': 23}, {'kind': 'TEMPORAL', 'status': 'RESOLVED', 'text': '24h qua', 'canonical': None, 'start': 37, 'end': 44}], 'confidenceScores': {'intent': 0.9, 'textQuery': 0.0, 'filters': 0.9, 'groupBy': 0.0, 'timeRange': 0.9}}",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.intent",
           "passed": true
@@ -2234,7 +2165,7 @@
         }
       ],
       "confirmation_followed": true,
-      "confirmation_latency_ms": 90.61089999158867,
+      "confirmation_latency_ms": 109.18600000150036,
       "confirmation_status": 200,
       "description": "",
       "error": "",
@@ -2246,28 +2177,15 @@
             "filter": [
               {
                 "term": {
-                  "event_type": "auth"
+                  "event_type": "failed_login"
                 }
               },
               {
                 "range": {
                   "timestamp": {
-                    "gte": "2026-06-30T12:40:00Z",
-                    "lt": "2026-07-01T12:40:00Z"
+                    "gte": "2026-07-02T04:37:02.117292600Z",
+                    "lt": "2026-07-03T04:37:02.117292600Z"
                   }
-                }
-              }
-            ],
-            "must": [
-              {
-                "simple_query_string": {
-                  "default_operator": "and",
-                  "fields": [
-                    "message",
-                    "raw",
-                    "user_agent"
-                  ],
-                  "query": "failed"
                 }
               }
             ]
@@ -2284,11 +2202,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 321.6449999890756,
+      "initial_latency_ms": 1049.6214000013424,
       "initial_needs_confirmation": true,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 412.25589998066425,
+      "latency_ms": 1158.8074000028428,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 0,
@@ -2313,7 +2231,7 @@
         },
         {
           "detail": "missing field",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:field:generatedDsl",
           "passed": true
         },
@@ -2337,31 +2255,31 @@
         },
         {
           "detail": "missing path",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:generatedDsl_path_exists:query",
           "passed": true
         },
         {
           "detail": "fragment not found",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:dsl_contains:\"terms\"",
           "passed": true
         },
         {
           "detail": "fragment not found",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:dsl_contains:\"field\":\"host\"",
           "passed": true
         },
         {
           "detail": "fragment not found",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:dsl_contains:\"size\":3",
           "passed": true
         },
         {
           "detail": "no alternative fragment found",
-          "metric_group": "DSL Correctness",
+          "metric_group": "Aggregation Correctness",
           "name": "final:dsl_any_contains:['error', 'failure']",
           "passed": false
         },
@@ -2427,11 +2345,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 69.24060001620091,
+      "initial_latency_ms": 79.06809999258257,
       "initial_needs_confirmation": false,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 69.24060001620091,
+      "latency_ms": 79.06809999258257,
       "needs_confirmation": false,
       "passed": false,
       "result_count": 100,
@@ -2455,7 +2373,7 @@
           "passed": true
         },
         {
-          "detail": "actual='bbde663b-6c46-4204-ab89-ac8b14205179'",
+          "detail": "actual='2164c568-a197-4338-9ecb-9dbad8d476f3'",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.confirmationId",
           "passed": true
@@ -2546,7 +2464,7 @@
         }
       ],
       "confirmation_followed": true,
-      "confirmation_latency_ms": 76.26750000054017,
+      "confirmation_latency_ms": 101.67319999891333,
       "confirmation_status": 200,
       "description": "",
       "error": "",
@@ -2590,11 +2508,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 260.9946000156924,
+      "initial_latency_ms": 263.26950000657234,
       "initial_needs_confirmation": true,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 337.2621000162326,
+      "latency_ms": 364.9427000054857,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 0,
@@ -2618,7 +2536,7 @@
           "passed": true
         },
         {
-          "detail": "actual='e681271e-7e25-4396-8e95-3d81abab48da'",
+          "detail": "actual='4b6fd8d0-b8bf-41b7-a7cb-3b482e0692f2'",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.confirmationId",
           "passed": true
@@ -2715,7 +2633,7 @@
         }
       ],
       "confirmation_followed": true,
-      "confirmation_latency_ms": 72.40380000439472,
+      "confirmation_latency_ms": 100.79419999965467,
       "confirmation_status": 200,
       "description": "",
       "error": "",
@@ -2751,11 +2669,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 233.68909998680465,
+      "initial_latency_ms": 266.5402999991784,
       "initial_needs_confirmation": true,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 306.0928999911994,
+      "latency_ms": 367.33449999883305,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 0,
@@ -2779,7 +2697,7 @@
           "passed": true
         },
         {
-          "detail": "actual='33d80b1d-5fb8-4f2f-b301-0126af68395e'",
+          "detail": "actual='81d1351e-4885-4984-a0ef-bc3c2184cec0'",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.confirmationId",
           "passed": true
@@ -2876,7 +2794,7 @@
         }
       ],
       "confirmation_followed": true,
-      "confirmation_latency_ms": 67.96870002290234,
+      "confirmation_latency_ms": 77.5392999930773,
       "confirmation_status": 200,
       "description": "",
       "error": "",
@@ -2912,11 +2830,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 282.1819999953732,
+      "initial_latency_ms": 252.1822999988217,
       "initial_needs_confirmation": true,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 350.15070001827553,
+      "latency_ms": 329.721599991899,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 0,
@@ -2940,7 +2858,7 @@
           "passed": true
         },
         {
-          "detail": "actual='a9871891-c028-4871-bde2-e06d4974b7bb'",
+          "detail": "actual='c1685efe-8eef-4bdb-9b42-ee88ea81ea11'",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.confirmationId",
           "passed": true
@@ -3031,7 +2949,7 @@
         }
       ],
       "confirmation_followed": true,
-      "confirmation_latency_ms": 92.18770000734366,
+      "confirmation_latency_ms": 84.91149998735636,
       "confirmation_status": 200,
       "description": "",
       "error": "",
@@ -3065,11 +2983,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 251.27060001250356,
+      "initial_latency_ms": 257.88079999620095,
       "initial_needs_confirmation": true,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 343.45830001984723,
+      "latency_ms": 342.7922999835573,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 0,
@@ -3093,7 +3011,7 @@
           "passed": true
         },
         {
-          "detail": "actual='9a53deed-550a-4c65-983a-0341a018d49c'",
+          "detail": "actual='9846650b-c4f0-4f85-8c60-3ef12340b518'",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.confirmationId",
           "passed": true
@@ -3184,7 +3102,7 @@
         }
       ],
       "confirmation_followed": true,
-      "confirmation_latency_ms": 63.24509999831207,
+      "confirmation_latency_ms": 78.81710000219755,
       "confirmation_status": 200,
       "description": "",
       "error": "",
@@ -3229,11 +3147,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 286.95999999763444,
+      "initial_latency_ms": 257.01919999846723,
       "initial_needs_confirmation": true,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 350.2050999959465,
+      "latency_ms": 335.8363000006648,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 0,
@@ -3257,7 +3175,7 @@
           "passed": true
         },
         {
-          "detail": "actual='f85a21f2-0b6f-4ae2-bfee-8f4324f1bc5e'",
+          "detail": "actual='d3f71bbb-c135-4759-96ce-e4ae59434409'",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.confirmationId",
           "passed": true
@@ -3354,7 +3272,7 @@
         }
       ],
       "confirmation_followed": true,
-      "confirmation_latency_ms": 69.55949999974109,
+      "confirmation_latency_ms": 60.52270000509452,
       "confirmation_status": 200,
       "description": "",
       "error": "",
@@ -3404,11 +3322,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 275.9301000041887,
+      "initial_latency_ms": 234.0868000028422,
       "initial_needs_confirmation": true,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 345.4896000039298,
+      "latency_ms": 294.60950000793673,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 0,
@@ -3432,7 +3350,7 @@
           "passed": true
         },
         {
-          "detail": "actual='f9868c83-84da-4d7c-b873-3cc38e485bc8'",
+          "detail": "actual='c109fccb-61b1-4d94-b8e2-7c1f063ea8cc'",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.confirmationId",
           "passed": true
@@ -3541,7 +3459,7 @@
         }
       ],
       "confirmation_followed": true,
-      "confirmation_latency_ms": 96.66950002429076,
+      "confirmation_latency_ms": 89.60409999417607,
       "confirmation_status": 200,
       "description": "",
       "error": "",
@@ -3586,11 +3504,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 266.60329999867827,
+      "initial_latency_ms": 266.7091000039363,
       "initial_needs_confirmation": true,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 363.272800022969,
+      "latency_ms": 356.3131999981124,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 100,
@@ -3614,7 +3532,7 @@
           "passed": true
         },
         {
-          "detail": "actual='778529ef-aadc-449e-b73b-abf13c3a93ff'",
+          "detail": "actual='e87caa78-c90b-4932-8e2b-b815071deb3f'",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.confirmationId",
           "passed": true
@@ -3705,7 +3623,7 @@
         }
       ],
       "confirmation_followed": true,
-      "confirmation_latency_ms": 78.9121999987401,
+      "confirmation_latency_ms": 70.41669999307487,
       "confirmation_status": 200,
       "description": "",
       "error": "",
@@ -3749,11 +3667,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 269.6501000027638,
+      "initial_latency_ms": 243.94430000393186,
       "initial_needs_confirmation": true,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 348.5623000015039,
+      "latency_ms": 314.36099999700673,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 0,
@@ -3777,7 +3695,7 @@
           "passed": true
         },
         {
-          "detail": "actual='821a650a-1106-4ebe-8333-439ca46931f9'",
+          "detail": "actual='872200cf-19fc-4884-bad9-eb7c1ca7c6d1'",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.confirmationId",
           "passed": true
@@ -3868,7 +3786,7 @@
         }
       ],
       "confirmation_followed": true,
-      "confirmation_latency_ms": 75.13709997874685,
+      "confirmation_latency_ms": 59.10959999891929,
       "confirmation_status": 200,
       "description": "",
       "error": "",
@@ -3919,11 +3837,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 252.35090000205673,
+      "initial_latency_ms": 253.0213999998523,
       "initial_needs_confirmation": true,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 327.4879999808036,
+      "latency_ms": 312.1309999987716,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 0,
@@ -3947,7 +3865,7 @@
           "passed": true
         },
         {
-          "detail": "actual='1f1f8c7a-3e20-404c-8c4b-50802a28350e'",
+          "detail": "actual='1f403400-7e5b-4350-b351-d7c3af01014c'",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.confirmationId",
           "passed": true
@@ -4056,7 +3974,7 @@
         }
       ],
       "confirmation_followed": true,
-      "confirmation_latency_ms": 114.33799998485483,
+      "confirmation_latency_ms": 80.79490000091027,
       "confirmation_status": 200,
       "description": "",
       "error": "",
@@ -4096,11 +4014,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 259.7796999907587,
+      "initial_latency_ms": 247.1940999967046,
       "initial_needs_confirmation": true,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 374.1176999756135,
+      "latency_ms": 327.9889999976149,
       "needs_confirmation": false,
       "passed": false,
       "result_count": 100,
@@ -4124,7 +4042,7 @@
           "passed": true
         },
         {
-          "detail": "actual='222078d6-9edf-4e15-890f-ed47f4764db2'",
+          "detail": "actual='6a51f76f-bce6-45b0-a3ec-790e9532dc11'",
           "metric_group": "Safety / Guardrail",
           "name": "initial:non_empty:confirmation.confirmationId",
           "passed": true
@@ -4227,7 +4145,7 @@
         }
       ],
       "confirmation_followed": true,
-      "confirmation_latency_ms": 84.49030001065694,
+      "confirmation_latency_ms": 49.376099996152334,
       "confirmation_status": 200,
       "description": "",
       "error": "",
@@ -4267,11 +4185,11 @@
         "timeout": "5s",
         "track_total_hits": true
       },
-      "initial_latency_ms": 286.0477000067476,
+      "initial_latency_ms": 257.71269999677315,
       "initial_needs_confirmation": true,
       "initial_status": 200,
       "iteration": 1,
-      "latency_ms": 370.53800001740456,
+      "latency_ms": 307.0887999929255,
       "needs_confirmation": false,
       "passed": true,
       "result_count": 50,
@@ -4295,12 +4213,12 @@
       "temporal": 7
     },
     "category_latency_p95_ms": {
-      "ambiguity": 2487.0155599986892,
-      "api_contract": 6131.450844994104,
-      "llm_language": 396.7295999900671,
-      "perception_prefilter": 217.20215500390623,
-      "soc_nl2plan": 5091.789705023984,
-      "temporal": 373.0437899881508
+      "ambiguity": 4207.631600004969,
+      "api_contract": 3746.596354992653,
+      "llm_language": 960.9391750018403,
+      "perception_prefilter": 311.6201749886386,
+      "soc_nl2plan": 4994.5573200100625,
+      "temporal": 350.1701299988781
     },
     "category_pass_rates": {
       "ambiguity": 1.0,
@@ -4310,44 +4228,44 @@
       "soc_nl2plan": 1.0,
       "temporal": 0.8571428571428571
     },
-    "confirmation_followed_runs": 20,
-    "confirmation_rate": 0.7142857142857143,
-    "confirmation_runs": 20,
+    "confirmation_followed_runs": 18,
+    "confirmation_rate": 0.6428571428571429,
+    "confirmation_runs": 18,
     "evaluation_fingerprint": "84a3146ecb2accbd60ad2aa669e6ea2ed310863bd5061e18f2de8bffc8b143c3",
     "executed_runs": 28,
     "execution_target_met": true,
     "failed": 2,
-    "latency_max_ms": 6610.902999993414,
-    "latency_median_ms": 366.9054000201868,
-    "latency_min_ms": 69.24060001620091,
-    "latency_p95_ms": 4577.266850015437,
+    "latency_max_ms": 5089.518300010241,
+    "latency_median_ms": 360.62795000179904,
+    "latency_min_ms": 79.06809999258257,
+    "latency_p95_ms": 4327.162475002114,
     "metric_group_check_counts": {
-      "Aggregation Correctness": 28,
-      "DSL Correctness": 94,
-      "Result Quality": 227,
-      "Safety / Guardrail": 76
+      "Aggregation Correctness": 59,
+      "DSL Correctness": 63,
+      "Result Quality": 225,
+      "Safety / Guardrail": 70
     },
     "metric_group_check_pass_rates": {
-      "Aggregation Correctness": 0.9642857142857143,
-      "DSL Correctness": 0.9893617021276596,
+      "Aggregation Correctness": 0.9661016949152542,
+      "DSL Correctness": 1.0,
       "Result Quality": 1.0,
       "Safety / Guardrail": 1.0
     },
     "metric_group_latency_p95_ms": {
-      "Aggregation Correctness": 1540.5325799831187,
-      "DSL Correctness": 5024.4636000221335,
-      "Result Quality": 4577.266850015437,
-      "Safety / Guardrail": 2786.983735003742
+      "Aggregation Correctness": 1959.9383499880787,
+      "DSL Correctness": 4693.968460007454,
+      "Result Quality": 4327.162475002114,
+      "Safety / Guardrail": 3432.732800001392
     },
     "metric_group_run_counts": {
-      "Aggregation Correctness": 5,
-      "DSL Correctness": 23,
+      "Aggregation Correctness": 11,
+      "DSL Correctness": 17,
       "Result Quality": 28,
-      "Safety / Guardrail": 20
+      "Safety / Guardrail": 19
     },
     "metric_group_run_pass_rates": {
-      "Aggregation Correctness": 0.8,
-      "DSL Correctness": 0.9565217391304348,
+      "Aggregation Correctness": 0.8181818181818182,
+      "DSL Correctness": 1.0,
       "Result Quality": 1.0,
       "Safety / Guardrail": 1.0
     },
@@ -4363,8 +4281,8 @@
     },
     "total": 28,
     "variant": "workflow-v2",
-    "zero_result_rate": 0.5357142857142857,
-    "zero_result_runs": 15
+    "zero_result_rate": 0.5,
+    "zero_result_runs": 14
   },
   "variant": "workflow-v2",
   "warmup": 0

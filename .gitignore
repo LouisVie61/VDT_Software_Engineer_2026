@@ -1,50 +1,36 @@
-HELP.md
+﻿# Build outputs
 target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+*.class
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
+# IDE
+.idea/
 .vscode/
+*.iml
 
-src/main/resources/application.properties
-src/main/resources/application-dev.yml
-src/main/resources/application-postgres.yml
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment / local config
+.env
+application.properties
+application-dev.yml
+application-local.yml
+application-postgres.yml
+
 .claude/
+
+# Logs
+logs/
+*.log
 docs/
+evaluation/__pycache__/
+# Generated ingest data
+data/ingest/archive/
+data/ingest/incoming/
+*.jsonl
 
-data/ingest/incoming/*
-
-!data/ingest/incoming/csv/.gitkeep
-!data/ingest/incoming/jsonl/.gitkeep
-
-**/__pycache__/ 
-*.pycdemo_report.md
-
-
-/demo_report.md
+# Docker volumes / local runtime
+fluentd-buffer/
+fluentd-pos/
+HELP.md

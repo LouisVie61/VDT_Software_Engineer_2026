@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from evaluator import EvaluationCase, assisted_evaluation_case, load_cases, run_case
+from evaluator import EvaluationCase, assisted_evaluation_case, is_aggregation_case, load_cases, run_case
 from metrics import summarize_runs
 from runner import benchmark_passed
 
@@ -108,6 +108,24 @@ class AssistedExecutionTest(unittest.TestCase):
         self.assertEqual(28, len({case.id for case in cases}))
         self.assertTrue(all(case.request == source_requests[case.id] for case in cases))
         self.assertTrue(all(case.assisted.get("scoreFinalResponse") is True for case in cases))
+
+    def test_v1_and_v2_have_the_same_metric_group_denominators(self) -> None:
+        v1_cases = load_cases([Path("evaluation/cases/llm_cases.jsonl")])
+        v2_cases = load_cases([Path("evaluation/cases/v2_cases.jsonl")])
+
+        for cases in (v1_cases, v2_cases):
+            aggregation_ids = {case.id for case in cases if is_aggregation_case(case)}
+            dsl_ids = {case.id for case in cases if not is_aggregation_case(case)}
+
+            self.assertEqual(11, len(aggregation_ids))
+            self.assertEqual(17, len(dsl_ids))
+            self.assertIn("amb-002", aggregation_ids)
+            self.assertIn("tmp-003", aggregation_ids)
+
+        self.assertEqual(
+            {case.id for case in v1_cases if is_aggregation_case(case)},
+            {case.id for case in v2_cases if is_aggregation_case(case)},
+        )
 
     def test_benchmark_fails_when_execution_target_is_not_met(self) -> None:
         self.assertFalse(benchmark_passed({"pass_rate": 1.0, "execution_target_met": False}, 0.9))

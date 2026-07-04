@@ -114,12 +114,21 @@ public class AppProperties {
     }
 
     public static class Llm {
-        private String providerOrder = "GEMINI,GROQ";
-        private boolean summaryEnabled = true;
+        private String mode = "real";
+        private String mockFixture = "classpath:llm/mock-search-events.json";
+        private String providerOrder = "GPT,GEMINI,GROQ,OPENROUTER";
         private int connectTimeoutSeconds = 2;
         private int readTimeoutSeconds = 20;
         private final Gemini gemini = new Gemini();
         private final Groq groq = new Groq();
+        private final Gpt gpt = new Gpt();
+        private final OpenRouter openrouter = new OpenRouter();
+        private final CircuitBreaker circuitBreaker = new CircuitBreaker();
+
+        public String getMode() { return mode; }
+        public void setMode(String mode) { this.mode = mode; }
+        public String getMockFixture() { return mockFixture; }
+        public void setMockFixture(String mockFixture) { this.mockFixture = mockFixture; }
 
         public String getProviderOrder() {
             return providerOrder;
@@ -127,14 +136,6 @@ public class AppProperties {
 
         public void setProviderOrder(String providerOrder) {
             this.providerOrder = providerOrder;
-        }
-
-        public boolean isSummaryEnabled() {
-            return summaryEnabled;
-        }
-
-        public void setSummaryEnabled(boolean summaryEnabled) {
-            this.summaryEnabled = summaryEnabled;
         }
 
         public int getConnectTimeoutSeconds() {
@@ -160,6 +161,27 @@ public class AppProperties {
         public Groq getGroq() {
             return groq;
         }
+
+        public Gpt getGpt() {
+            return gpt;
+        }
+
+        public OpenRouter getOpenrouter() { return openrouter; }
+
+        public CircuitBreaker getCircuitBreaker() { return circuitBreaker; }
+    }
+
+    public static class CircuitBreaker {
+        private int threshold = 3;
+        private int windowSeconds = 60;
+        private int cooldownSeconds = 60;
+
+        public int getThreshold() { return threshold; }
+        public void setThreshold(int threshold) { this.threshold = threshold; }
+        public int getWindowSeconds() { return windowSeconds; }
+        public void setWindowSeconds(int windowSeconds) { this.windowSeconds = windowSeconds; }
+        public int getCooldownSeconds() { return cooldownSeconds; }
+        public void setCooldownSeconds(int cooldownSeconds) { this.cooldownSeconds = cooldownSeconds; }
     }
 
     public static class Gemini {
@@ -214,9 +236,9 @@ public class AppProperties {
     }
 
     public static class Search {
-        private String schemaVersion = "v5";
-        private int confirmationTtlSeconds = 900;
+        private String schemaVersion = "v7";
         private int cacheTtlSeconds = 3600;
+        private int sessionTtlSeconds = 1800;
 
         public String getSchemaVersion() {
             return schemaVersion;
@@ -226,14 +248,6 @@ public class AppProperties {
             this.schemaVersion = schemaVersion;
         }
 
-        public int getConfirmationTtlSeconds() {
-            return confirmationTtlSeconds;
-        }
-
-        public void setConfirmationTtlSeconds(int confirmationTtlSeconds) {
-            this.confirmationTtlSeconds = confirmationTtlSeconds;
-        }
-
         public int getCacheTtlSeconds() {
             return cacheTtlSeconds;
         }
@@ -241,5 +255,37 @@ public class AppProperties {
         public void setCacheTtlSeconds(int cacheTtlSeconds) {
             this.cacheTtlSeconds = cacheTtlSeconds;
         }
+
+        public int getSessionTtlSeconds() { return sessionTtlSeconds; }
+        public void setSessionTtlSeconds(int sessionTtlSeconds) { this.sessionTtlSeconds = sessionTtlSeconds; }
+    }
+
+    public static class Gpt {
+        private String model = "gpt-4.1-mini";
+        private String apiKey;
+        private String baseUrl = "https://api.openai.com/v1/chat/completions";
+
+        public String getModel() { return model; }
+        public void setModel(String model) { this.model = model; }
+        public String getApiKey() { return apiKey; }
+        public void setApiKey(String apiKey) { this.apiKey = apiKey; }
+        public String getBaseUrl() { return baseUrl; }
+        public void setBaseUrl(String baseUrl) { this.baseUrl = baseUrl; }
+    }
+
+    public static class OpenRouter {
+        private String model = "openrouter/free";
+        private String apiKey;
+        private String baseUrl = "https://openrouter.ai/api/v1/chat/completions";
+        private Path credentialsFile = Path.of(".claude", "settings.json");
+
+        public String getModel() { return model; }
+        public void setModel(String model) { this.model = model; }
+        public String getApiKey() { return apiKey; }
+        public void setApiKey(String apiKey) { this.apiKey = apiKey; }
+        public String getBaseUrl() { return baseUrl; }
+        public void setBaseUrl(String baseUrl) { this.baseUrl = baseUrl; }
+        public Path getCredentialsFile() { return credentialsFile; }
+        public void setCredentialsFile(Path credentialsFile) { this.credentialsFile = credentialsFile; }
     }
 }

@@ -11,6 +11,7 @@ import vdt.se.demo.adapter.config.AppProperties;
 import vdt.se.demo.application.port.outboundPort.llm.LlmProviderPort;
 import vdt.se.demo.domain.exception.LlmException;
 import vdt.se.demo.domain.exception.LlmRetryableException;
+import vdt.se.demo.domain.exception.LlmRateLimitException;
 import vdt.se.demo.domain.valueObjects.LlmProvider;
 
 import java.io.InterruptedIOException;
@@ -46,6 +47,15 @@ public class GeminiAdapter implements LlmProviderPort {
 
     @Override
     public String complete(String systemPrompt, String userPrompt) {
+        return completeRequest(systemPrompt, userPrompt, List.of());
+    }
+
+    @Override
+    public String completeWithTools(String systemPrompt, String userPrompt, List<JsonNode> tools) {
+        return completeRequest(systemPrompt, userPrompt, tools);
+    }
+
+    private String completeRequest(String systemPrompt, String userPrompt, List<JsonNode> tools) {
         String apiKey = properties.getLlm().getGemini().getApiKey();
         if (apiKey == null || apiKey.isBlank()) {
             throw new LlmRetryableException("Gemini API key is not configured");
@@ -54,14 +64,21 @@ public class GeminiAdapter implements LlmProviderPort {
             String response = restClient.post()
                     .uri(GEMINI_BASE_URL + properties.getLlm().getGemini().getModel()
                             + ":generateContent?key=" + apiKey)
-                    .body(body(systemPrompt, userPrompt))
+                    .body(body(systemPrompt, userPrompt, tools))
                     .retrieve()
                     .onStatus(this::retryableStatus, (request, clientResponse) -> {
+                        if (clientResponse.getStatusCode().value() == 429)
+                            throw new LlmRateLimitException("Gemini rate limited the request");
                         throw new LlmRetryableException("Gemini retryable status: " + clientResponse.getStatusCode());
                     })
                     .body(String.class);
             JsonNode root = objectMapper.readTree(response);
-            JsonNode text = root.path("candidates").path(0).path("content").path("parts").path(0).path("text");
+            JsonNode part = root.path("candidates").path(0).path("content").path("parts").path(0);
+            JsonNode function = part.path("functionCall");
+            if (!function.isMissingNode() && function.path("name").isString()) {
+                return objectMapper.writeValueAsString(Map.of("name", function.path("name").asString(), "arguments", function.path("args")));
+            }
+            JsonNode text = part.path("text");
             if (text.isMissingNode() || text.asString().isBlank()) {
                 throw new LlmException("Gemini response did not contain text content");
             }
@@ -71,10 +88,13 @@ public class GeminiAdapter implements LlmProviderPort {
         } catch (ResourceAccessException e) {
             throw new LlmRetryableException("Gemini request timed out or was unavailable", e);
         } catch (RestClientResponseException e) {
+            if (e.getStatusCode().value() == 429)
+                throw new LlmRateLimitException("Gemini rate limited the request", e);
             if (isRetryableStatus(e.getStatusCode())) {
                 throw new LlmRetryableException("Gemini retryable status: " + e.getStatusCode(), e);
             }
-            throw new LlmException("Gemini request failed with non-retryable status: " + e.getStatusCode(), e);
+            throw new LlmException("Gemini request failed with non-retryable status: " + e.getStatusCode()
+                    + ", body=" + responseBody(e), e);
         } catch (Exception e) {
             if (isTimeout(e)) {
                 throw new LlmRetryableException("Gemini request timed out or was unavailable", e);
@@ -83,19 +103,49 @@ public class GeminiAdapter implements LlmProviderPort {
         }
     }
 
-    private Map<String, Object> body(String systemPrompt, String userPrompt) {
+    private Map<String, Object> body(String systemPrompt, String userPrompt, List<JsonNode> definitions) {
         Map<String, Object> body = new LinkedHashMap<>();
+
         if (systemPrompt != null && !systemPrompt.isBlank()) {
-            body.put("systemInstruction", Map.of("parts", List.of(Map.of("text", systemPrompt))));
+            body.put("systemInstruction", Map.of(
+                    "parts", List.of(Map.of("text", systemPrompt))
+            ));
         }
+
         body.put("contents", List.of(Map.of(
                 "role", "user",
                 "parts", List.of(Map.of("text", userPrompt))
         )));
-        body.put("generationConfig", Map.of(
-                        "responseMimeType", "application/json",
-                        "temperature", 0.1d
-        ));
+
+        boolean hasTools = definitions != null && !definitions.isEmpty();
+
+        if (hasTools) {
+            body.put("generationConfig", Map.of(
+                    "temperature", 0.1d
+            ));
+
+            body.put("tools", List.of(Map.of(
+                    "functionDeclarations",
+                    definitions.stream()
+                            .map(definition -> Map.of(
+                                    "name", definition.path("name").asString(),
+                                    "description", definition.path("description").asString(),
+                                    "parameters", definition.path("input_schema")
+                            ))
+                            .toList()
+            )));
+
+            body.put("toolConfig", Map.of(
+                    "functionCallingConfig",
+                    Map.of("mode", "ANY")
+            ));
+        } else {
+            body.put("generationConfig", Map.of(
+                    "responseMimeType", "application/json",
+                    "temperature", 0.1d
+            ));
+        }
+
         return body;
     }
 
@@ -120,5 +170,9 @@ public class GeminiAdapter implements LlmProviderPort {
             current = current.getCause();
         }
         return false;
+    }
+    private String responseBody(RestClientResponseException exception) {
+        String body = exception.getResponseBodyAsString();
+        return body == null || body.isBlank() ? "<empty>" : body.substring(0, Math.min(body.length(), 1000));
     }
 }

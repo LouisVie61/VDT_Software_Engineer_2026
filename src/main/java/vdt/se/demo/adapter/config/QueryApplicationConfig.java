@@ -4,103 +4,48 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tools.jackson.databind.ObjectMapper;
 import vdt.se.demo.application.port.inboundPort.QueryUseCase;
-import vdt.se.demo.application.port.outboundPort.cache.DslCachePort;
-import vdt.se.demo.application.port.outboundPort.cache.IntentCachePort;
+import vdt.se.demo.application.port.outboundPort.execution.QueryExecutorPort;
+import vdt.se.demo.application.port.outboundPort.cache.BaseDslCachePort;
 import vdt.se.demo.application.port.outboundPort.history.QueryHistoryPort;
-import vdt.se.demo.application.port.outboundPort.llm.IntentExtractionPort;
-import vdt.se.demo.application.port.outboundPort.semantic.MitreEnrichmentPort;
-import vdt.se.demo.application.service.context.ContextRetrievalService;
-import vdt.se.demo.application.service.execution.SearchExecutionService;
-import vdt.se.demo.application.service.intent.IntentMergeService;
-import vdt.se.demo.application.service.intent.ConfirmationIntentValidator;
-import vdt.se.demo.application.service.intent.SearchIntentNormalizer;
-import vdt.se.demo.application.service.query.FinalizedSearchService;
-import vdt.se.demo.application.service.query.PendingConfirmationResultFactory;
-import vdt.se.demo.application.service.query.QueryAuditService;
-import vdt.se.demo.application.service.query.QueryConfirmationWorkflow;
-import vdt.se.demo.application.service.query.QueryCsvExportService;
-import vdt.se.demo.application.service.query.QueryResultPersistenceService;
-import vdt.se.demo.application.service.query.QueryDiagnosticService;
-import vdt.se.demo.application.service.query.QuerySearchWorkflow;
-import vdt.se.demo.application.service.query.QuerySummaryService;
-import vdt.se.demo.application.service.query.QueryUseCaseService;
-import vdt.se.demo.application.service.query.SearchCacheContextService;
-import vdt.se.demo.application.service.query.SearchDslCacheLookupService;
-import vdt.se.demo.application.service.query.SearchPlanPreparationService;
-import vdt.se.demo.application.service.routing.PerceptionPrefilterService;
-import vdt.se.demo.application.service.routing.QueryRoutingService;
-import vdt.se.demo.application.service.routing.RoutingHintPolicy;
-import vdt.se.demo.application.service.template.CanonicalPlanBuilder;
-import vdt.se.demo.application.service.cache.QueryHashService;
+import vdt.se.demo.application.port.outboundPort.llm.LlmToolCallPort;
+import vdt.se.demo.application.port.outboundPort.session.SessionStateStore;
+import vdt.se.demo.application.service.compile.DslCompiler;
+import vdt.se.demo.application.service.cache.IqlCacheKeyService;
+import vdt.se.demo.application.service.execution.CachedIqlExecutionService;
+import vdt.se.demo.application.service.llm.LlmToolDefinitions;
+import vdt.se.demo.application.service.patch.PatchApplierService;
+import vdt.se.demo.application.service.patch.PatchTopicChangeDetector;
+import vdt.se.demo.application.service.query.*;
+import vdt.se.demo.application.service.reference.ReferenceResolverService;
+import vdt.se.demo.application.service.validation.SchemaRegistry;
 
 @Configuration
 public class QueryApplicationConfig {
-    @Bean
-    QueryUseCase queryUseCase(QuerySearchWorkflow searchWorkflow,
-                              QueryConfirmationWorkflow confirmationWorkflow,
-                              QueryCsvExportService csvExportService,
-                              QueryHistoryPort queryHistoryPort,
-                              QuerySummaryService summaryService,
-                              AppProperties properties) {
-        return new QueryUseCaseService(searchWorkflow, confirmationWorkflow, csvExportService, queryHistoryPort, summaryService,
-                properties);
+    @Bean QueryUseCase queryUseCase(IqlSearchWorkflow workflow, QueryCsvExportService csv,
+                                    QueryHistoryPort history, QuerySummaryService summary, AppProperties properties) {
+        return new QueryUseCaseService(workflow, csv, history, summary, properties.getUser().getDefaultId());
     }
-
-    @Bean
-    QuerySearchWorkflow querySearchWorkflow(SearchCacheContextService cacheContextService,
-                                            SearchPlanPreparationService planPreparationService,
-                                            SearchDslCacheLookupService cacheLookupService,
-                                            PendingConfirmationResultFactory confirmationResultFactory,
-                                            FinalizedSearchService finalizedSearchService,
-                                            QueryAuditService auditService) {
-        return new QuerySearchWorkflow(cacheContextService, planPreparationService, cacheLookupService,
-                confirmationResultFactory, finalizedSearchService, auditService);
+    @Bean IqlSearchWorkflow iqlSearchWorkflow(SessionStateStore states, IqlQueryPreparationService preparation,
+            CachedIqlExecutionService execution, ResultSummaryBuilder summaries) {
+        return new IqlSearchWorkflow(states, preparation, execution, summaries);
     }
-
-    @Bean
-    SearchPlanPreparationService searchPlanPreparationService(QueryRoutingService routingService,
-                                                              RoutingHintPolicy routingHintPolicy,
-                                                              PerceptionPrefilterService perceptionPrefilterService,
-                                                              ContextRetrievalService contextRetrievalService,
-                                                              IntentExtractionPort intentExtractionPort,
-                                                              MitreEnrichmentPort mitreEnrichmentPort,
-                                                              IntentMergeService intentMergeService,
-                                                              SearchIntentNormalizer searchIntentNormalizer,
-                                                              CanonicalPlanBuilder canonicalPlanBuilder,
-                                                              SearchCacheContextService cacheContextService) {
-        return new SearchPlanPreparationService(routingService, routingHintPolicy, perceptionPrefilterService,
-                contextRetrievalService, intentExtractionPort, mitreEnrichmentPort, intentMergeService, searchIntentNormalizer,
-                canonicalPlanBuilder, cacheContextService);
+    @Bean IqlQueryPreparationService iqlQueryPreparationService(LlmToolCallPort llm,
+            LlmToolDefinitions tools, PatchApplierService patches, ReferenceResolverService refs,
+            SchemaRegistry schema, PatchTopicChangeDetector topicChanges, IqlQueryNormalizer normalizer,
+            DslCompiler compiler) {
+        return new IqlQueryPreparationService(llm, tools, patches, refs, schema, topicChanges, normalizer, compiler);
     }
-
-    @Bean
-    SearchDslCacheLookupService searchDslCacheLookupService(DslCachePort dslCachePort,
-                                                            SearchExecutionService searchExecutionService,
-                                                            QueryResultPersistenceService persistenceService,
-                                                            QueryAuditService auditService,
-                                                            ObjectMapper objectMapper,
-                                                            QuerySummaryService summaryService,
-                                                            QueryDiagnosticService diagnosticService) {
-        return new SearchDslCacheLookupService(dslCachePort, searchExecutionService, persistenceService,
-                auditService, objectMapper, summaryService, diagnosticService);
+    @Bean CachedIqlExecutionService cachedIqlExecutionService(IqlCacheKeyService keys, BaseDslCachePort cache,
+            DslCompiler compiler, QueryExecutorPort executor, ObjectMapper mapper) { return new CachedIqlExecutionService(keys, cache, compiler, executor, mapper); }
+    @Bean IqlCacheKeyService iqlCacheKeyService(ObjectMapper mapper, AppProperties properties) {
+        return new IqlCacheKeyService(mapper, properties.getSearch().getSchemaVersion());
     }
-
-    @Bean
-    PendingConfirmationResultFactory pendingConfirmationResultFactory(IntentCachePort intentCachePort,
-                                                                      ObjectMapper objectMapper) {
-        return new PendingConfirmationResultFactory(intentCachePort, objectMapper);
-    }
-
-    @Bean
-    QueryConfirmationWorkflow queryConfirmationWorkflow(IntentCachePort intentCachePort,
-                                                        SearchIntentNormalizer searchIntentNormalizer,
-                                                        ConfirmationIntentValidator confirmationIntentValidator,
-                                                        CanonicalPlanBuilder canonicalPlanBuilder,
-                                                        FinalizedSearchService finalizedSearchService,
-                                                        QueryHashService queryHashService,
-                                                        QueryAuditService auditService) {
-        return new QueryConfirmationWorkflow(intentCachePort, searchIntentNormalizer, confirmationIntentValidator,
-                canonicalPlanBuilder,
-                finalizedSearchService, queryHashService, auditService);
-    }
+    @Bean ResultSummaryBuilder resultSummaryBuilder(ObjectMapper mapper) { return new ResultSummaryBuilder(mapper); }
+    @Bean LlmToolDefinitions llmToolDefinitions(ObjectMapper mapper) { return new LlmToolDefinitions(mapper); }
+    @Bean PatchApplierService patchApplierService(ObjectMapper mapper) { return new PatchApplierService(mapper); }
+    @Bean PatchTopicChangeDetector patchTopicChangeDetector() { return new PatchTopicChangeDetector(); }
+    @Bean ReferenceResolverService referenceResolverService(ObjectMapper mapper) { return new ReferenceResolverService(mapper); }
+    @Bean SchemaRegistry schemaRegistry() { return new SchemaRegistry(); }
+    @Bean DslCompiler dslCompiler(ObjectMapper mapper) { return new DslCompiler(mapper); }
+    @Bean IqlQueryNormalizer iqlQueryNormalizer(ObjectMapper mapper) { return new IqlQueryNormalizer(mapper); }
 }

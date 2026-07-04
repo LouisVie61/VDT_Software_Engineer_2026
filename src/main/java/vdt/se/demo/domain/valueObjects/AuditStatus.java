@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum AuditStatus {
     SUCCESS,
+    PENDING_CONFIRMATION,
     FAILED;
 
     @JsonCreator

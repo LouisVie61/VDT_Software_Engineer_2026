@@ -1,10 +1,8 @@
 package vdt.se.demo.adapter.in.rest.dto;
 
 import tools.jackson.databind.JsonNode;
-import vdt.se.demo.domain.model.QueryConfirmation;
 import vdt.se.demo.domain.model.QueryResult;
 import vdt.se.demo.domain.model.SearchWarning;
-import vdt.se.demo.domain.model.ZeroResultDiagnostic;
 import vdt.se.demo.domain.valueObjects.ChartType;
 import vdt.se.demo.domain.valueObjects.SummaryStatus;
 
@@ -23,13 +21,11 @@ public record SearchResponse(
         ChartType chartType,
         Integer page,
         Integer pageSize,
-        boolean needsConfirmation,
-        QueryConfirmation confirmation,
         List<SearchWarning> warnings,
         String selectedTemplate,
         boolean cacheHit,
         SummaryStatus summaryStatus,
-        ZeroResultDiagnostic diagnostic,
+        Object diagnostic,
         Map<String, Double> confidenceScores,
         String overrideIntent,
         String overrideReason,
@@ -47,8 +43,6 @@ public record SearchResponse(
                 result.getChartType(),
                 result.getPage(),
                 result.getPageSize(),
-                result.isNeedsConfirmation(),
-                result.getConfirmation(),
                 result.getWarnings(),
                 result.getSelectedTemplate(),
                 result.isCacheHit(),

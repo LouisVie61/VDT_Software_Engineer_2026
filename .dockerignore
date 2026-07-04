@@ -1,0 +1,11 @@
+.git
+.idea
+.claude
+target
+dataset
+evaluation
+docs
+demo_report.md
+HELP.md
+data
+fluentd

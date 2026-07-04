@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -33,6 +34,8 @@ public class ApiRequestLoggingFilter extends OncePerRequestFilter {
             requestId = java.util.UUID.randomUUID().toString();
         }
         response.setHeader("X-Request-Id", requestId);
+        String previousRequestId = MDC.get("requestId");
+        MDC.put("requestId", requestId);
         try {
             filterChain.doFilter(request, response);
         } finally {
@@ -41,6 +44,8 @@ public class ApiRequestLoggingFilter extends OncePerRequestFilter {
                         response.getStatus(), request.getMethod(), request.getRequestURI(),
                         errorMessage(request), TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt), requestId);
             }
+            if (previousRequestId == null) MDC.remove("requestId");
+            else MDC.put("requestId", previousRequestId);
         }
     }
 

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import vdt.se.demo.adapter.in.rest.dto.QueryHistoryResponse;
 import vdt.se.demo.adapter.in.rest.dto.SearchResponse;
 import vdt.se.demo.adapter.in.rest.dto.SummaryResponse;
-import vdt.se.demo.application.dto.ConfirmSearchRequest;
 import vdt.se.demo.application.dto.SearchRequest;
 import vdt.se.demo.application.port.inboundPort.QueryUseCase;
 
@@ -33,11 +32,6 @@ public class QueryController {
     @PostMapping
     public SearchResponse search(@Valid @RequestBody SearchRequest request) {
         return SearchResponse.from(queryUseCase.search(request));
-    }
-
-    @PostMapping("/confirm")
-    public SearchResponse confirm(@Valid @RequestBody ConfirmSearchRequest request) {
-        return SearchResponse.from(queryUseCase.confirm(request));
     }
 
     @GetMapping("/history")
