@@ -56,14 +56,20 @@ services:
       - SPRING_DATA_REDIS_PORT=6379
       - APP_INGEST_SPOOL_ROOT=/app/data/ingest
       - APP_SCHEMA_VERSION=${APP_SCHEMA_VERSION:-v7}
-      - APP_LLM_PROVIDER_ORDER=${APP_LLM_PROVIDER_ORDER:-GPT,GEMINI,GROQ}
+      - APP_LLM_PROVIDER_ORDER=${APP_LLM_PROVIDER_ORDER:-GPT,GEMINI,GROQ,OPENROUTER}
+      - APP_LLM_SUMMARY_ENABLED=${APP_LLM_SUMMARY_ENABLED:-true}
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4.1-mini}
       - GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.5-flash}
       - GROQ_MODEL=${GROQ_MODEL:-llama-3.3-70b-versatile}
       - GROQ_BASE_URL=${GROQ_BASE_URL:-https://api.groq.com/openai/v1/chat/completions}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-openrouter/free}
+      - OPENROUTER_CREDENTIALS_FILE=/app/.claude/settings.json
     volumes:
       - ./data/ingest:/app/data/ingest
+      - ./.claude:/app/.claude:ro
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -88,6 +94,8 @@ services:
         condition: service_healthy
       spring-boot-app:
         condition: service_started
+    ports:
+      - "24224:24224"
 
 volumes:
   elasticsearch-data:
