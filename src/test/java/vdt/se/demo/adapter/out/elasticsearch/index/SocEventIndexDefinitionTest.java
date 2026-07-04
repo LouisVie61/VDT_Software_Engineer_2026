@@ -17,7 +17,8 @@ class SocEventIndexDefinitionTest {
         JsonNode properties = mapping.get("mappings").get("properties");
 
         for (String field : java.util.List.of(
-                "timestamp", "source", "severity", "event_type", "action", "user", "host", "ip",
+                "timestamp", "timestamp_year", "timestamp_month", "timestamp_day", "timestamp_hour",
+                "timestamp_minute", "timestamp_second", "source", "severity", "event_type", "action", "user", "host", "ip",
                 "geo_location", "user_agent", "message", "raw", "metadata", "advanced_metadata")) {
             assertThat(properties.get(field)).isNotNull();
         }
@@ -26,6 +27,7 @@ class SocEventIndexDefinitionTest {
         assertThat(properties.get("geo_location").get("type").asString()).isEqualTo("keyword");
         assertThat(properties.get("user_agent").get("type").asString()).isEqualTo("keyword");
         assertThat(properties.get("action").get("type").asString()).isEqualTo("keyword");
+        assertThat(properties.get("timestamp_year").get("type").asString()).isEqualTo("integer");
         JsonNode metadata = properties.get("metadata");
         assertThat(metadata.get("type").asString()).isEqualTo("flattened");
         assertThat(properties.get("advanced_metadata").get("type").asString()).isEqualTo("flattened");

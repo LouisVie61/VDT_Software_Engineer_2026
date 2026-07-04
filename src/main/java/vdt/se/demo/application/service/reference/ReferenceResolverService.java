@@ -19,7 +19,7 @@ public final class ReferenceResolverService {
         for (IqlQuery.FilterCondition filter : query.filters()) {
             JsonNode value = filter.value();
             if (value != null && value.isObject() && value.has("$ref")) {
-                if (summary == null) throw new BadQueryException("Reference requires a previous result");
+                if (summary == null) throw clarification("I don't have a previous result to reference. Please clarify what you want to search.");
                 value = resolvePointer(mapper.valueToTree(summary), value.path("$ref").asString());
             }
             resolved.add(new IqlQuery.FilterCondition(filter.id(), filter.field(), filter.op(), value));
@@ -31,7 +31,12 @@ public final class ReferenceResolverService {
     private JsonNode resolvePointer(JsonNode root, String reference) {
         String pointer = "/" + reference.replace("[", "/").replace("]", "").replace(".", "/");
         JsonNode value = root.at(pointer);
-        if (value.isMissingNode() || value.isNull()) throw new BadQueryException("Unknown or stale reference: " + reference);
+        if (value.isMissingNode() || value.isNull())
+            throw clarification("The previous result no longer contains reference " + reference + ". Please clarify the value.");
         return value.deepCopy();
+    }
+
+    private BadQueryException clarification(String message) {
+        return new BadQueryException("CLARIFICATION_REQUIRED", message);
     }
 }

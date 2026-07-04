@@ -17,9 +17,42 @@ public final class PatchApplierService {
         if (query == null) throw new BadQueryException("Patch mode requires a previous query");
         IqlQuery current = query;
         for (PatchOperation operation : operations == null ? List.<PatchOperation>of() : operations) {
+            IqlQuery before = current;
             current = applyOne(current, operation);
+            verifyPreservation(before, current, operation);
         }
         return current;
+    }
+
+    private void verifyPreservation(IqlQuery before, IqlQuery after, PatchOperation operation) {
+        requireEqual("select", before.select(), after.select());
+        requireEqual("filterLogic", before.filterLogic(), after.filterLogic());
+        requireEqual("orderBy", before.orderBy(), after.orderBy());
+        requireEqual("pageAfter", before.pageAfter(), after.pageAfter());
+        switch (operation.op()) {
+            case ADD_FILTER, REMOVE_FILTER, REPLACE_FILTER -> {
+                requireEqual("timeRange", before.timeRange(), after.timeRange());
+                requireEqual("groupBy", before.groupBy(), after.groupBy());
+                requireEqual("metrics", before.metrics(), after.metrics());
+                requireEqual("sort", before.sort(), after.sort());
+                requireEqual("size", before.size(), after.size());
+            }
+            case SET_GROUP_BY, CLEAR_GROUP_BY -> verifyExceptGroupBy(before, after);
+            case SET_TIME_RANGE -> verifyExceptTimeRange(before, after);
+            case SET_METRICS -> verifyExceptMetrics(before, after);
+            case SET_SORT -> verifyExceptSort(before, after);
+            case SET_SIZE -> verifyExceptSize(before, after);
+        }
+    }
+
+    private void verifyExceptGroupBy(IqlQuery a, IqlQuery b) { requireEqual("filters",a.filters(),b.filters()); requireEqual("timeRange",a.timeRange(),b.timeRange()); requireEqual("metrics",a.metrics(),b.metrics()); requireEqual("sort",a.sort(),b.sort()); requireEqual("size",a.size(),b.size()); }
+    private void verifyExceptTimeRange(IqlQuery a, IqlQuery b) { requireEqual("filters",a.filters(),b.filters()); requireEqual("groupBy",a.groupBy(),b.groupBy()); requireEqual("metrics",a.metrics(),b.metrics()); requireEqual("sort",a.sort(),b.sort()); requireEqual("size",a.size(),b.size()); }
+    private void verifyExceptMetrics(IqlQuery a, IqlQuery b) { requireEqual("filters",a.filters(),b.filters()); requireEqual("groupBy",a.groupBy(),b.groupBy()); requireEqual("timeRange",a.timeRange(),b.timeRange()); requireEqual("sort",a.sort(),b.sort()); requireEqual("size",a.size(),b.size()); }
+    private void verifyExceptSort(IqlQuery a, IqlQuery b) { requireEqual("filters",a.filters(),b.filters()); requireEqual("groupBy",a.groupBy(),b.groupBy()); requireEqual("timeRange",a.timeRange(),b.timeRange()); requireEqual("metrics",a.metrics(),b.metrics()); requireEqual("size",a.size(),b.size()); }
+    private void verifyExceptSize(IqlQuery a, IqlQuery b) { requireEqual("filters",a.filters(),b.filters()); requireEqual("groupBy",a.groupBy(),b.groupBy()); requireEqual("timeRange",a.timeRange(),b.timeRange()); requireEqual("metrics",a.metrics(),b.metrics()); requireEqual("sort",a.sort(),b.sort()); }
+    private void requireEqual(String field, Object before, Object after) {
+        if (!java.util.Objects.equals(before, after))
+            throw new IllegalStateException("Patch invariant violated: untouched field changed: " + field);
     }
 
     private IqlQuery applyOne(IqlQuery query, PatchOperation operation) {

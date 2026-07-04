@@ -1,6 +1,5 @@
 package vdt.se.demo.application.service.query;
 
-import vdt.se.demo.application.dto.ConfirmSearchRequest;
 import vdt.se.demo.application.dto.SearchRequest;
 import vdt.se.demo.application.port.inboundPort.QueryUseCase;
 import vdt.se.demo.application.port.outboundPort.history.QueryHistoryPort;
@@ -33,11 +32,6 @@ public class QueryUseCaseService implements QueryUseCase {
     @Override
     public QueryResult search(SearchRequest request) {
         return searchWorkflow.search(request);
-    }
-
-    @Override
-    public QueryResult confirm(ConfirmSearchRequest request) {
-        throw new vdt.se.demo.domain.exception.BadQueryException("No pending IQL confirmation was found");
     }
 
     @Override

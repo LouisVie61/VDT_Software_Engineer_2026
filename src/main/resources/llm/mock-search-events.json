@@ -1,0 +1,13 @@
+{
+  "name": "search_events",
+  "arguments": {
+    "mode": "new",
+    "select": ["event_id", "timestamp", "severity", "event_type", "source", "message"],
+      "filters": [],
+      "time_range": {"field": "timestamp", "from": "now-24h", "to": "now"},
+      "group_by": [],
+      "metrics": [{"type": "count"}],
+      "sort": [{"field": "timestamp", "order": "desc"}],
+    "size": 50
+  }
+}

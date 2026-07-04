@@ -35,6 +35,27 @@ class PatchApplierServiceTest {
                 .isInstanceOf(BadQueryException.class);
     }
 
+    @Test
+    void preservesEveryFieldNotAddressedByPatch() {
+        IqlQuery.TimeRange range = new IqlQuery.TimeRange("timestamp", "2026-01-01T00:00:00Z", "2026-01-02T00:00:00Z");
+        IqlQuery previous = new IqlQuery(List.of("event_id"), List.of(), null, range,
+                List.of(new IqlQuery.GroupBy("severity", 10)), List.of(new IqlQuery.Metric(IqlQuery.MetricType.COUNT, null)),
+                new IqlQuery.OrderBy(IqlQuery.OrderTarget.COUNT, null, IqlQuery.Direction.DESC),
+                List.of(), 50, null);
+        PatchOperation add = new PatchOperation(PatchOperation.Type.ADD_FILTER, null,
+                mapper.readTree("{\"id\":\"f1\",\"field\":\"host\",\"op\":\"EQ\",\"value\":\"web-1\"}"));
+
+        IqlQuery result = service.apply(previous, List.of(add));
+
+        assertThat(result.select()).isSameAs(previous.select());
+        assertThat(result.timeRange()).isSameAs(previous.timeRange());
+        assertThat(result.groupBy()).isSameAs(previous.groupBy());
+        assertThat(result.metrics()).isSameAs(previous.metrics());
+        assertThat(result.orderBy()).isSameAs(previous.orderBy());
+        assertThat(result.sort()).isSameAs(previous.sort());
+        assertThat(result.size()).isEqualTo(previous.size());
+    }
+
     private IqlQuery query(List<IqlQuery.FilterCondition> filters) {
         return new IqlQuery(List.of(), filters, null, null, List.of(), List.of(), null, List.of(), 50, null);
     }

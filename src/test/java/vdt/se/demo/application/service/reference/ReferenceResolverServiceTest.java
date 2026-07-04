@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import vdt.se.demo.domain.exception.BadQueryException;
 
 class ReferenceResolverServiceTest {
     @Test
@@ -22,5 +24,17 @@ class ReferenceResolverServiceTest {
         IqlQuery resolved = new ReferenceResolverService(mapper).resolve(query, summary);
 
         assertThat(resolved.filters().getFirst().value().asString()).isEqualTo("10.0.0.8");
+    }
+
+    @Test
+    void staleReferenceRequiresClarification() {
+        ObjectMapper mapper = new ObjectMapper();
+        IqlQuery query = new IqlQuery(List.of(), List.of(new IqlQuery.FilterCondition("f1", "ip", IqlQuery.Operator.EQ,
+                mapper.readTree("{\"$ref\":\"buckets[0].key.ip\"}"))), null, null, List.of(), List.of(), null, List.of(), 50, null);
+
+        assertThatThrownBy(() -> new ReferenceResolverService(mapper).resolve(query, null))
+                .isInstanceOf(BadQueryException.class)
+                .extracting(error -> ((BadQueryException) error).getReasonCode())
+                .isEqualTo("CLARIFICATION_REQUIRED");
     }
 }

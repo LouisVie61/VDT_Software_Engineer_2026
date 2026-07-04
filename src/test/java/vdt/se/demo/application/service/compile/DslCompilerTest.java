@@ -24,6 +24,7 @@ class DslCompilerTest {
 
         assertThat(dsl.at("/query/bool/filter/0/term/severity").asString()).isEqualTo("critical");
         assertThat(dsl.at("/query/bool/filter/1/range/timestamp/gte").asString()).isEqualTo("now-24h");
+        assertThat(dsl.at("/query/bool/filter/1/range/timestamp/lt").asString()).isEqualTo("now");
         assertThat(dsl.at("/query/bool/must").isMissingNode()).isTrue();
         assertThat(dsl.path("track_total_hits").asBoolean()).isTrue();
         assertThat(dsl.at("/sort/1/event_id/order").asString()).isEqualTo("asc");

@@ -57,10 +57,13 @@ public class ElasticsearchSearchResponseMapper {
     private Map<String, Object> sourceToRow(JsonNode hit) {
         JsonNode source = hit == null ? null : hit.get("_source");
         Map<String, Object> row = new LinkedHashMap<>();
-        row.put("id", text(source, "id", text(hit, "_id", null)));
+
+        row.put("id", text(source, SocEventSchema.EVENT_ID, text(hit, "_id", null)));
+
         for (String field : SocEventSchema.RESPONSE_FIELDS) {
-            row.put(field, text(source, field, null));
+            row.put(field, value(source, field, null));
         }
+
         return row;
     }
 
@@ -148,11 +151,48 @@ public class ElasticsearchSearchResponseMapper {
         if (node == null || node.isNull()) {
             return defaultValue;
         }
+
         JsonNode value = node.get(field);
         if (value == null || value.isNull()) {
             return defaultValue;
         }
+
+        if (!value.isString()) {
+            return value.toString();
+        }
+
         String text = value.asString();
         return text == null || text.isBlank() ? defaultValue : text;
     }
+
+    private Object value(JsonNode node, String field, Object defaultValue) {
+        if (node == null || node.isNull()) {
+            return defaultValue;
+        }
+
+        JsonNode value = node.get(field);
+        if (value == null || value.isNull()) {
+            return defaultValue;
+        }
+
+        if (value.isString()) {
+            String text = value.asString();
+            return text == null || text.isBlank() ? defaultValue : text;
+        }
+
+        if (value.isNumber()) {
+            return value.numberValue();
+        }
+
+        if (value.isBoolean()) {
+            return value.asBoolean();
+        }
+
+        if (value.isObject() || value.isArray()) {
+            return value;
+        }
+
+        return value.toString();
+    }
+
 }

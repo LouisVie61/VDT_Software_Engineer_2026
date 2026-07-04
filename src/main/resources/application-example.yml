@@ -27,7 +27,7 @@ app:
   user:
     default-id: ${APP_DEFAULT_USER_ID:soc-analyst-demo}
   elasticsearch:
-    events-index: ${APP_EVENTS_INDEX:soc-events}
+    events-index: ${APP_EVENTS_INDEX:soc-events-v7}
     initialize-index: ${APP_ELASTICSEARCH_INITIALIZE_INDEX:true}
   ingest:
     spool-root: ${APP_INGEST_SPOOL_ROOT:data/ingest}
@@ -36,7 +36,13 @@ app:
       max-requests: ${APP_INGEST_RATE_LIMIT_MAX_REQUESTS:10}
       window-seconds: ${APP_INGEST_RATE_LIMIT_WINDOW_SECONDS:60}
   llm:
-    provider-order: ${APP_LLM_PROVIDER_ORDER:GEMINI,GROQ}
+    mode: ${APP_LLM_MODE:real}
+    mock-fixture: ${APP_LLM_MOCK_FIXTURE:classpath:llm/mock-search-events.json}
+    provider-order: ${APP_LLM_PROVIDER_ORDER:GPT,GEMINI,GROQ}
+    circuit-breaker:
+      threshold: ${APP_LLM_429_THRESHOLD:3}
+      window-seconds: ${APP_LLM_429_WINDOW_SECONDS:60}
+      cooldown-seconds: ${APP_LLM_429_COOLDOWN_SECONDS:60}
     gemini:
       model: ${GEMINI_MODEL:gemini-2.5-flash}
       api-key: ${GEMINI_API_KEY:${GOOGLE_API_KEY:}}
@@ -44,7 +50,11 @@ app:
       model: ${GROQ_MODEL:llama-3.3-70b-versatile}
       api-key: ${GROQ_API_KEY:}
       base-url: ${GROQ_BASE_URL:https://api.groq.com/openai/v1/chat/completions}
+    gpt:
+      model: ${OPENAI_MODEL:gpt-4.1-mini}
+      api-key: ${OPENAI_API_KEY:}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1/chat/completions}
   search:
-    schema-version: ${APP_SCHEMA_VERSION:v6}
-    confirmation-ttl-seconds: ${APP_CONFIRMATION_TTL_SECONDS:900}
+    schema-version: ${APP_SCHEMA_VERSION:v7}
     cache-ttl-seconds: ${APP_QUERY_CACHE_TTL_SECONDS:3600}
+    session-ttl-seconds: ${APP_SESSION_TTL_SECONDS:1800}

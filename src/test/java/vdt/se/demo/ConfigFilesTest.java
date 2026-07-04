@@ -41,6 +41,8 @@ class ConfigFilesTest {
         assertThat(fluentd).contains("keys event_id,timestamp,source,severity,event_type,action,user,host,ip,message,raw,advanced_metadata");
         assertThat(fluentd).contains("event_id ${record['event_id']}");
         assertThat(fluentd).contains("action ${record['action']}");
+        assertThat(fluentd).contains("timestamp_year ${m=record['timestamp']");
+        assertThat(fluentd).contains("timestamp_second ${m=record['timestamp']");
         assertThat(fluentd).contains("record['raw_log']");
         assertThat(fluentd).contains("record['description']");
     }

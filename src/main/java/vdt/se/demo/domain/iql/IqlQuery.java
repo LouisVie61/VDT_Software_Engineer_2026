@@ -28,7 +28,7 @@ public record IqlQuery(List<String> select, List<FilterCondition> filters, Filte
     public record Metric(MetricType type, String field) {}
     public enum MetricType { COUNT, CARDINALITY, AVG, SUM, MIN, MAX }
     public record OrderBy(OrderTarget target, Integer metricIndex, Direction direction) {}
-    public enum OrderTarget { METRIC, KEY }
+    public enum OrderTarget { METRIC, KEY, COUNT }
     public record Sort(String field, Direction order) {}
     public enum Direction { ASC, DESC }
 }

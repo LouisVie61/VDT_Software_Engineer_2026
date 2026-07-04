@@ -32,8 +32,6 @@ public class QueryResult {
     private ChartType chartType;
     private Integer page;
     private Integer pageSize;
-    private boolean needsConfirmation;
-    private Object confirmation;
     @Builder.Default
     private List<SearchWarning> warnings = List.of();
     private String selectedTemplate;

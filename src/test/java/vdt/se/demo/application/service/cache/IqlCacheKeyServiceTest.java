@@ -11,11 +11,20 @@ class IqlCacheKeyServiceTest {
     @Test
     void excludesPaginationCursorFromCacheKey() {
         ObjectMapper mapper=new ObjectMapper();
-        IqlCacheKeyService service=new IqlCacheKeyService(mapper);
+        IqlCacheKeyService service=new IqlCacheKeyService(mapper, "mapping-v1");
         IqlQuery first=new IqlQuery(List.of(),List.of(),null,null,List.of(new IqlQuery.GroupBy("source",10)),
                 List.of(),null,List.of(),50,null);
         IqlQuery next=new IqlQuery(first.select(),first.filters(),null,null,first.groupBy(),first.metrics(),null,
                 first.sort(),first.size(),Map.of("source",mapper.valueToTree("firewall")));
         assertThat(service.key(first)).isEqualTo(service.key(next));
     }
+
+    @Test
+    void mappingVersionInvalidatesCachedDsl() {
+        ObjectMapper mapper = new ObjectMapper();
+        IqlQuery query = new IqlQuery(List.of(), List.of(), null, null, List.of(), List.of(), null, List.of(), 50, null);
+        assertThat(new IqlCacheKeyService(mapper, "mapping-v1").key(query))
+                .isNotEqualTo(new IqlCacheKeyService(mapper, "mapping-v2").key(query));
+    }
+
 }

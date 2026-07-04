@@ -1,9 +1,14 @@
 package vdt.se.demo.adapter.out.llm;
 
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import vdt.se.demo.application.port.outboundPort.llm.LlmProviderPort;
+import vdt.se.demo.application.port.outboundPort.llm.LlmCallBudget;
 import vdt.se.demo.application.port.outboundPort.llm.LlmToolCallPort;
 import vdt.se.demo.adapter.config.AppProperties;
 import vdt.se.demo.domain.iql.SessionState;
@@ -12,7 +17,9 @@ import vdt.se.demo.domain.iql.ToolCallResult;
 import java.util.List;
 
 @Component
+@ConditionalOnProperty(prefix = "app.llm", name = "mode", havingValue = "real", matchIfMissing = true)
 public final class StructuredToolCallAdapter implements LlmToolCallPort {
+    private static final Logger log = LoggerFactory.getLogger(StructuredToolCallAdapter.class);
     private final LlmProviderChain chain;
     private final IqlSystemPromptBuilder prompts;
     private final ToolCallResponseParser parser;
@@ -25,8 +32,24 @@ public final class StructuredToolCallAdapter implements LlmToolCallPort {
 
     @Override
     public ToolCallResult invoke(String text, SessionState state, List<JsonNode> definitions) {
+        return invoke(text, state, definitions, List.of(), new LlmCallBudget(2));
+    }
+
+    @Override
+    public ToolCallResult invoke(String text, SessionState state, List<JsonNode> definitions,
+                                 List<String> correctionErrors, LlmCallBudget budget) {
         String system = prompts.systemPrompt(definitions);
-        String user = prompts.userPrompt(text, state);
-        return chain.firstSuccessful(provider -> parser.parse(provider.complete(system, user)));
+        String user = prompts.userPrompt(text, state, correctionErrors);
+        log.info("LLM_INPUT requestId={} text={} correctionErrors={}", requestId(), text, correctionErrors);
+        return chain.firstSuccessful(provider -> {
+            String raw = provider.completeWithTools(system, user, definitions);
+            log.info("LLM_OUTPUT requestId={} provider={} output={}", requestId(), provider.provider(), raw);
+            return parser.parse(raw);
+        }, budget);
+    }
+
+    private String requestId() {
+        String value = MDC.get("requestId");
+        return value == null || value.isBlank() ? "n/a" : value;
     }
 }

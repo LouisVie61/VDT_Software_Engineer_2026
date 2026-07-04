@@ -48,15 +48,30 @@ public final class SchemaRegistry {
     }
 
     private void validateMetric(IqlQuery.Metric metric, List<String> errors) {
-        if (metric.type() == null) { errors.add("Metric type is required"); return; }
-        if (metric.type() != IqlQuery.MetricType.COUNT) {
-            allowed(metric.field(), "metric", errors);
-            if (metric.field() == null || metric.field().isBlank()) errors.add(metric.type() + " requires a field");
+        if (metric == null) {
+            errors.add("Metric is required");
+            return;
         }
+
+        if (metric.type() == null) {
+            errors.add("Metric type is required");
+            return;
+        }
+
+        if (metric.type() == IqlQuery.MetricType.COUNT) {
+            return;
+        }
+
+        if (metric.field() == null || metric.field().isBlank()) {
+            errors.add(metric.type() + " requires a field");
+            return;
+        }
+
+        allowed(metric.field(), "metric", errors);
     }
 
     private void validateTimeRange(IqlQuery.TimeRange range, List<String> errors, List<String> warnings) {
-        if (range == null) { warnings.add("No time range supplied"); return; }
+        if (range == null) { errors.add("Time range is required after normalization"); return; }
         if (!SocEventSchema.TIMESTAMP.equals(range.field())) errors.add("Time range field must be timestamp");
         if (range.from() == null || range.to() == null) return;
         try {

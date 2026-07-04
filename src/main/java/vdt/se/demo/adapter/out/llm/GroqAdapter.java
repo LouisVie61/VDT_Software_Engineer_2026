@@ -13,6 +13,7 @@ import vdt.se.demo.adapter.config.AppProperties;
 import vdt.se.demo.application.port.outboundPort.llm.LlmProviderPort;
 import vdt.se.demo.domain.exception.LlmException;
 import vdt.se.demo.domain.exception.LlmRetryableException;
+import vdt.se.demo.domain.exception.LlmRateLimitException;
 import vdt.se.demo.domain.valueObjects.LlmProvider;
 
 import java.io.InterruptedIOException;
@@ -46,6 +47,15 @@ public class GroqAdapter implements LlmProviderPort {
 
     @Override
     public String complete(String systemPrompt, String userPrompt) {
+        return completeRequest(systemPrompt, userPrompt, List.of());
+    }
+
+    @Override
+    public String completeWithTools(String systemPrompt, String userPrompt, List<JsonNode> tools) {
+        return completeRequest(systemPrompt, userPrompt, tools);
+    }
+
+    private String completeRequest(String systemPrompt, String userPrompt, List<JsonNode> tools) {
         String apiKey = properties.getLlm().getGroq().getApiKey();
         if (apiKey == null || apiKey.isBlank()) {
             throw new LlmRetryableException("Groq API key is not configured");
@@ -55,14 +65,22 @@ public class GroqAdapter implements LlmProviderPort {
                     .uri(properties.getLlm().getGroq().getBaseUrl())
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(body(systemPrompt, userPrompt))
+                    .body(body(systemPrompt, userPrompt, tools))
                     .retrieve()
                     .onStatus(this::retryableStatus, (request, clientResponse) -> {
+                        if (clientResponse.getStatusCode().value() == 429)
+                            throw new LlmRateLimitException("Groq rate limited the request");
                         throw new LlmRetryableException("Groq retryable status: " + clientResponse.getStatusCode());
                     })
                     .body(String.class);
             JsonNode root = objectMapper.readTree(response);
-            JsonNode text = root.path("choices").path(0).path("message").path("content");
+            JsonNode message = root.path("choices").path(0).path("message");
+            JsonNode function = message.path("tool_calls").path(0).path("function");
+            if (!function.isMissingNode() && function.path("name").isString()) {
+                JsonNode arguments = objectMapper.readTree(function.path("arguments").asString());
+                return objectMapper.writeValueAsString(Map.of("name", function.path("name").asString(), "arguments", arguments));
+            }
+            JsonNode text = message.path("content");
             if (text.isMissingNode() || text.asString().isBlank()) {
                 throw new LlmException("Groq response did not contain text content");
             }
@@ -72,10 +90,13 @@ public class GroqAdapter implements LlmProviderPort {
         } catch (ResourceAccessException e) {
             throw new LlmRetryableException("Groq request timed out or was unavailable", e);
         } catch (RestClientResponseException e) {
+            if (e.getStatusCode().value() == 429)
+                throw new LlmRateLimitException("Groq rate limited the request", e);
             if (isRetryableStatus(e.getStatusCode())) {
                 throw new LlmRetryableException("Groq retryable status: " + e.getStatusCode(), e);
             }
-            throw new LlmException("Groq request failed with non-retryable status: " + e.getStatusCode(), e);
+            throw new LlmException("Groq request failed with non-retryable status: " + e.getStatusCode()
+                    + ", body=" + responseBody(e), e);
         } catch (Exception e) {
             if (isTimeout(e)) {
                 throw new LlmRetryableException("Groq request timed out or was unavailable", e);
@@ -84,13 +105,20 @@ public class GroqAdapter implements LlmProviderPort {
         }
     }
 
-    private Map<String, Object> body(String systemPrompt, String userPrompt) {
-        return Map.of(
-                "model", properties.getLlm().getGroq().getModel(),
-                "temperature", 0.1d,
-                "response_format", Map.of("type", "json_object"),
-                "messages", messages(systemPrompt, userPrompt)
-        );
+    private Map<String, Object> body(String systemPrompt, String userPrompt, List<JsonNode> definitions) {
+        Map<String,Object> body = new java.util.LinkedHashMap<>();
+        body.put("model", properties.getLlm().getGroq().getModel());
+        body.put("temperature", 0.1d);
+        body.put("messages", messages(systemPrompt, userPrompt));
+        if (definitions == null || definitions.isEmpty()) body.put("response_format", Map.of("type", "json_object"));
+        else {
+            body.put("tools", definitions.stream().map(definition -> Map.of("type", "function", "function", Map.of(
+                    "name", definition.path("name").asString(),
+                    "description", definition.path("description").asString(),
+                    "parameters", definition.path("input_schema")))).toList());
+            body.put("tool_choice", "required");
+        }
+        return body;
     }
 
     private List<Map<String, String>> messages(String systemPrompt, String userPrompt) {
@@ -124,5 +152,9 @@ public class GroqAdapter implements LlmProviderPort {
             current = current.getCause();
         }
         return false;
+    }
+    private String responseBody(RestClientResponseException exception) {
+        String body = exception.getResponseBodyAsString();
+        return body == null || body.isBlank() ? "<empty>" : body.substring(0, Math.min(body.length(), 1000));
     }
 }

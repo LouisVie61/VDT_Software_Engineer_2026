@@ -8,6 +8,12 @@ final class SocEventElasticsearchMapping {
     private static final Map<String, String> FIELD_MAPPINGS = Map.ofEntries(
             Map.entry(SocEventSchema.EVENT_ID, "{ \"type\": \"keyword\" }"),
             Map.entry(SocEventSchema.TIMESTAMP, "{ \"type\": \"date\" }"),
+            Map.entry(SocEventSchema.TIMESTAMP_YEAR, "{ \"type\": \"integer\" }"),
+            Map.entry(SocEventSchema.TIMESTAMP_MONTH, "{ \"type\": \"integer\" }"),
+            Map.entry(SocEventSchema.TIMESTAMP_DAY, "{ \"type\": \"integer\" }"),
+            Map.entry(SocEventSchema.TIMESTAMP_HOUR, "{ \"type\": \"integer\" }"),
+            Map.entry(SocEventSchema.TIMESTAMP_MINUTE, "{ \"type\": \"integer\" }"),
+            Map.entry(SocEventSchema.TIMESTAMP_SECOND, "{ \"type\": \"integer\" }"),
             Map.entry(SocEventSchema.SOURCE, "{ \"type\": \"keyword\" }"),
             Map.entry(SocEventSchema.SEVERITY, "{ \"type\": \"keyword\" }"),
             Map.entry(SocEventSchema.EVENT_TYPE, "{ \"type\": \"keyword\" }"),

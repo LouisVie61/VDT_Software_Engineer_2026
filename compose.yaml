@@ -51,12 +51,14 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - ELASTICSEARCH_URIS=http://elasticsearch:9200
-      - APP_EVENTS_INDEX=${APP_EVENTS_INDEX:-soc-events-v6}
+      - APP_EVENTS_INDEX=${APP_EVENTS_INDEX:-soc-events-v7}
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
       - APP_INGEST_SPOOL_ROOT=/app/data/ingest
-      - APP_SCHEMA_VERSION=${APP_SCHEMA_VERSION:-v6}
-      - APP_LLM_PROVIDER_ORDER=${APP_LLM_PROVIDER_ORDER:-GEMINI,GROQ}
+      - APP_SCHEMA_VERSION=${APP_SCHEMA_VERSION:-v7}
+      - APP_LLM_PROVIDER_ORDER=${APP_LLM_PROVIDER_ORDER:-GPT,GEMINI,GROQ}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4.1-mini}
       - GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.5-flash}
       - GROQ_MODEL=${GROQ_MODEL:-llama-3.3-70b-versatile}
       - GROQ_BASE_URL=${GROQ_BASE_URL:-https://api.groq.com/openai/v1/chat/completions}
@@ -76,7 +78,7 @@ services:
       - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST:-elasticsearch}
       - ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT:-9200}
       - ELASTICSEARCH_SCHEME=${ELASTICSEARCH_SCHEME:-http}
-      - APP_EVENTS_INDEX=${APP_EVENTS_INDEX:-soc-events-v6}
+      - APP_EVENTS_INDEX=${APP_EVENTS_INDEX:-soc-events-v7}
     volumes:
       - ./data/ingest/incoming:/fluentd/incoming
       - fluentd-buffer:/fluentd/buffer

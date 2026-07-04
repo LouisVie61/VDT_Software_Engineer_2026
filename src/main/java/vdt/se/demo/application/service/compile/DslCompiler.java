@@ -43,7 +43,7 @@ public final class DslCompiler {
             }
 
             if (query.timeRange().to() != null && !query.timeRange().to().isBlank()) {
-                bounds.put("lte", query.timeRange().to());
+                bounds.put("lt", query.timeRange().to());
             }
 
             if (!bounds.isEmpty()) {
@@ -107,10 +107,48 @@ public final class DslCompiler {
     }
 
     private void addTermsOrder(ObjectNode terms, IqlQuery query) {
-        if (query.orderBy() == null) return;
-        String target = query.orderBy().target() == IqlQuery.OrderTarget.KEY ? "_key"
-                : metricName(query.orderBy().metricIndex() == null ? 0 : query.orderBy().metricIndex());
-        terms.putObject("order").put(target, direction(query.orderBy().direction()));
+        if (query.orderBy() == null) {
+            return;
+        }
+
+        String target = resolveTermsOrderTarget(query);
+
+        terms.putObject("order")
+                .put(target, direction(query.orderBy().direction()));
+    }
+
+    private String resolveTermsOrderTarget(IqlQuery query) {
+        IqlQuery.OrderBy orderBy = query.orderBy();
+
+        if (orderBy == null) {
+            return "_count";
+        }
+
+        return switch (orderBy.target()) {
+            case KEY -> "_key";
+            case COUNT -> "_count";
+            case METRIC -> resolveMetricOrderTarget(query, orderBy.metricIndex());
+        };
+    }
+
+    private String resolveMetricOrderTarget(IqlQuery query, Integer metricIndex) {
+        int index = metricIndex == null ? 0 : metricIndex;
+
+        if (index < 0) {
+            throw new BadQueryException("metric_index cannot be negative");
+        }
+
+        if (index >= query.metrics().size()) {
+            throw new BadQueryException("metric_index is out of range");
+        }
+
+        IqlQuery.Metric metric = query.metrics().get(index);
+
+        if (metric.type() == IqlQuery.MetricType.COUNT) {
+            return "_count";
+        }
+
+        return metricName(index);
     }
 
     private void addTopLevelMetrics(ObjectNode root, IqlQuery query) {

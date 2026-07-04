@@ -8,4 +8,11 @@ import java.util.List;
 
 public interface LlmToolCallPort {
     ToolCallResult invoke(String naturalLanguageText, SessionState sessionState, List<JsonNode> toolDefinitions);
+
+    default ToolCallResult invoke(String naturalLanguageText, SessionState sessionState,
+                                  List<JsonNode> toolDefinitions, List<String> correctionErrors,
+                                  LlmCallBudget budget) {
+        if (!budget.tryConsume()) throw new IllegalStateException("LLM call budget exhausted");
+        return invoke(naturalLanguageText, sessionState, toolDefinitions);
+    }
 }
