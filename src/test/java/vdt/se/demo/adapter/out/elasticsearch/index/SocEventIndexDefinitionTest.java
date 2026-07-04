@@ -28,6 +28,10 @@ class SocEventIndexDefinitionTest {
         assertThat(properties.get("user_agent").get("type").asString()).isEqualTo("keyword");
         assertThat(properties.get("action").get("type").asString()).isEqualTo("keyword");
         assertThat(properties.get("timestamp_year").get("type").asString()).isEqualTo("integer");
+        assertThat(properties.get("src_ip").get("type").asString()).isEqualTo("ip");
+        assertThat(properties.get("risk_score").get("type").asString()).isEqualTo("double");
+        assertThat(properties.get("frequency_anomaly").get("type").asString()).isEqualTo("boolean");
+        assertThat(properties.get("source_product").get("type").asString()).isEqualTo("keyword");
         JsonNode metadata = properties.get("metadata");
         assertThat(metadata.get("type").asString()).isEqualTo("flattened");
         assertThat(properties.get("advanced_metadata").get("type").asString()).isEqualTo("flattened");
@@ -39,5 +43,9 @@ class SocEventIndexDefinitionTest {
         assertThat(SocEventSchema.FILTERABLE_FIELDS).allMatch(SocEventSchema.INDEX_FIELDS::contains);
         assertThat(SocEventSchema.GROUPABLE_FIELDS).allMatch(SocEventSchema.INDEX_FIELDS::contains);
         assertThat(SocEventSchema.FULL_TEXT_FIELDS).allMatch(SocEventSchema.INDEX_FIELDS::contains);
+        assertThat(SocEventSchema.NUMERIC_METRIC_FIELDS).allMatch(SocEventSchema.INDEX_FIELDS::contains);
+        assertThat(SocEventSchema.FIELD_WHITELIST).contains(
+                "src_ip", "dst_ip", "device_type", "process_id", "risk_score", "baseline_deviation",
+                "source_product", "risk_level", "event_type_action");
     }
 }

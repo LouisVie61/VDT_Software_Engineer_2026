@@ -12,8 +12,14 @@ public final class SocEventSchema {
     public static final String TIMESTAMP_HOUR = "timestamp_hour";
     public static final String TIMESTAMP_MINUTE = "timestamp_minute";
     public static final String TIMESTAMP_SECOND = "timestamp_second";
+    public static final String TIMESTAMP_DATE = "timestamp_date";
+    public static final String TIMESTAMP_DAY_OF_WEEK = "timestamp_day_of_week";
+    public static final String TIMESTAMP_IS_WEEKEND = "timestamp_is_weekend";
     public static final String SOURCE = "source";
+    public static final String SOURCE_PRODUCT = "source_product";
+    public static final String SOURCE_VERSION = "source_version";
     public static final String SEVERITY = "severity";
+    public static final String SEVERITY_RANK = "severity_rank";
     public static final String EVENT_TYPE = "event_type";
     public static final String ACTION = "action";
     public static final String USER = "user";
@@ -21,6 +27,37 @@ public final class SocEventSchema {
     public static final String IP = "ip";
     public static final String GEO_LOCATION = "geo_location";
     public static final String USER_AGENT = "user_agent";
+    public static final String USER_AGENT_FAMILY = "user_agent_family";
+    public static final String USER_AGENT_OS = "user_agent_os";
+    public static final String SRC_IP = "src_ip";
+    public static final String DST_IP = "dst_ip";
+    public static final String SRC_IP_PREFIX24 = "src_ip_prefix24";
+    public static final String DST_IP_PREFIX24 = "dst_ip_prefix24";
+    public static final String NETWORK_PAIR = "network_pair";
+    public static final String ALERT_TYPE = "alert_type";
+    public static final String SIGNATURE_ID = "signature_id";
+    public static final String CATEGORY = "category";
+    public static final String DEVICE_TYPE = "device_type";
+    public static final String DEVICE_ID = "device_id";
+    public static final String FIRMWARE_VERSION = "firmware_version";
+    public static final String OBJECT = "object";
+    public static final String PROCESS_ID = "process_id";
+    public static final String PARENT_PROCESS = "parent_process";
+    public static final String ADDITIONAL_INFO = "additional_info";
+    public static final String DESCRIPTION = "description";
+    public static final String RAW_LOG = "raw_log";
+    public static final String DEVICE_HASH = "device_hash";
+    public static final String SESSION_ID = "session_id";
+    public static final String RISK_SCORE = "risk_score";
+    public static final String RISK_LEVEL = "risk_level";
+    public static final String CONFIDENCE = "confidence";
+    public static final String CONFIDENCE_LEVEL = "confidence_level";
+    public static final String BASELINE_DEVIATION = "baseline_deviation";
+    public static final String ENTROPY = "entropy";
+    public static final String FREQUENCY_ANOMALY = "frequency_anomaly";
+    public static final String SEQUENCE_ANOMALY = "sequence_anomaly";
+    public static final String HAS_BEHAVIORAL_ANOMALY = "has_behavioral_anomaly";
+    public static final String EVENT_TYPE_ACTION = "event_type_action";
     public static final String MESSAGE = "message";
     public static final String RAW = "raw";
     public static final String METADATA = "metadata";
@@ -28,8 +65,14 @@ public final class SocEventSchema {
 
     public static final List<String> INDEX_FIELDS = List.of(
             EVENT_ID, TIMESTAMP, TIMESTAMP_YEAR, TIMESTAMP_MONTH, TIMESTAMP_DAY,
-            TIMESTAMP_HOUR, TIMESTAMP_MINUTE, TIMESTAMP_SECOND, SOURCE, SEVERITY, EVENT_TYPE, ACTION, USER, HOST, IP,
-            GEO_LOCATION, USER_AGENT, MESSAGE, RAW, METADATA, ADVANCED_METADATA
+            TIMESTAMP_HOUR, TIMESTAMP_MINUTE, TIMESTAMP_SECOND, TIMESTAMP_DATE, TIMESTAMP_DAY_OF_WEEK,
+            TIMESTAMP_IS_WEEKEND, SOURCE, SOURCE_PRODUCT, SOURCE_VERSION, SEVERITY, SEVERITY_RANK,
+            EVENT_TYPE, ACTION, EVENT_TYPE_ACTION, USER, HOST, IP, GEO_LOCATION, USER_AGENT,
+            USER_AGENT_FAMILY, USER_AGENT_OS, SRC_IP, DST_IP, SRC_IP_PREFIX24, DST_IP_PREFIX24, NETWORK_PAIR,
+            ALERT_TYPE, SIGNATURE_ID, CATEGORY, DEVICE_TYPE, DEVICE_ID, FIRMWARE_VERSION, OBJECT, PROCESS_ID,
+            PARENT_PROCESS, ADDITIONAL_INFO, DESCRIPTION, RAW_LOG, DEVICE_HASH, SESSION_ID, RISK_SCORE, RISK_LEVEL,
+            CONFIDENCE, CONFIDENCE_LEVEL, BASELINE_DEVIATION, ENTROPY, FREQUENCY_ANOMALY, SEQUENCE_ANOMALY,
+            HAS_BEHAVIORAL_ANOMALY, MESSAGE, RAW, METADATA, ADVANCED_METADATA
     );
 
     public static final List<String> CSV_HEADER_FIELDS = List.of(
@@ -38,26 +81,53 @@ public final class SocEventSchema {
 
     public static final Set<String> FIELD_WHITELIST = Set.of(
             EVENT_ID, TIMESTAMP, TIMESTAMP_YEAR, TIMESTAMP_MONTH, TIMESTAMP_DAY,
-            TIMESTAMP_HOUR, TIMESTAMP_MINUTE, TIMESTAMP_SECOND, SOURCE, SEVERITY, EVENT_TYPE, ACTION, USER, HOST, IP,
-            GEO_LOCATION, USER_AGENT, MESSAGE, RAW, METADATA, ADVANCED_METADATA
+            TIMESTAMP_HOUR, TIMESTAMP_MINUTE, TIMESTAMP_SECOND, TIMESTAMP_DATE, TIMESTAMP_DAY_OF_WEEK,
+            TIMESTAMP_IS_WEEKEND, SOURCE, SOURCE_PRODUCT, SOURCE_VERSION, SEVERITY, SEVERITY_RANK,
+            EVENT_TYPE, ACTION, EVENT_TYPE_ACTION, USER, HOST, IP, GEO_LOCATION, USER_AGENT, USER_AGENT_FAMILY,
+            USER_AGENT_OS, SRC_IP, DST_IP, SRC_IP_PREFIX24, DST_IP_PREFIX24, NETWORK_PAIR, ALERT_TYPE, SIGNATURE_ID,
+            CATEGORY, DEVICE_TYPE, DEVICE_ID, FIRMWARE_VERSION, OBJECT, PROCESS_ID, PARENT_PROCESS, ADDITIONAL_INFO,
+            DESCRIPTION, RAW_LOG, DEVICE_HASH, SESSION_ID, RISK_SCORE, RISK_LEVEL, CONFIDENCE, CONFIDENCE_LEVEL,
+            BASELINE_DEVIATION, ENTROPY, FREQUENCY_ANOMALY, SEQUENCE_ANOMALY, HAS_BEHAVIORAL_ANOMALY,
+            MESSAGE, RAW, METADATA, ADVANCED_METADATA
     );
 
     public static final List<String> FILTERABLE_FIELDS = List.of(
             EVENT_ID, TIMESTAMP_YEAR, TIMESTAMP_MONTH, TIMESTAMP_DAY, TIMESTAMP_HOUR,
-            TIMESTAMP_MINUTE, TIMESTAMP_SECOND, SEVERITY, EVENT_TYPE, ACTION, USER, HOST, IP, SOURCE, GEO_LOCATION, USER_AGENT
+            TIMESTAMP_MINUTE, TIMESTAMP_SECOND, TIMESTAMP_DATE, TIMESTAMP_DAY_OF_WEEK, TIMESTAMP_IS_WEEKEND,
+            SEVERITY, SEVERITY_RANK, EVENT_TYPE, ACTION, EVENT_TYPE_ACTION, USER, HOST, IP, SOURCE, SOURCE_PRODUCT,
+            SOURCE_VERSION, GEO_LOCATION, USER_AGENT, USER_AGENT_FAMILY, USER_AGENT_OS, SRC_IP, DST_IP,
+            SRC_IP_PREFIX24, DST_IP_PREFIX24, NETWORK_PAIR, ALERT_TYPE, SIGNATURE_ID, CATEGORY, DEVICE_TYPE,
+            DEVICE_ID, FIRMWARE_VERSION, OBJECT, PROCESS_ID, PARENT_PROCESS, DEVICE_HASH, SESSION_ID, RISK_SCORE,
+            RISK_LEVEL, CONFIDENCE, CONFIDENCE_LEVEL, BASELINE_DEVIATION, ENTROPY, FREQUENCY_ANOMALY,
+            SEQUENCE_ANOMALY, HAS_BEHAVIORAL_ANOMALY
     );
 
     public static final List<String> GROUPABLE_FIELDS = List.of(
             TIMESTAMP_YEAR, TIMESTAMP_MONTH, TIMESTAMP_DAY, TIMESTAMP_HOUR, TIMESTAMP_MINUTE, TIMESTAMP_SECOND,
-            SOURCE, SEVERITY, EVENT_TYPE, ACTION, USER, HOST, IP, GEO_LOCATION, USER_AGENT
+            TIMESTAMP_DATE, TIMESTAMP_DAY_OF_WEEK, TIMESTAMP_IS_WEEKEND, SOURCE, SOURCE_PRODUCT, SOURCE_VERSION,
+            SEVERITY, SEVERITY_RANK, EVENT_TYPE, ACTION, EVENT_TYPE_ACTION, USER, HOST, IP, GEO_LOCATION,
+            USER_AGENT, USER_AGENT_FAMILY, USER_AGENT_OS, SRC_IP, DST_IP, SRC_IP_PREFIX24, DST_IP_PREFIX24,
+            NETWORK_PAIR, ALERT_TYPE, SIGNATURE_ID, CATEGORY, DEVICE_TYPE, DEVICE_ID, FIRMWARE_VERSION, OBJECT,
+            PROCESS_ID, PARENT_PROCESS, RISK_LEVEL, CONFIDENCE_LEVEL, FREQUENCY_ANOMALY, SEQUENCE_ANOMALY,
+            HAS_BEHAVIORAL_ANOMALY
     );
 
-    public static final List<String> FULL_TEXT_FIELDS = List.of(MESSAGE);
+    public static final List<String> FULL_TEXT_FIELDS = List.of(MESSAGE, DESCRIPTION, ADDITIONAL_INFO);
+
+    public static final Set<String> NUMERIC_METRIC_FIELDS = Set.of(
+            SEVERITY_RANK, PROCESS_ID, RISK_SCORE, CONFIDENCE, BASELINE_DEVIATION, ENTROPY
+    );
 
     public static final List<String> RESPONSE_FIELDS = List.of(
             EVENT_ID, TIMESTAMP, TIMESTAMP_YEAR, TIMESTAMP_MONTH, TIMESTAMP_DAY,
-            TIMESTAMP_HOUR, TIMESTAMP_MINUTE, TIMESTAMP_SECOND, SOURCE, SEVERITY, EVENT_TYPE, ACTION, USER, HOST, IP,
-            GEO_LOCATION, USER_AGENT, MESSAGE, RAW, METADATA, ADVANCED_METADATA
+            TIMESTAMP_HOUR, TIMESTAMP_MINUTE, TIMESTAMP_SECOND, TIMESTAMP_DATE, TIMESTAMP_DAY_OF_WEEK,
+            TIMESTAMP_IS_WEEKEND, SOURCE, SOURCE_PRODUCT, SOURCE_VERSION, SEVERITY, SEVERITY_RANK, EVENT_TYPE,
+            ACTION, EVENT_TYPE_ACTION, USER, HOST, IP, GEO_LOCATION, USER_AGENT, USER_AGENT_FAMILY, USER_AGENT_OS,
+            SRC_IP, DST_IP, SRC_IP_PREFIX24, DST_IP_PREFIX24, NETWORK_PAIR, ALERT_TYPE, SIGNATURE_ID, CATEGORY,
+            DEVICE_TYPE, DEVICE_ID, FIRMWARE_VERSION, OBJECT, PROCESS_ID, PARENT_PROCESS, ADDITIONAL_INFO,
+            DESCRIPTION, RAW_LOG, DEVICE_HASH, SESSION_ID, RISK_SCORE, RISK_LEVEL, CONFIDENCE, CONFIDENCE_LEVEL,
+            BASELINE_DEVIATION, ENTROPY, FREQUENCY_ANOMALY, SEQUENCE_ANOMALY, HAS_BEHAVIORAL_ANOMALY,
+            MESSAGE, RAW, METADATA, ADVANCED_METADATA
     );
 
     private SocEventSchema() {

@@ -75,12 +75,20 @@ final class IqlSystemPromptBuilder {
                   select, exact numeric filter, group_by, hit sort
                 - source, severity, event_type, action, user, host, ip, geo_location, user_agent:
                   select, exact filter, group_by, hit sort, cardinality metric
-                - message: select and full-text filter with contains
+                - Dataset fields: src_ip, dst_ip, alert_type, signature_id, category, device_type, device_id,
+                  firmware_version, object, process_id, parent_process, additional_info, description, raw_log,
+                  device_hash, session_id, risk_score, confidence, baseline_deviation, entropy,
+                  frequency_anomaly, sequence_anomaly.
+                - Derived analysis fields: timestamp_date, timestamp_day_of_week, timestamp_is_weekend,
+                  source_product, source_version, severity_rank, user_agent_family, user_agent_os,
+                  src_ip_prefix24, dst_ip_prefix24, network_pair, risk_level, confidence_level,
+                  has_behavioral_anomaly, event_type_action.
+                - message, description, additional_info: select and full-text filter with contains
                 - raw, metadata, advanced_metadata: select only
 
-                Groupable fields are only: timestamp_year, timestamp_month, timestamp_day, timestamp_hour,
-                timestamp_minute, timestamp_second, source, severity, event_type, action, user, host, ip,
-                geo_location, user_agent. timestamp is not groupable.
+                Groupable fields include all categorical/boolean dataset and derived fields listed above, except
+                timestamp, message, description, additional_info, raw_log, raw, metadata, advanced_metadata and
+                continuous numeric measurements. timestamp is not groupable.
                 raw, message, metadata, and advanced_metadata are not groupable.
 
                 ## 5. Filter schema and semantics
@@ -101,6 +109,8 @@ final class IqlSystemPromptBuilder {
                 - group_by contains 1 to 3 entries. Each size is 1..1000; use the requested top N as size.
                 - Multiple dimensions become multiple group_by entries in the analyst's stated order.
                 - Metrics: count, cardinality, avg, sum, min, max. count has no field; every other metric requires a field.
+                - avg/sum/min/max numeric fields: severity_rank, process_id, risk_score, confidence,
+                  baseline_deviation, entropy. cardinality may use any queryable scalar field.
                 - order_by controls buckets. sort controls event hits and is valid only when group_by is absent.
                 - Map time grouping explicitly: year/năm=>timestamp_year, month/tháng=>timestamp_month,
                   day/ngày=>timestamp_day, hour/giờ=>timestamp_hour, minute/phút=>timestamp_minute,

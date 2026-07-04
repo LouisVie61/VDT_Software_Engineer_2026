@@ -23,10 +23,10 @@ public final class SchemaRegistry {
         for (IqlQuery.FilterCondition filter : query.filters()) {
             if (filter.id() == null || filter.id().isBlank() || !ids.add(filter.id())) errors.add("Filter ids must be non-blank and unique");
             allowed(filter.field(), "filter", errors);
-            if (!SocEventSchema.FILTERABLE_FIELDS.contains(filter.field()) && !SocEventSchema.MESSAGE.equals(filter.field()))
+            if (!SocEventSchema.FILTERABLE_FIELDS.contains(filter.field()) && !SocEventSchema.FULL_TEXT_FIELDS.contains(filter.field()))
                 errors.add("Field is not filterable: " + filter.field());
-            if (filter.op() == IqlQuery.Operator.CONTAINS && !SocEventSchema.MESSAGE.equals(filter.field()))
-                errors.add("contains is only allowed for message");
+            if (filter.op() == IqlQuery.Operator.CONTAINS && !SocEventSchema.FULL_TEXT_FIELDS.contains(filter.field()))
+                errors.add("contains is only allowed for full-text fields");
             if (filter.op() != IqlQuery.Operator.EXISTS && (filter.value() == null || filter.value().isNull()))
                 errors.add("Filter value is required: " + filter.id());
         }
@@ -68,6 +68,10 @@ public final class SchemaRegistry {
         }
 
         allowed(metric.field(), "metric", errors);
+        if (metric.type() != IqlQuery.MetricType.CARDINALITY
+                && !SocEventSchema.NUMERIC_METRIC_FIELDS.contains(metric.field())) {
+            errors.add(metric.type() + " requires a numeric field: " + metric.field());
+        }
     }
 
     private void validateTimeRange(IqlQuery.TimeRange range, List<String> errors, List<String> warnings) {
