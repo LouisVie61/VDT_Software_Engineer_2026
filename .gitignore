@@ -34,3 +34,4 @@ data/ingest/incoming/
 fluentd-buffer/
 fluentd-pos/
 HELP.md
+scripts/

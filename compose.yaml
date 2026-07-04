@@ -51,11 +51,11 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - ELASTICSEARCH_URIS=http://elasticsearch:9200
-      - APP_EVENTS_INDEX=${APP_EVENTS_INDEX:-soc-events-v7}
+      - APP_EVENTS_INDEX=${APP_EVENTS_INDEX:-soc-events-v8}
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
       - APP_INGEST_SPOOL_ROOT=/app/data/ingest
-      - APP_SCHEMA_VERSION=${APP_SCHEMA_VERSION:-v7}
+      - APP_SCHEMA_VERSION=${APP_SCHEMA_VERSION:-v8}
       - APP_LLM_PROVIDER_ORDER=${APP_LLM_PROVIDER_ORDER:-GPT,GEMINI,GROQ,OPENROUTER}
       - APP_LLM_SUMMARY_ENABLED=${APP_LLM_SUMMARY_ENABLED:-true}
       - GROQ_API_KEY=${GROQ_API_KEY:-}
@@ -84,7 +84,7 @@ services:
       - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST:-elasticsearch}
       - ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT:-9200}
       - ELASTICSEARCH_SCHEME=${ELASTICSEARCH_SCHEME:-http}
-      - APP_EVENTS_INDEX=${APP_EVENTS_INDEX:-soc-events-v7}
+      - APP_EVENTS_INDEX=${APP_EVENTS_INDEX:-soc-events-v8}
     volumes:
       - ./data/ingest/incoming:/fluentd/incoming
       - fluentd-buffer:/fluentd/buffer

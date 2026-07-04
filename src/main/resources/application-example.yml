@@ -27,7 +27,7 @@ app:
   user:
     default-id: ${APP_DEFAULT_USER_ID:soc-analyst-demo}
   elasticsearch:
-    events-index: ${APP_EVENTS_INDEX:soc-events-v7}
+    events-index: ${APP_EVENTS_INDEX:soc-events-v8}
     initialize-index: ${APP_ELASTICSEARCH_INITIALIZE_INDEX:true}
   ingest:
     spool-root: ${APP_INGEST_SPOOL_ROOT:data/ingest}
@@ -60,6 +60,6 @@ app:
       base-url: ${OPENROUTER_BASE_URL:https://openrouter.ai/api/v1/chat/completions}
       credentials-file: ${OPENROUTER_CREDENTIALS_FILE:.claude/settings.json}
   search:
-    schema-version: ${APP_SCHEMA_VERSION:v7}
+    schema-version: ${APP_SCHEMA_VERSION:v8}
     cache-ttl-seconds: ${APP_QUERY_CACHE_TTL_SECONDS:3600}
     session-ttl-seconds: ${APP_SESSION_TTL_SECONDS:1800}

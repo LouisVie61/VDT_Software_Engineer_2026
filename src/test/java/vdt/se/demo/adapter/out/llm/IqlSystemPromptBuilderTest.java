@@ -44,4 +44,17 @@ class IqlSystemPromptBuilderTest {
                 .contains("Vietnamese request => Vietnamese question")
                 .contains("schema names in tool arguments");
     }
+
+    @Test
+    void plansDependentDualIntentsAsNestedSelectButEmitsOneValidToolCall() {
+        String prompt = new IqlSystemPromptBuilder(new ObjectMapper()).systemPrompt(List.of());
+
+        assertThat(prompt)
+                .contains("Nested SELECT planning DSL (reasoning only)")
+                .contains("SELECT <outer result>")
+                .contains("schema-valid search_events call")
+                .contains("A single call cannot")
+                .contains("Never emit a fictional nested query")
+                .contains("documented $ref object");
+    }
 }
