@@ -42,4 +42,19 @@ class DslCompilerTest {
         assertThat(dsl.at("/aggs/events/composite/sources").size()).isEqualTo(2);
         assertThat(dsl.at("/aggs/events/aggs/ordered_buckets/bucket_sort").isObject()).isTrue();
     }
+
+    @Test
+    void compilesPerBucketSampleHitsPreview() {
+        IqlQuery.SampleHits samples = new IqlQuery.SampleHits(null,
+                List.of(new IqlQuery.Sort("timestamp", IqlQuery.Direction.DESC)));
+        IqlQuery query = new IqlQuery(List.of(), List.of(), null, null,
+                List.of(new IqlQuery.GroupBy("host", 5, samples)),
+                List.of(new IqlQuery.Metric(IqlQuery.MetricType.COUNT, null)), null, List.of(), 50, null);
+
+        ObjectNode dsl = compiler.compile(query);
+
+        assertThat(dsl.at("/aggs/events/aggs/sample_hits/top_hits/size").asInt()).isEqualTo(5);
+        assertThat(dsl.at("/aggs/events/aggs/sample_hits/top_hits/sort/0/timestamp/order").asString())
+                .isEqualTo("desc");
+    }
 }

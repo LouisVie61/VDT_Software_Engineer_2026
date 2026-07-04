@@ -69,6 +69,18 @@ class ToolCallResponseParserTest {
     }
 
     @Test
+    void parsesGroupSampleHits() {
+        ToolCallResult.SearchEvents call = (ToolCallResult.SearchEvents) parser.parse("""
+                {"name":"search_events","arguments":{"mode":"new","group_by":[{"field":"host","size":5,
+                "sample_hits":{"size":3,"sort":[{"field":"timestamp","order":"desc"}]}}]}}
+                """);
+
+        IqlQuery.SampleHits samples = call.query().groupBy().getFirst().sampleHits();
+        assertThat(samples.effectiveSize()).isEqualTo(3);
+        assertThat(samples.sort().getFirst().field()).isEqualTo("timestamp");
+    }
+
+    @Test
     void rejectsLegacyNestedQueryInsteadOfSilentlyUsingDefaults() {
         ToolCallResponseParser parser = new ToolCallResponseParser(new ObjectMapper());
         assertThatThrownBy(() -> parser.parse("""
