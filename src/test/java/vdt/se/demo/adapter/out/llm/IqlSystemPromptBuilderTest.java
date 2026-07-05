@@ -57,4 +57,17 @@ class IqlSystemPromptBuilderTest {
                 .contains("Never emit a fictional nested query")
                 .contains("documented $ref object");
     }
+
+    @Test
+    void preventsExamplesFromSupplyingMissingTimeConstraints() {
+        String prompt = new IqlSystemPromptBuilder(new ObjectMapper()).systemPrompt(List.of());
+
+        assertThat(prompt)
+                .contains("examples illustrate structure only")
+                .contains("When the request has no time scope, omit time_range")
+                .contains("query has no time filter")
+                .contains("Never borrow a month or year from examples")
+                .doesNotContain("2025-07-01T00:00:00Z")
+                .doesNotContain("2025-08-01T00:00:00Z");
+    }
 }

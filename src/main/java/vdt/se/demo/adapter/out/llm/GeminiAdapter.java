@@ -52,24 +52,42 @@ public class GeminiAdapter implements LlmProviderPort {
 
     @Override
     public String completeWithTools(String systemPrompt, String userPrompt, List<JsonNode> tools) {
-        return completeRequest(systemPrompt, userPrompt, tools, properties.getLlm().getGemini().getModel());
+        return completeRequest(systemPrompt, userPrompt, tools, queryConfig());
     }
 
     @Override
     public String completeWithTools(String systemPrompt, String userPrompt, List<JsonNode> tools,
                                     String queryText, boolean forceComplexModel) {
-        AppProperties.Gemini config = properties.getLlm().getGemini();
+        AppProperties.Gemini config = queryConfig();
         boolean complex = forceComplexModel || (queryText != null
                 && queryText.codePointCount(0, queryText.length()) > config.getComplexQueryLength());
-        return completeRequest(systemPrompt, userPrompt, tools, complex ? config.getComplexModel() : config.getModel());
+        String model = complex ? config.getComplexModel() : config.getModel();
+        return completeRequest(systemPrompt, userPrompt, tools, config, model);
+    }
+
+    public String completeSummary(String systemPrompt, String userPrompt) {
+        return completeRequest(systemPrompt, userPrompt, null, properties.getLlm().getGemini1());
     }
 
     private String completeRequest(String systemPrompt, String userPrompt, List<JsonNode> tools) {
-        return completeRequest(systemPrompt, userPrompt, tools, properties.getLlm().getGemini().getModel());
+        return completeRequest(systemPrompt, userPrompt, tools, queryConfig());
     }
 
-    private String completeRequest(String systemPrompt, String userPrompt, List<JsonNode> tools, String model) {
-        String apiKey = properties.getLlm().getGemini().getApiKey();
+    private String completeRequest(String systemPrompt, String userPrompt, List<JsonNode> tools,
+                                   AppProperties.Gemini config) {
+        return completeRequest(systemPrompt, userPrompt, tools, config, config.getModel());
+    }
+
+    private AppProperties.Gemini queryConfig() {
+        AppProperties.Gemini gemini2 = properties.getLlm().getGemini2();
+        return gemini2.getApiKey() == null || gemini2.getApiKey().isBlank()
+                ? properties.getLlm().getGemini()
+                : gemini2;
+    }
+
+    private String completeRequest(String systemPrompt, String userPrompt, List<JsonNode> tools,
+                                   AppProperties.Gemini config, String model) {
+        String apiKey = config.getApiKey();
         if (apiKey == null || apiKey.isBlank()) {
             throw new LlmRetryableException("Gemini API key is not configured");
         }
@@ -152,11 +170,13 @@ public class GeminiAdapter implements LlmProviderPort {
                     "functionCallingConfig",
                     Map.of("mode", "ANY")
             ));
-        } else {
+        } else if (definitions != null) {
             body.put("generationConfig", Map.of(
                     "responseMimeType", "application/json",
                     "temperature", 0.1d
             ));
+        } else {
+            body.put("generationConfig", Map.of("temperature", 0.1d));
         }
 
         return body;

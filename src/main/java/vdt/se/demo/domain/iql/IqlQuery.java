@@ -10,7 +10,8 @@ import java.util.Map;
 
 public record IqlQuery(List<String> select, List<FilterCondition> filters, FilterLogic filterLogic,
                        TimeRange timeRange, List<GroupBy> groupBy, List<Metric> metrics,
-                       OrderBy orderBy, List<Sort> sort, int size, Map<String, JsonNode> pageAfter) {
+                       OrderBy orderBy, List<Sort> sort, int size, Map<String, JsonNode> pageAfter,
+                       List<Window> windows, List<HavingCondition> having, List<DerivedMetric> derivedMetrics) {
     public IqlQuery {
         select = select == null ? List.of() : List.copyOf(select);
         filters = filters == null ? List.of() : List.copyOf(filters);
@@ -19,6 +20,16 @@ public record IqlQuery(List<String> select, List<FilterCondition> filters, Filte
         sort = sort == null ? List.of() : List.copyOf(sort);
         size = size <= 0 ? 50 : size;
         pageAfter = pageAfter == null ? null : Map.copyOf(pageAfter);
+        windows = windows == null ? List.of() : List.copyOf(windows);
+        having = having == null ? List.of() : List.copyOf(having);
+        derivedMetrics = derivedMetrics == null ? List.of() : List.copyOf(derivedMetrics);
+    }
+
+    public IqlQuery(List<String> select, List<FilterCondition> filters, FilterLogic filterLogic,
+                    TimeRange timeRange, List<GroupBy> groupBy, List<Metric> metrics,
+                    OrderBy orderBy, List<Sort> sort, int size, Map<String, JsonNode> pageAfter) {
+        this(select, filters, filterLogic, timeRange, groupBy, metrics, orderBy, sort, size, pageAfter,
+                List.of(), List.of(), List.of());
     }
 
     public record FilterCondition(String id, String field, Operator op, JsonNode value) {}
@@ -98,6 +109,46 @@ public record IqlQuery(List<String> select, List<FilterCondition> filters, Filte
     }
 
     public record Sort(String field, Direction order) {}
+
+    public record Window(String name, TimeRange timeRange, List<FilterCondition> filters) {
+        public Window {
+            filters = filters == null ? List.of() : List.copyOf(filters);
+        }
+    }
+
+    public record HavingCondition(String metric, String window, ComparisonOp op, Double value) {}
+
+    public enum ComparisonOp {
+        EQ, NEQ, GT, GTE, LT, LTE;
+
+        @JsonCreator
+        public static ComparisonOp fromJson(String value) {
+            return parseEnum(ComparisonOp.class, value, "comparison operator");
+        }
+
+        @JsonValue
+        public String toJson() {
+            return name().toLowerCase(Locale.ROOT);
+        }
+    }
+
+    public record DerivedMetric(String name, DerivedMetricType type, MetricRef numerator, MetricRef denominator) {}
+
+    public enum DerivedMetricType {
+        RATIO, PERCENT;
+
+        @JsonCreator
+        public static DerivedMetricType fromJson(String value) {
+            return parseEnum(DerivedMetricType.class, value, "derived metric type");
+        }
+
+        @JsonValue
+        public String toJson() {
+            return name().toLowerCase(Locale.ROOT);
+        }
+    }
+
+    public record MetricRef(String metric, String window) {}
 
     public enum Direction {
         ASC, DESC;

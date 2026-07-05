@@ -40,6 +40,18 @@ class ToolCallResponseParserTest {
         assertThat(orderBy.path("properties").path("target").path("enum").toString()).contains("metric", "key");
     }
 
+    @Test
+    void toolSchemaDefinesWindowHavingAndDerivedMetricContracts() {
+        JsonNode schema = new vdt.se.demo.application.service.llm.LlmToolDefinitions(new ObjectMapper())
+                .searchEvents().path("input_schema").path("properties");
+
+        assertThat(schema.path("windows").isObject()).isTrue();
+        assertThat(schema.path("having").path("items").path("properties").path("metric").path("enum").toString())
+                .contains("count");
+        assertThat(schema.path("derived_metrics").path("items").path("properties").path("type").path("enum").toString())
+                .contains("percent", "ratio");
+    }
+
 
     private final ToolCallResponseParser parser = new ToolCallResponseParser(new ObjectMapper());
 
@@ -78,6 +90,23 @@ class ToolCallResponseParserTest {
         IqlQuery.SampleHits samples = call.query().groupBy().getFirst().sampleHits();
         assertThat(samples.effectiveSize()).isEqualTo(3);
         assertThat(samples.sort().getFirst().field()).isEqualTo("timestamp");
+    }
+
+    @Test
+    void parsesWindowsHavingAndDerivedMetrics() {
+        ToolCallResult.SearchEvents call = (ToolCallResult.SearchEvents) parser.parse("""
+                {"name":"search_events","arguments":{"mode":"new",
+                "group_by":[{"field":"severity","size":1000}],
+                "metrics":[{"type":"count"}],
+                "windows":[{"name":"today","time_range":{"field":"timestamp","from":"now-1d","to":"now"}}],
+                "having":[{"metric":"count","window":"today","op":"gt","value":0}],
+                "derived_metrics":[{"name":"today_percent","type":"percent",
+                  "numerator":{"metric":"count","window":"today"},"denominator":{"metric":"count"}}]}}
+                """);
+
+        assertThat(call.query().windows().getFirst().name()).isEqualTo("today");
+        assertThat(call.query().having().getFirst().op()).isEqualTo(IqlQuery.ComparisonOp.GT);
+        assertThat(call.query().derivedMetrics().getFirst().type()).isEqualTo(IqlQuery.DerivedMetricType.PERCENT);
     }
 
     @Test

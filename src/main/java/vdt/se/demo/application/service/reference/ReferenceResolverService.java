@@ -25,7 +25,8 @@ public final class ReferenceResolverService {
             resolved.add(new IqlQuery.FilterCondition(filter.id(), filter.field(), filter.op(), value));
         }
         return new IqlQuery(query.select(), resolved, query.filterLogic(), query.timeRange(), query.groupBy(),
-                query.metrics(), query.orderBy(), query.sort(), query.size(), query.pageAfter());
+                query.metrics(), query.orderBy(), query.sort(), query.size(), query.pageAfter(),
+                query.windows(), query.having(), query.derivedMetrics());
     }
 
     private JsonNode resolvePointer(JsonNode root, String reference) {

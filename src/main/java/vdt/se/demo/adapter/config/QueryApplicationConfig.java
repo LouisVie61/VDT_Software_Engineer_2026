@@ -21,6 +21,8 @@ import vdt.se.demo.application.service.validation.SchemaRegistry;
 
 @Configuration
 public class QueryApplicationConfig {
+    private static final String DSL_COMPILER_CACHE_VERSION = "dsl-v2-nested-groups";
+
     @Bean QueryUseCase queryUseCase(IqlSearchWorkflow workflow, QueryCsvExportService csv,
                                     QueryHistoryPort history, QuerySummaryService summary, AppProperties properties) {
         return new QueryUseCaseService(workflow, csv, history, summary, properties.getUser().getDefaultId());
@@ -38,7 +40,8 @@ public class QueryApplicationConfig {
     @Bean CachedIqlExecutionService cachedIqlExecutionService(IqlCacheKeyService keys, BaseDslCachePort cache,
             DslCompiler compiler, QueryExecutorPort executor, ObjectMapper mapper) { return new CachedIqlExecutionService(keys, cache, compiler, executor, mapper); }
     @Bean IqlCacheKeyService iqlCacheKeyService(ObjectMapper mapper, AppProperties properties) {
-        return new IqlCacheKeyService(mapper, properties.getSearch().getSchemaVersion());
+        return new IqlCacheKeyService(mapper,
+                properties.getSearch().getSchemaVersion() + ":" + DSL_COMPILER_CACHE_VERSION);
     }
     @Bean ResultSummaryBuilder resultSummaryBuilder(ObjectMapper mapper) { return new ResultSummaryBuilder(mapper); }
     @Bean LlmToolDefinitions llmToolDefinitions(ObjectMapper mapper) { return new LlmToolDefinitions(mapper); }

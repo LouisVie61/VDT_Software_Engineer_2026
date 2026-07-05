@@ -9,7 +9,6 @@ import vdt.se.demo.domain.model.SocEventSchema;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +37,23 @@ public final class IqlQueryNormalizer {
 
         IqlQuery.TimeRange range = resolveRange(c, query.timeRange() != null ? query.timeRange() : migrated);
         return new IqlQuery(query.select(), filters, query.filterLogic(), range, query.groupBy(), query.metrics(),
-                query.orderBy(), query.sort(), query.size(), query.pageAfter());
+                query.orderBy(), query.sort(), query.size(), query.pageAfter(), normalizeWindows(query.windows()),
+                query.having(), query.derivedMetrics());
+    }
+
+    private List<IqlQuery.Window> normalizeWindows(List<IqlQuery.Window> windows) {
+        if (windows == null || windows.isEmpty()) return List.of();
+        Instant now = clock.instant();
+        return windows.stream()
+                .map(window -> new IqlQuery.Window(window.name(), normalizeWindowRange(window.timeRange(), now), window.filters()))
+                .toList();
+    }
+
+    private IqlQuery.TimeRange normalizeWindowRange(IqlQuery.TimeRange range, Instant now) {
+        if (range == null) throw new BadQueryException("Window time_range is required");
+        String from = range.from() == null ? null : absolute(range.from(), now);
+        String to = range.to() == null ? null : absolute(range.to(), now);
+        return new IqlQuery.TimeRange(range.field(), from, to);
     }
 
     private void putOverride(List<IqlQuery.FilterCondition> filters, String id, String field, String value) {
@@ -63,11 +78,10 @@ public final class IqlQueryNormalizer {
     private IqlQuery.TimeRange resolveRange(SearchConstraints c, IqlQuery.TimeRange inferred) {
         String from = nonBlank(c.from(), inferred == null ? null : inferred.from());
         String to = nonBlank(c.to(), inferred == null ? null : inferred.to());
+        if (from == null && to == null) return null;
         Instant now = clock.instant();
-        if (to == null) to = now.toString();
-        else to = absolute(to, now);
-        if (from == null) from = now.minus(24, ChronoUnit.HOURS).toString();
-        else from = absolute(from, now);
+        if (from != null) from = absolute(from, now);
+        if (to != null) to = absolute(to, now);
         return new IqlQuery.TimeRange(SocEventSchema.TIMESTAMP, from, to);
     }
 
@@ -75,6 +89,7 @@ public final class IqlQueryNormalizer {
         if ("now".equals(value)) return now.toString();
         if (!value.startsWith("now-")) return value;
         String amount = value.substring(4);
+        if (!amount.matches("\\d+[mhd]")) return value;
         if (amount.length() < 2) throw new BadQueryException("Invalid relative time: " + value);
         long number;
         try { number = Long.parseLong(amount.substring(0, amount.length() - 1)); }

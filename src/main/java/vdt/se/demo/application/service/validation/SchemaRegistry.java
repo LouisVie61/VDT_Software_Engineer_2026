@@ -37,6 +37,8 @@ public final class SchemaRegistry {
             if (group.effectiveSize() < 1 || group.effectiveSize() > MAX_BUCKET_SIZE) errors.add("Invalid bucket size for: " + group.field());
         });
         query.metrics().forEach(metric -> validateMetric(metric, errors));
+        validateWindows(query, errors, warnings);
+        validatePipelineAggregations(query, errors);
         if (query.size() > MAX_RESULT_SIZE) errors.add("Result size exceeds " + MAX_RESULT_SIZE);
         validateTimeRange(query.timeRange(), errors, warnings);
         if (query.pageAfter() != null && query.groupBy().isEmpty()) errors.add("page_after requires group_by");
@@ -45,6 +47,71 @@ public final class SchemaRegistry {
             errors.add("Composite pagination with metric bucket ordering is not supported");
         if (!query.groupBy().isEmpty() && !query.sort().isEmpty()) warnings.add("hits sort is ignored when group_by is present");
         return new ValidationResult(errors, warnings);
+    }
+
+    private void validateWindows(IqlQuery query, List<String> errors, List<String> warnings) {
+        Set<String> names = new HashSet<>();
+        for (IqlQuery.Window window : query.windows()) {
+            if (!validIdentifier(window.name()) || !names.add(window.name())) {
+                errors.add("Window names must be unique safe identifiers");
+            }
+            validateTimeRange(window.timeRange(), errors, warnings);
+            Set<String> filterIds = new HashSet<>();
+            for (IqlQuery.FilterCondition filter : window.filters()) {
+                if (filter.id() == null || filter.id().isBlank() || !filterIds.add(filter.id())) {
+                    errors.add("Window filter ids must be non-blank and unique");
+                }
+                allowed(filter.field(), "window filter", errors);
+                if (!SocEventSchema.FILTERABLE_FIELDS.contains(filter.field()) && !SocEventSchema.FULL_TEXT_FIELDS.contains(filter.field())) {
+                    errors.add("Field is not filterable in window: " + filter.field());
+                }
+            }
+        }
+    }
+
+    private void validatePipelineAggregations(IqlQuery query, List<String> errors) {
+        if (!query.having().isEmpty() && query.groupBy().isEmpty()) {
+            errors.add("having requires group_by");
+        }
+        if (!query.derivedMetrics().isEmpty() && query.groupBy().isEmpty()) {
+            errors.add("derived_metrics requires group_by; use named window/filter counts for top-level percentages");
+        }
+        if (!query.having().isEmpty()) {
+            query.groupBy().forEach(group -> {
+                if (group.effectiveSize() < MAX_BUCKET_SIZE
+                        && !group.field().startsWith("timestamp_")
+                        && query.groupBy().size() == 1) {
+                    errors.add("having on terms group_by requires size " + MAX_BUCKET_SIZE + " to avoid truncated buckets: " + group.field());
+                }
+            });
+        }
+        query.having().forEach(condition -> {
+            validateMetricRef(condition.metric(), condition.window(), query, errors);
+            if (condition.op() == null) errors.add("having op is required");
+            if (condition.value() == null || !Double.isFinite(condition.value())) errors.add("having value must be a finite number");
+        });
+        query.derivedMetrics().forEach(derived -> {
+            if (!validIdentifier(derived.name())) errors.add("derived metric name must be a safe identifier");
+            if (derived.type() == null) errors.add("derived metric type is required");
+            validateMetricRef(derived.numerator() == null ? null : derived.numerator().metric(),
+                    derived.numerator() == null ? null : derived.numerator().window(), query, errors);
+            validateMetricRef(derived.denominator() == null ? null : derived.denominator().metric(),
+                    derived.denominator() == null ? null : derived.denominator().window(), query, errors);
+        });
+    }
+
+    private void validateMetricRef(String metric, String window, IqlQuery query, List<String> errors) {
+        if (!"count".equals(metric)) {
+            errors.add("Only count is currently supported in pipeline metric references");
+        }
+        if (window != null && !window.isBlank()
+                && query.windows().stream().noneMatch(candidate -> window.equals(candidate.name()))) {
+            errors.add("Unknown window in pipeline metric reference: " + window);
+        }
+    }
+
+    private boolean validIdentifier(String value) {
+        return value != null && value.matches("[A-Za-z][A-Za-z0-9_]{0,63}");
     }
 
     private void validateMetric(IqlQuery.Metric metric, List<String> errors) {
@@ -75,13 +142,17 @@ public final class SchemaRegistry {
     }
 
     private void validateTimeRange(IqlQuery.TimeRange range, List<String> errors, List<String> warnings) {
-        if (range == null) { errors.add("Time range is required after normalization"); return; }
+        if (range == null) return;
         if (!SocEventSchema.TIMESTAMP.equals(range.field())) errors.add("Time range field must be timestamp");
         if (range.from() == null || range.to() == null) return;
         try {
-            if (!range.from().startsWith("now") && !range.to().startsWith("now")
+            if (!isDateMath(range.from()) && !isDateMath(range.to())
                     && !Instant.parse(range.from()).isBefore(Instant.parse(range.to()))) errors.add("Time range from must be before to");
         } catch (RuntimeException ignored) { errors.add("Time range must use ISO-8601 or now-relative values"); }
+    }
+
+    private boolean isDateMath(String value) {
+        return value != null && value.startsWith("now");
     }
 
     private void allowed(String field, String usage, List<String> errors) {

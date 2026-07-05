@@ -60,7 +60,11 @@ public final class IqlQueryPreparationService {
                         ? patches.apply(previous.lastQuery(), search.patchOps()) : search.query();
                 query = references.resolve(query, previous.lastResultSummary());
                 query = normalizer.normalize(query, authoritative);
-                log.info("Resolved IQL time range: from={}, to={}", query.timeRange().from(), query.timeRange().to());
+                if (query.timeRange() == null) {
+                    log.info("Resolved IQL time range: none");
+                } else {
+                    log.info("Resolved IQL time range: from={}, to={}", query.timeRange().from(), query.timeRange().to());
+                }
                 ValidationResult result = schema.validate(query);
                 if (!result.ok()) throw new BadQueryException("BAD_QUERY", String.join("; ", result.errors()), compiler.compile(query));
                 if (isEmptyDsl(compiler.compile(query))) {

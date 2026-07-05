@@ -39,6 +39,17 @@ class SocEventIndexDefinitionTest {
     }
 
     @Test
+    void mapsDerivedCapabilityFieldsAsExactOrNumericTypes() {
+        JsonNode properties = objectMapper.readTree(new SocEventIndexDefinition().json()).get("mappings").get("properties");
+
+        assertThat(properties.get("timestamp_date").get("type").asString()).isEqualTo("keyword");
+        assertThat(properties.get("severity_rank").get("type").asString()).isEqualTo("integer");
+        assertThat(properties.get("src_ip_prefix24").get("type").asString()).isEqualTo("keyword");
+        assertThat(properties.get("network_pair").get("type").asString()).isEqualTo("keyword");
+        assertThat(properties.get("user_agent_family").get("type").asString()).isEqualTo("keyword");
+    }
+
+    @Test
     void everyQueryableFieldHasAnIndexMapping() {
         assertThat(SocEventSchema.FILTERABLE_FIELDS).allMatch(SocEventSchema.INDEX_FIELDS::contains);
         assertThat(SocEventSchema.GROUPABLE_FIELDS).allMatch(SocEventSchema.INDEX_FIELDS::contains);

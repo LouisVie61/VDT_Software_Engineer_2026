@@ -48,6 +48,29 @@ public final class LlmToolDefinitions {
                     "field":{"anyOf":[{"type":"string"},{"type":"null"}],"description":"Required for cardinality, avg, sum, min, max. For count, omit this field or set it to null."}
                   }}},
 
+                  "windows":{"type":"array","description":"Named filter/time sub-aggregations used for one-query comparisons.","items":{"type":"object","required":["name","time_range"],"properties":{
+                    "name":{"type":"string","pattern":"^[A-Za-z][A-Za-z0-9_]{0,63}$"},
+                    "time_range":{"type":"object","required":["field"],"properties":{"field":{"type":"string"},"from":{"type":"string"},"to":{"type":"string"}}},
+                    "filters":{"type":"array","items":{"type":"object","required":["id","field","op","value"],"properties":{
+                      "id":{"type":"string"},"field":{"type":"string"},"op":{"type":"string","enum":["eq","neq","in","not_in","gt","gte","lt","lte","exists","contains"]},
+                      "value":{"type":"string","description":"JSON-encoded scalar, array, or prior-result reference object"}
+                    }}}
+                  }}},
+
+                  "having":{"type":"array","description":"Post-aggregation bucket filters lowered by code to bucket_selector.","items":{"type":"object","required":["metric","op","value"],"properties":{
+                    "metric":{"type":"string","enum":["count"]},
+                    "window":{"type":"string","description":"Optional named window; omit for bucket _count."},
+                    "op":{"type":"string","enum":["eq","neq","gt","gte","lt","lte"]},
+                    "value":{"type":"number"}
+                  }}},
+
+                  "derived_metrics":{"type":"array","description":"Ratio or percentage bucket metrics lowered by code to bucket_script.","items":{"type":"object","required":["name","type","numerator","denominator"],"properties":{
+                    "name":{"type":"string","pattern":"^[A-Za-z][A-Za-z0-9_]{0,63}$"},
+                    "type":{"type":"string","enum":["ratio","percent"]},
+                    "numerator":{"type":"object","required":["metric"],"properties":{"metric":{"type":"string","enum":["count"]},"window":{"type":"string"}}},
+                    "denominator":{"type":"object","required":["metric"],"properties":{"metric":{"type":"string","enum":["count"]},"window":{"type":"string"}}}
+                  }}},
+
                   "order_by":{"type":"object","required":["target","direction"],"properties":{
                     "target":{"type":"string","enum":["metric","key","count"]},
                     "metric_index":{"type":"integer","minimum":0},

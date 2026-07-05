@@ -116,10 +116,13 @@ public class AppProperties {
     public static class Llm {
         private String mode = "real";
         private String mockFixture = "classpath:llm/mock-search-events.json";
-        private String providerOrder = "GPT,GEMINI,GROQ,OPENROUTER";
+        // private String providerOrder = "GPT,GEMINI,GROQ,OPENROUTER";
+        private String providerOrder = "GEMINI,OPENROUTER";
         private int connectTimeoutSeconds = 2;
         private int readTimeoutSeconds = 20;
         private final Gemini gemini = new Gemini();
+        private final Gemini gemini1 = new Gemini();
+        private final Gemini gemini2 = new Gemini();
         private final Groq groq = new Groq();
         private final Gpt gpt = new Gpt();
         private final OpenRouter openrouter = new OpenRouter();
@@ -154,17 +157,19 @@ public class AppProperties {
             this.readTimeoutSeconds = readTimeoutSeconds;
         }
 
-        public Gemini getGemini() {
-            return gemini;
-        }
+        public Gemini getGemini() { return gemini; }
+
+        public Gemini getGemini1() { return gemini1; }
+
+        public Gemini getGemini2() { return gemini2; }
 
         public Groq getGroq() {
             return groq;
         }
 
-        public Gpt getGpt() {
-            return gpt;
-        }
+        // public Gpt getGpt() {
+        //     return gpt;
+        // }
 
         public OpenRouter getOpenrouter() { return openrouter; }
 
@@ -243,7 +248,7 @@ public class AppProperties {
     }
 
     public static class Search {
-        private String schemaVersion = "v7";
+        private String schemaVersion = "v8";
         private int cacheTtlSeconds = 3600;
         private int sessionTtlSeconds = 1800;
 

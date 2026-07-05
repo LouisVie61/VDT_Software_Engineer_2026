@@ -40,7 +40,8 @@ final class ToolCallResponseParser {
         if (mode == ToolCallResult.Mode.PATCH) return new ToolCallResult.SearchEvents(mode, null, patches(args.path("patch_ops")));
         if (args.has("query")) throw new LlmException("search_events fields must be direct children of arguments; unexpected arguments.query");
         optionalArray(args, "select"); optionalArray(args, "filters"); optionalArray(args, "group_by");
-        optionalArray(args, "metrics"); optionalArray(args, "sort");
+        optionalArray(args, "metrics"); optionalArray(args, "sort"); optionalArray(args, "windows");
+        optionalArray(args, "having"); optionalArray(args, "derived_metrics");
         return new ToolCallResult.SearchEvents(mode, query(args), List.of());
     }
 
@@ -61,8 +62,9 @@ final class ToolCallResponseParser {
         JsonNode order=node.path("order_by");
         IqlQuery.OrderBy orderBy=order.isObject()&&!order.isEmpty()?new IqlQuery.OrderBy(enumValue(IqlQuery.OrderTarget.class,
                 requiredText(order,"target")),integer(order,"metric_index"),enumValue(IqlQuery.Direction.class,requiredText(order,"direction"))):null;
-        return new IqlQuery(strings(node.path("select")),filters,null,range,groups,metrics,orderBy,sorts,
-                node.path("size").isNumber()?node.path("size").asInt():50,pageAfter(node.path("page_after")));
+        return new IqlQuery(strings(node.path("select")), filters, null, range, groups, metrics, orderBy, sorts,
+                node.path("size").isNumber() ? node.path("size").asInt() : 50, pageAfter(node.path("page_after")),
+                windows(node.path("windows")), having(node.path("having")), derivedMetrics(node.path("derived_metrics")));
     }
 
     private List<PatchOperation> patches(JsonNode array) {
@@ -79,11 +81,49 @@ final class ToolCallResponseParser {
     private String requiredText(JsonNode node,String field){String v=text(node,field);if(v==null||v.isBlank())throw new LlmException(field+" is required");return v;}
     private String text(JsonNode node,String field){JsonNode v=node.path(field);return v.isString()?v.asString():null;}
     private Integer integer(JsonNode node,String field){JsonNode v=node.path(field);return v.isNumber()?v.asInt():null;}
+    private Double doubleValue(JsonNode node,String field){JsonNode v=node.path(field);return v.isNumber()?v.asDouble():null;}
     private List<String> strings(JsonNode node){List<String> r=new ArrayList<>();if(node.isArray())node.forEach(v->{if(v.isString())r.add(v.asString());});return r;}
     private JsonNode decodedValue(JsonNode value){
         if(value==null||!value.isString())return value;
         String raw=value.asString();
         try{return mapper.readTree(raw);}catch(RuntimeException ignored){return value;}
+    }
+
+    private List<IqlQuery.Window> windows(JsonNode array) {
+        List<IqlQuery.Window> result = new ArrayList<>();
+        if (!array.isArray()) return result;
+        array.forEach(item -> {
+            JsonNode time = requiredObject(item, "time_range");
+            List<IqlQuery.FilterCondition> filters = new ArrayList<>();
+            item.path("filters").forEach(filter -> filters.add(new IqlQuery.FilterCondition(requiredText(filter, "id"),
+                    requiredText(filter, "field"), enumValue(IqlQuery.Operator.class, requiredText(filter, "op")),
+                    decodedValue(filter.get("value")))));
+            result.add(new IqlQuery.Window(requiredText(item, "name"),
+                    new IqlQuery.TimeRange(text(time, "field"), text(time, "from"), text(time, "to")), filters));
+        });
+        return result;
+    }
+
+    private List<IqlQuery.HavingCondition> having(JsonNode array) {
+        List<IqlQuery.HavingCondition> result = new ArrayList<>();
+        if (!array.isArray()) return result;
+        array.forEach(item -> result.add(new IqlQuery.HavingCondition(requiredText(item, "metric"),
+                text(item, "window"), enumValue(IqlQuery.ComparisonOp.class, requiredText(item, "op")),
+                doubleValue(item, "value"))));
+        return result;
+    }
+
+    private List<IqlQuery.DerivedMetric> derivedMetrics(JsonNode array) {
+        List<IqlQuery.DerivedMetric> result = new ArrayList<>();
+        if (!array.isArray()) return result;
+        array.forEach(item -> result.add(new IqlQuery.DerivedMetric(requiredText(item, "name"),
+                enumValue(IqlQuery.DerivedMetricType.class, requiredText(item, "type")),
+                metricRef(requiredObject(item, "numerator")), metricRef(requiredObject(item, "denominator")))));
+        return result;
+    }
+
+    private IqlQuery.MetricRef metricRef(JsonNode node) {
+        return new IqlQuery.MetricRef(requiredText(node, "metric"), text(node, "window"));
     }
 
     private IqlQuery.SampleHits sampleHits(JsonNode node) {

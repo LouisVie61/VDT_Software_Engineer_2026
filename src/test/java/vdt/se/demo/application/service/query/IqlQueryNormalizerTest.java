@@ -18,7 +18,7 @@ class IqlQueryNormalizerTest {
             Clock.fixed(Instant.parse("2026-07-04T00:00:00Z"), ZoneOffset.UTC));
 
     @Test
-    void appliesStructuredOverridesAndDefaultAbsoluteTimeRange() {
+    void appliesStructuredOverridesWithoutInventingTimeRange() {
         IqlQuery input = query(List.of(new IqlQuery.FilterCondition("llm-severity", "severity", IqlQuery.Operator.EQ,
                 mapper.valueToTree("low"))), null);
 
@@ -27,8 +27,7 @@ class IqlQueryNormalizerTest {
 
         assertThat(result.filters()).extracting(IqlQuery.FilterCondition::id)
                 .containsExactly("request-severity", "request-host");
-        assertThat(result.timeRange().from()).isEqualTo("2026-07-03T00:00:00Z");
-        assertThat(result.timeRange().to()).isEqualTo("2026-07-04T00:00:00Z");
+        assertThat(result.timeRange()).isNull();
     }
 
     @Test
@@ -42,6 +41,33 @@ class IqlQueryNormalizerTest {
         assertThat(result.filters()).isEmpty();
         assertThat(result.timeRange().from()).isEqualTo("2026-07-03T22:00:00Z");
         assertThat(result.timeRange().to()).isEqualTo("2026-07-04T00:00:00Z");
+    }
+
+    @Test
+    void preservesOneSidedTimeRangeWithoutInventingOtherBound() {
+        IqlQuery input = query(List.of(), new IqlQuery.TimeRange("timestamp", "now-2h", null));
+
+        IqlQuery result = normalizer.normalize(input, SearchConstraints.empty());
+
+        assertThat(result.timeRange().from()).isEqualTo("2026-07-03T22:00:00Z");
+        assertThat(result.timeRange().to()).isNull();
+    }
+
+    @Test
+    void preservesElasticsearchDateMathInTimeWindows() {
+        IqlQuery input = new IqlQuery(List.of(), List.of(), null,
+                new IqlQuery.TimeRange("timestamp", "now/d-1d", "now/d+1d"),
+                List.of(), List.of(), null, List.of(), 50, null,
+                List.of(new IqlQuery.Window("yesterday",
+                        new IqlQuery.TimeRange("timestamp", "now-1d/d", "now/d"), List.of())),
+                List.of(), List.of());
+
+        IqlQuery result = normalizer.normalize(input, SearchConstraints.empty());
+
+        assertThat(result.timeRange().from()).isEqualTo("now/d-1d");
+        assertThat(result.timeRange().to()).isEqualTo("now/d+1d");
+        assertThat(result.windows().getFirst().timeRange().from()).isEqualTo("now-1d/d");
+        assertThat(result.windows().getFirst().timeRange().to()).isEqualTo("now/d");
     }
 
     private IqlQuery query(List<IqlQuery.FilterCondition> filters, IqlQuery.TimeRange range) {

@@ -100,13 +100,19 @@ public class ElasticsearchSearchResponseMapper {
 
     private List<Map<String, Object>> extractMetric(String aggregationName, JsonNode aggregation) {
         JsonNode value = aggregation == null ? null : aggregation.get("value");
-        if (value == null || value.isNull()) {
+        JsonNode docCount = aggregation == null ? null : aggregation.get("doc_count");
+        if ((value == null || value.isNull()) && (docCount == null || docCount.isNull())) {
             return List.of();
         }
         Map<String, Object> row = new LinkedHashMap<>();
         row.put("aggregation", aggregationName);
-        row.put("value", value.asDouble());
-        JsonNode valueAsString = aggregation.get("value_as_string");
+        if (value != null && !value.isNull()) {
+            row.put("value", value.asDouble());
+        }
+        if (docCount != null && !docCount.isNull()) {
+            row.put("count", intValue(docCount));
+        }
+        JsonNode valueAsString = aggregation == null ? null : aggregation.get("value_as_string");
         if (valueAsString != null && !valueAsString.isNull()) {
             row.put("value_as_string", valueAsString.asString());
         }
@@ -124,6 +130,40 @@ public class ElasticsearchSearchResponseMapper {
             row.put("aggregation", aggregationName);
             row.put("key", bucketKey(bucket));
             row.put("count", intValue(bucket.get("doc_count")));
+            addBucketSubAggregationValues(row, bucket);
+            rows.add(row);
+        }
+        return rows;
+    }
+
+    private void addBucketSubAggregationValues(Map<String, Object> row, JsonNode bucket) {
+        for (Map.Entry<String, JsonNode> entry : bucket.properties()) {
+            JsonNode value = entry.getValue();
+            if (!value.isObject()) {
+                continue;
+            }
+            JsonNode docCount = value.get("doc_count");
+            if (docCount != null && !docCount.isNull()) {
+                row.put(entry.getKey() + "_count", intValue(docCount));
+            }
+            JsonNode metricValue = value.get("value");
+            if (metricValue != null && !metricValue.isNull()) {
+                row.put(entry.getKey(), metricValue.asDouble());
+            }
+            JsonNode buckets = value.get("buckets");
+            if (buckets != null && buckets.isArray()) {
+                row.put(entry.getKey() + "_buckets", bucketRows(buckets));
+            }
+        }
+    }
+
+    private List<Map<String, Object>> bucketRows(JsonNode buckets) {
+        List<Map<String, Object>> rows = new ArrayList<>();
+        for (JsonNode bucket : buckets) {
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("key", bucketKey(bucket));
+            row.put("count", intValue(bucket.get("doc_count")));
+            addBucketSubAggregationValues(row, bucket);
             rows.add(row);
         }
         return rows;
