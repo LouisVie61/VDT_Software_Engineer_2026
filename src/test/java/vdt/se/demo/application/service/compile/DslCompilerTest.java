@@ -57,4 +57,18 @@ class DslCompilerTest {
         assertThat(dsl.at("/aggs/events/aggs/sample_hits/top_hits/sort/0/timestamp/order").asString())
                 .isEqualTo("desc");
     }
+
+    @Test
+    void compilesTemporalDimensionsAsDateHistograms() {
+        IqlQuery query = new IqlQuery(List.of(), List.of(), null,
+                new IqlQuery.TimeRange("timestamp", "2023-01-01T00:00:00Z", "2024-01-01T00:00:00Z"),
+                List.of(new IqlQuery.GroupBy("timestamp_quarter", 10)),
+                List.of(new IqlQuery.Metric(IqlQuery.MetricType.COUNT, null)), null, List.of(), 50, null);
+
+        ObjectNode dsl = compiler.compile(query);
+
+        assertThat(dsl.at("/aggs/events/date_histogram/field").asString()).isEqualTo("timestamp");
+        assertThat(dsl.at("/aggs/events/date_histogram/calendar_interval").asString()).isEqualTo("quarter");
+        assertThat(dsl.at("/aggs/events/terms").isMissingNode()).isTrue();
+    }
 }

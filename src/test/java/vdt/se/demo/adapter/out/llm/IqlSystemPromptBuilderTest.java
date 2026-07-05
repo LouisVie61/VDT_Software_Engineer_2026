@@ -14,7 +14,7 @@ class IqlSystemPromptBuilderTest {
         String prompt = new IqlSystemPromptBuilder(new ObjectMapper()).systemPrompt(List.of());
 
         assertThat(prompt)
-                .contains("timestamp_year, timestamp_month, timestamp_day, timestamp_hour")
+                .contains("timestamp_year, timestamp_quarter, timestamp_month, timestamp_day, timestamp_hour")
                 .contains("timestamp is not groupable")
                 .contains("day/ngày=>timestamp_day");
     }

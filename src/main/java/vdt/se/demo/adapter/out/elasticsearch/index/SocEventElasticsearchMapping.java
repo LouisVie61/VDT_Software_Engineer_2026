@@ -11,6 +11,7 @@ final class SocEventElasticsearchMapping {
             Map.entry(SocEventSchema.TIMESTAMP_YEAR, "{ \"type\": \"integer\" }"),
             Map.entry(SocEventSchema.TIMESTAMP_MONTH, "{ \"type\": \"integer\" }"),
             Map.entry(SocEventSchema.TIMESTAMP_DAY, "{ \"type\": \"integer\" }"),
+            Map.entry(SocEventSchema.TIMESTAMP_QUARTER, "{ \"type\": \"integer\" }"),
             Map.entry(SocEventSchema.TIMESTAMP_HOUR, "{ \"type\": \"integer\" }"),
             Map.entry(SocEventSchema.TIMESTAMP_MINUTE, "{ \"type\": \"integer\" }"),
             Map.entry(SocEventSchema.TIMESTAMP_SECOND, "{ \"type\": \"integer\" }"),

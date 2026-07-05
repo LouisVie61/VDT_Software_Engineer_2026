@@ -110,7 +110,7 @@ final class IqlSystemPromptBuilder {
                 ## 5. Field capability matrix
                 - event_id: select, exact filter, hit sort
                 - timestamp: select, time_range, hit sort; never group_by
-                - timestamp_year, timestamp_month, timestamp_day, timestamp_hour, timestamp_minute, timestamp_second:
+                - timestamp_year, timestamp_quarter, timestamp_month, timestamp_day, timestamp_hour, timestamp_minute, timestamp_second:
                   select, exact numeric filter, group_by, hit sort
                 - source, severity, event_type, action, user, host, ip, geo_location, user_agent:
                   select, exact filter, group_by, hit sort, cardinality metric
@@ -159,7 +159,7 @@ final class IqlSystemPromptBuilder {
                   It is a preview, not the complete event list for the bucket.
                 - Use a two-turn flow (aggregate first, then filter by returned bucket values via $ref) only when
                   the analyst explicitly requests the full, potentially large or paginated event list per bucket.
-                - Map time grouping explicitly: year/năm=>timestamp_year, month/tháng=>timestamp_month,
+                - Map time grouping explicitly: year/năm=>timestamp_year, quarter/quý=>timestamp_quarter, month/tháng=>timestamp_month,
                   day/ngày=>timestamp_day, hour/giờ=>timestamp_hour, minute/phút=>timestamp_minute,
                   second/giây=>timestamp_second. Never put timestamp itself in group_by.
 

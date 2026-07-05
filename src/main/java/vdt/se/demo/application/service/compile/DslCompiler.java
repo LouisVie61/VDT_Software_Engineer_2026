@@ -8,7 +8,18 @@ import vdt.se.demo.domain.exception.BadQueryException;
 import vdt.se.demo.domain.iql.IqlQuery;
 import vdt.se.demo.domain.model.SocEventSchema;
 
+import java.util.Map;
+
 public final class DslCompiler {
+    private static final Map<String, String> CALENDAR_INTERVAL_BY_GROUP = Map.of(
+            SocEventSchema.TIMESTAMP_YEAR, "year",
+            SocEventSchema.TIMESTAMP_QUARTER, "quarter",
+            SocEventSchema.TIMESTAMP_MONTH, "month",
+            SocEventSchema.TIMESTAMP_DAY, "day",
+            SocEventSchema.TIMESTAMP_HOUR, "hour",
+            SocEventSchema.TIMESTAMP_MINUTE, "minute",
+            SocEventSchema.TIMESTAMP_SECOND, "second"
+    );
     private final ObjectMapper mapper;
 
     public DslCompiler(ObjectMapper mapper) { this.mapper = mapper; }
@@ -66,20 +77,59 @@ public final class DslCompiler {
 
     private JsonNode clause(IqlQuery.FilterCondition condition) {
         return switch (condition.op()) {
-            case EQ, NEQ -> fieldClause("term", condition.field(), condition.value());
-            case IN, NOT_IN -> fieldClause("terms", condition.field(), condition.value());
-            case CONTAINS -> fieldClause("match_phrase", condition.field(), condition.value());
-            case EXISTS -> { ObjectNode body = mapper.createObjectNode(); body.put("field", condition.field()); ObjectNode result = mapper.createObjectNode(); result.set("exists", body); yield result; }
+            case EQ, NEQ -> fieldClause("term", condition.field(), normalizeValue(condition.value()));
+
+            case IN, NOT_IN -> termsClause(condition.field(), condition.value());
+
+            case CONTAINS -> fieldClause("match_phrase", condition.field(), normalizeValue(condition.value()));
+
+            case EXISTS -> {
+                ObjectNode body = mapper.createObjectNode();
+                body.put("field", condition.field());
+
+                ObjectNode result = mapper.createObjectNode();
+                result.set("exists", body);
+
+                yield result;
+            }
+
             case GT, GTE, LT, LTE -> {
-                ObjectNode comparison = mapper.createObjectNode(); comparison.set(condition.op().name().toLowerCase(), condition.value());
+                ObjectNode comparison = mapper.createObjectNode();
+                comparison.set(condition.op().name().toLowerCase(), normalizeValue(condition.value()));
+
                 yield fieldClause("range", condition.field(), comparison);
             }
         };
     }
 
     private ObjectNode fieldClause(String type, String field, JsonNode value) {
-        ObjectNode body = mapper.createObjectNode(); body.set(field, value);
-        ObjectNode result = mapper.createObjectNode(); result.set(type, body); return result;
+        ObjectNode body = mapper.createObjectNode();
+        body.set(field, value);
+
+        ObjectNode result = mapper.createObjectNode();
+        result.set(type, body);
+
+        return result;
+    }
+
+    private ObjectNode termsClause(String field, JsonNode rawValue) {
+        JsonNode value = normalizeValue(rawValue);
+
+        ArrayNode values = mapper.createArrayNode();
+
+        if (value.isArray()) {
+            value.forEach(values::add);
+        } else {
+            values.add(value);
+        }
+
+        ObjectNode body = mapper.createObjectNode();
+        body.set(field, values);
+
+        ObjectNode result = mapper.createObjectNode();
+        result.set("terms", body);
+
+        return result;
     }
 
     private void addGroupedAggregations(ObjectNode root, IqlQuery query) {
@@ -94,8 +144,22 @@ public final class DslCompiler {
             if (query.pageAfter() != null) definition.set("after", mapper.valueToTree(query.pageAfter()));
         } else {
             IqlQuery.GroupBy group = query.groupBy().getFirst();
-            ObjectNode terms = bucket.putObject("terms"); terms.put("field", group.field()); terms.put("size", group.effectiveSize());
-            addTermsOrder(terms, query);
+            String calendarInterval = CALENDAR_INTERVAL_BY_GROUP.get(group.field());
+            if (calendarInterval != null) {
+                ObjectNode histogram = bucket.putObject("date_histogram");
+                histogram.put("field", SocEventSchema.TIMESTAMP);
+                histogram.put("calendar_interval", calendarInterval);
+                if (query.orderBy() != null) {
+                    histogram.putObject("order").put(
+                            query.orderBy().target() == IqlQuery.OrderTarget.KEY ? "_key" : "_count",
+                            direction(query.orderBy().direction()));
+                }
+            } else {
+                ObjectNode terms = bucket.putObject("terms");
+                terms.put("field", group.field());
+                terms.put("size", group.effectiveSize());
+                addTermsOrder(terms, query);
+            }
         }
         ObjectNode subAggs = bucket.putObject("aggs");
         addMetrics(subAggs, query);
@@ -211,4 +275,49 @@ public final class DslCompiler {
         }
     }
     private String direction(IqlQuery.Direction direction) { return direction == IqlQuery.Direction.ASC ? "asc" : "desc"; }
+
+    private JsonNode normalizeValue(JsonNode value) {
+        if (value == null || value.isNull()) {
+            return mapper.nullNode();
+        }
+
+        if (value.isString()) {
+            String text = value.stringValue().trim();
+
+            JsonNode parsed = tryParseJson(text);
+            if (parsed != null) {
+                return normalizeValue(parsed);
+            }
+
+            if ((text.startsWith("[") && text.endsWith("]"))
+                    || (text.startsWith("{") && text.endsWith("}"))) {
+                String unescaped = text
+                        .replace("\\\"", "\"")
+                        .replace("\\\\", "\\");
+
+                parsed = tryParseJson(unescaped);
+                if (parsed != null) {
+                    return normalizeValue(parsed);
+                }
+            }
+        }
+
+        if (value.isArray() && value.size() == 1 && value.get(0).isString()) {
+            JsonNode nested = normalizeValue(value.get(0));
+
+            if (nested.isArray() || nested.isObject()) {
+                return nested;
+            }
+        }
+
+        return value;
+    }
+
+    private JsonNode tryParseJson(String text) {
+        try {
+            return mapper.readTree(text);
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
 }
