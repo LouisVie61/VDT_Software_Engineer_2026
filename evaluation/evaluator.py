@@ -19,9 +19,9 @@ class EvaluationCase:
     description: str
     tags: list[str]
     request: dict[str, Any]
+    execution_request: dict[str, Any]
     expected: dict[str, Any]
     thresholds: dict[str, Any]
-    assisted: dict[str, Any]
 
 
 def load_cases(paths: list[Path]) -> list[EvaluationCase]:
@@ -41,9 +41,9 @@ def load_cases(paths: list[Path]) -> list[EvaluationCase]:
                         description=raw.get("description", ""),
                         tags=raw.get("tags", []),
                         request=raw["request"],
+                        execution_request=raw.get("executionRequest", raw["request"]),
                         expected=raw.get("expected", {}),
                         thresholds=raw.get("thresholds", {}),
-                        assisted=raw.get("assisted", {}),
                     )
                 )
     return cases
@@ -54,81 +54,17 @@ def run_case(
     base_url: str,
     timeout: float,
     iteration: int,
-    auto_confirm: bool = False,
 ) -> dict[str, Any]:
-    initial = _post_json(base_url.rstrip("/") + "/api/search", case.request, timeout)
-    initial_json = initial["response_json"]
-    initial_stats = execution_stats(initial_json)
-    final = initial
-    confirmation_followed = False
-    configuration_error = ""
-
-    if auto_confirm and initial_stats["needs_confirmation"] is True:
-        confirmation_followed = True
-        confirm_payload, configuration_error = build_confirmation_payload(case, initial_json)
-        if not configuration_error:
-            final = _post_json(base_url.rstrip("/") + "/api/search/confirm", confirm_payload, timeout)
-
-    latency_ms = initial["latency_ms"]
-    if final is not initial:
-        latency_ms += final["latency_ms"]
-
-    score_final_response = auto_confirm and case.assisted.get("scoreFinalResponse") is True
-    if score_final_response:
-        checks: list[CheckResult] = []
-        if confirmation_followed:
-            initial_expected = case.assisted.get("initialExpected") or {
-                "status": case.expected.get("status", 200),
-                "needsConfirmation": True,
-                "nonEmptyFields": ["confirmation.confirmationId", "confirmation.intent"],
-                "allowZeroResults": True,
-            }
-            initial_case = replace(case, expected=initial_expected, thresholds={})
-            checks.extend(prefix_checks(
-                evaluate_expectations(
-                    initial_case,
-                    initial["status"],
-                    initial_json,
-                    initial["response_text"],
-                    initial["latency_ms"],
-                ),
-                "initial",
-            ))
-
-        final_expected = case.assisted.get("finalExpected", case.expected)
-        final_thresholds = case.assisted.get("thresholds", case.thresholds)
-        evaluation_case = replace(case, expected=final_expected, thresholds=final_thresholds)
-        checks.extend(prefix_checks(
-            evaluate_expectations(
-                evaluation_case,
-                final["status"],
-                final["response_json"],
-                final["response_text"],
-                latency_ms,
-            ),
-            "final",
-        ))
-        checks.extend(prefix_checks(
-            assisted_execution_checks(final["status"], final["response_json"], configuration_error),
-            "final",
-        ))
-    else:
-        evaluation_case = assisted_evaluation_case(case, confirmation_followed) if auto_confirm else case
-        checks = evaluate_expectations(
-            evaluation_case,
-            initial["status"],
-            initial_json,
-            initial["response_text"],
-            latency_ms,
-        )
-        if auto_confirm:
-            checks.extend(assisted_execution_checks(final["status"], final["response_json"], configuration_error))
-    checks = assign_metric_groups(evaluation_case, checks)
+    response = _post_json(base_url.rstrip("/") + "/api/search", case.execution_request, timeout)
+    checks = evaluate_expectations(
+        case, response["status"], response["response_json"],
+        response["response_text"], response["latency_ms"]
+    )
+    checks = assign_metric_groups(case, checks)
     passed = all(check.passed for check in checks)
-    response_json = final["response_json"]
+    response_json = response["response_json"]
     response_stats = execution_stats(response_json)
-    final_execution = is_final_execution(final["status"], response_json)
-    errors = [value for value in (initial["error"], final["error"] if final is not initial else "", configuration_error) if value]
+    final_execution = is_final_execution(response["status"], response_json)
 
     return {
         "case_id": case.id,
@@ -137,27 +73,20 @@ def run_case(
         "tags": case.tags,
         "description": case.description,
         "iteration": iteration,
-        "status": final["status"],
-        "initial_status": initial["status"],
-        "confirmation_status": final["status"] if confirmation_followed and final is not initial else None,
+        "status": response["status"],
         "expected_status": case.expected.get("status", 200),
-        "latency_ms": latency_ms,
-        "initial_latency_ms": initial["latency_ms"],
-        "confirmation_latency_ms": final["latency_ms"] if final is not initial else 0.0,
+        "latency_ms": response["latency_ms"],
         "total_count": response_stats["total_count"],
         "result_count": response_stats["result_count"],
         "aggregation_count": response_stats["aggregation_count"],
         "selected_template": response_stats["selected_template"],
-        "needs_confirmation": response_stats["needs_confirmation"],
-        "initial_needs_confirmation": initial_stats["needs_confirmation"],
-        "confirmation_followed": confirmation_followed,
         "final_execution": final_execution,
         "cache_hit": response_stats["cache_hit"],
         "summary_status": response_stats["summary_status"],
         "generated_dsl": response_json.get("generatedDsl") if response_json else None,
         "passed": passed,
         "checks": checks,
-        "error": "; ".join(errors),
+        "error": response["error"],
     }
 
 
@@ -200,76 +129,8 @@ def _post_json(url: str, payload_value: dict[str, Any], timeout: float) -> dict[
     }
 
 
-def build_confirmation_payload(
-    case: EvaluationCase,
-    initial_response: dict[str, Any] | None,
-) -> tuple[dict[str, Any], str]:
-    if initial_response is None:
-        return {}, "auto-confirm requires a JSON search response"
-    confirmation_id = get_path(initial_response, "confirmation.confirmationId")
-    if not isinstance(confirmation_id, str) or not confirmation_id:
-        return {}, "auto-confirm response is missing confirmation.confirmationId"
-    pending_intent = get_path(initial_response, "confirmation.intent")
-    if not isinstance(pending_intent, dict):
-        return {}, "auto-confirm response is missing confirmation.intent"
-
-    edited_intent = deep_merge(pending_intent, case.assisted.get("editedIntent", {}))
-    page = case.assisted.get("page", case.request.get("page"))
-    page_size = case.assisted.get("pageSize", case.request.get("pageSize"))
-    payload: dict[str, Any] = {
-        "confirmationId": confirmation_id,
-        "editedIntent": edited_intent,
-        "page": 0 if page is None else page,
-        "pageSize": 50 if page_size is None else page_size,
-    }
-    session_id = case.request.get("sessionId")
-    if session_id:
-        payload["sessionId"] = session_id
-    return payload, ""
-
-
-def assisted_evaluation_case(case: EvaluationCase, confirmation_followed: bool) -> EvaluationCase:
-    expected = case.assisted.get("initialExpected", case.expected)
-    thresholds = case.assisted.get("thresholds")
-    if thresholds is None:
-        thresholds = dict(case.thresholds)
-        if confirmation_followed and "max_latency_ms" in thresholds:
-            thresholds["max_latency_ms"] = float(thresholds["max_latency_ms"]) * 2
-    return replace(case, expected=expected, thresholds=thresholds)
-
-
-def prefix_checks(checks: list[CheckResult], phase: str) -> list[CheckResult]:
-    return [replace(check, name=f"{phase}:{check.name}") for check in checks]
-
-
-def deep_merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
-    merged = dict(base)
-    for key, value in override.items():
-        if isinstance(value, dict) and isinstance(merged.get(key), dict):
-            merged[key] = deep_merge(merged[key], value)
-        else:
-            merged[key] = value
-    return merged
-
-
-def assisted_execution_checks(
-    status: int | None,
-    response_json: dict[str, Any] | None,
-    configuration_error: str,
-) -> list[CheckResult]:
-    return [
-        CheckResult("auto_confirm_config", not configuration_error, configuration_error or "configured"),
-        CheckResult("assisted_http_status", status == 200, f"expected=200, actual={status}"),
-        CheckResult(
-            "assisted_final_execution",
-            is_final_execution(status, response_json),
-            "final response must contain generatedDsl.query and must not require confirmation",
-        ),
-    ]
-
-
 def is_final_execution(status: int | None, response_json: dict[str, Any] | None) -> bool:
-    if status != 200 or response_json is None or get_path(response_json, "needsConfirmation") is True:
+    if status != 200 or response_json is None:
         return False
     generated_dsl = response_json.get("generatedDsl")
     return isinstance(generated_dsl, dict) and isinstance(generated_dsl.get("query"), dict)
@@ -283,7 +144,7 @@ def assign_metric_groups(case: EvaluationCase, checks: list[CheckResult]) -> lis
         if name == "latency_budget":
             return "Performance"
         if any(token in lowered for token in (
-            "confirmation", "warning", "diagnostic", "response_contains",
+            "warning", "diagnostic", "response_contains",
             "dsl_not_contains", "path_not_exists", "field_not_exists",
         )):
             return "Safety / Guardrail"
@@ -304,7 +165,6 @@ def assign_metric_groups(case: EvaluationCase, checks: list[CheckResult]) -> lis
 def is_aggregation_case(case: EvaluationCase) -> bool:
     """Classify the case from its ground truth, independently of backend output."""
     expected_text = json.dumps(case.expected, sort_keys=True).lower()
-    assisted_text = json.dumps(case.assisted, sort_keys=True).lower()
     aggregation_markers = (
         "terms_aggregation",
         "time_aggregation",
@@ -312,7 +172,7 @@ def is_aggregation_case(case: EvaluationCase) -> bool:
         "top_values",
         '\\"terms\\"',
     )
-    return any(marker in expected_text or marker in assisted_text for marker in aggregation_markers)
+    return any(marker in expected_text for marker in aggregation_markers)
 
 
 def evaluate_expectations(
@@ -365,10 +225,9 @@ def evaluate_expectations(
             checks.append(CheckResult(f"equals:{field}", actual == expected[field], f"expected={expected[field]!r}, actual={actual!r}"))
 
     total_count = get_path(response_json, "totalCount")
-    confirmation_response = get_path(response_json, "needsConfirmation") is True
-    if "minTotalCount" in expected and not confirmation_response:
+    if "minTotalCount" in expected:
         checks.append(CheckResult("min_total_count", isinstance(total_count, int) and total_count >= expected["minTotalCount"], f"actual={total_count!r}"))
-    if "maxTotalCount" in expected and not confirmation_response:
+    if "maxTotalCount" in expected:
         checks.append(CheckResult("max_total_count", isinstance(total_count, int) and total_count <= expected["maxTotalCount"], f"actual={total_count!r}"))
     if expected_status == 200 and not expected.get("allowZeroResults", False):
         checks.extend(execution_evidence_checks(response_json))
@@ -500,15 +359,6 @@ def path_expectations(prefix: str, payload: dict[str, Any], expected: dict[str, 
 
 def execution_evidence_checks(response_json: dict[str, Any]) -> list[CheckResult]:
     stats = execution_stats(response_json)
-    if stats["needs_confirmation"] is True:
-        return [
-            CheckResult(
-                "execution_evidence",
-                True,
-                "confirmation response does not execute search",
-            )
-        ]
-
     total_count = stats["total_count"]
     result_count = stats["result_count"]
     aggregation_count = stats["aggregation_count"]
@@ -535,7 +385,6 @@ def execution_stats(response_json: dict[str, Any] | None) -> dict[str, Any]:
             "result_count": 0,
             "aggregation_count": 0,
             "selected_template": None,
-            "needs_confirmation": None,
             "cache_hit": None,
             "summary_status": None,
         }
@@ -544,7 +393,6 @@ def execution_stats(response_json: dict[str, Any] | None) -> dict[str, Any]:
         "result_count": collection_size(get_path(response_json, "results")),
         "aggregation_count": collection_size(get_path(response_json, "aggregations")),
         "selected_template": get_path(response_json, "selectedTemplate"),
-        "needs_confirmation": get_path(response_json, "needsConfirmation"),
         "cache_hit": get_path(response_json, "cacheHit"),
         "summary_status": get_path(response_json, "summaryStatus"),
     }

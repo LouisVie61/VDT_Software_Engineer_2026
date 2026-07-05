@@ -1,0 +1,76 @@
+{
+  "version": "v3-eda-1",
+  "backendContract": "direct-iql",
+  "observations": [
+    "The current backend executes one POST /api/search request and has no confirmation endpoint.",
+    "Each benchmark case needs an isolated session because the backend persists prior IQL state by sessionId.",
+    "Four V1 prompts relied on assisted editedIntent and must be made explicit for direct execution."
+  ],
+  "caseAdaptations": {
+    "amb-001": {
+      "question": "show all security event records from the last 24 hours; this is a read-only search",
+      "rationale": "Use a broad read-only event search because V1 only requires a safe executable query."
+    },
+    "amb-003": {
+      "question": "thong ke cac loi theo event_type, lay top 10",
+      "rationale": "V1 supplied TERMS_AGGREGATION, groupBy=event_type and topN=10 after confirmation."
+    },
+    "amb-004": {
+      "question": "show error events during the second quarter of 2025",
+      "rationale": "Resolve the otherwise incomplete quarter into the year covered by the benchmark corpus."
+    },
+    "amb-005": {
+      "question": "count error events grouped by timestamp_quarter using calendar quarter buckets",
+      "rationale": "Select the virtual timestamp_quarter dimension compiled to a calendar-quarter date histogram."
+    },
+    "amb-007": {
+      "question": "count events by source, return the top 10 sources",
+      "rationale": "V1 supplied topN=10 after confirmation."
+    },
+    "amb-008": {
+      "question": "count all errors grouped by event_type, return the top 10 event types",
+      "rationale": "V1 supplied TERMS_AGGREGATION, groupBy=event_type and topN=10 after confirmation."
+    },
+    "amb-009": {
+      "question": "show only events whose severity is critical",
+      "rationale": "The isolated V3 session has no prior query to patch, so the full search intent is stated explicitly."
+    },
+    "llm-001": {
+      "question": "show events where event_type equals failed_login from the last 24 hours; these are authentication failure events",
+      "rationale": "Use the canonical event_type field required by the shared V1 ground truth."
+    },
+    "llm-002": {
+      "question": "show the top 3 hosts with the most error or failure events, grouped by host",
+      "rationale": "Make the terms aggregation field, bucket count and error filter explicit."
+    },
+    "llm-003": {
+      "question": "xu huong alert moi ngay trong thang nay, gom theo bucket 1 ngay",
+      "rationale": "V1 supplied TIME_AGGREGATION with a one-day bucket after confirmation."
+    },
+    "llm-004": {
+      "question": "show event records containing the phrase connection timeout error",
+      "rationale": "Make the full-text search intent explicit."
+    },
+    "llm-005": {
+      "question": "show event records containing signs of lateral movement attacks",
+      "rationale": "Make the full-text lateral-movement search intent explicit."
+    },
+    "tmp-003": {
+      "question": "show auth events grouped over time by day from June 1 through June 15 2025",
+      "rationale": "Make the date histogram required by the V1 ground truth explicit."
+    },
+    "tmp-004": {
+      "question": "show endpoint events since June 1 2025",
+      "requestOverrides": {"eventType": "endpoint"},
+      "rationale": "Provide endpoint as an authoritative structured event_type constraint."
+    },
+    "tmp-006": {
+      "question": "count events per day from June 1 through June 15 2025 using one-day buckets",
+      "rationale": "Make the daily date histogram explicit."
+    },
+    "tmp-007": {
+      "question": "count error events grouped by timestamp_quarter using calendar quarter buckets from 2023-01-01T00:00:00Z through 2024-01-01T00:00:00Z",
+      "rationale": "Use the virtual quarter dimension and exact year boundaries required by the shared ground truth."
+    }
+  }
+}
