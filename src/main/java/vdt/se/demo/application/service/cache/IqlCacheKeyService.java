@@ -14,7 +14,8 @@ public final class IqlCacheKeyService {
     }
     public String key(IqlQuery query) {
         IqlQuery cursorless = new IqlQuery(query.select(), query.filters(), query.filterLogic(), query.timeRange(),
-                query.groupBy(), query.metrics(), query.orderBy(), query.sort(), query.size(), null);
+                query.groupBy(), query.metrics(), query.orderBy(), query.sort(), query.size(), null,
+                query.windows(), query.having(), query.derivedMetrics());
         try {
             byte[] payload = mapper.writeValueAsBytes(java.util.List.of(mappingVersion, cursorless));
             return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(payload));

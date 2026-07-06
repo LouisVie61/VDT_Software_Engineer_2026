@@ -29,6 +29,9 @@ public final class PatchApplierService {
         requireEqual("filterLogic", before.filterLogic(), after.filterLogic());
         requireEqual("orderBy", before.orderBy(), after.orderBy());
         requireEqual("pageAfter", before.pageAfter(), after.pageAfter());
+        requireEqual("windows", before.windows(), after.windows());
+        requireEqual("having", before.having(), after.having());
+        requireEqual("derivedMetrics", before.derivedMetrics(), after.derivedMetrics());
         switch (operation.op()) {
             case ADD_FILTER, REMOVE_FILTER, REPLACE_FILTER -> {
                 requireEqual("timeRange", before.timeRange(), after.timeRange());
@@ -103,6 +106,7 @@ public final class PatchApplierService {
 
     private IqlQuery copy(IqlQuery q, List<IqlQuery.FilterCondition> filters, List<IqlQuery.GroupBy> groups,
                           IqlQuery.TimeRange range, List<IqlQuery.Metric> metrics, List<IqlQuery.Sort> sort, int size) {
-        return new IqlQuery(q.select(), filters, q.filterLogic(), range, groups, metrics, q.orderBy(), sort, size, q.pageAfter());
+        return new IqlQuery(q.select(), filters, q.filterLogic(), range, groups, metrics, q.orderBy(), sort, size,
+                q.pageAfter(), q.windows(), q.having(), q.derivedMetrics());
     }
 }

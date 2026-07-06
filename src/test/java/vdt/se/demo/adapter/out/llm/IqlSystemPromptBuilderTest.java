@@ -14,7 +14,7 @@ class IqlSystemPromptBuilderTest {
         String prompt = new IqlSystemPromptBuilder(new ObjectMapper()).systemPrompt(List.of());
 
         assertThat(prompt)
-                .contains("timestamp_year, timestamp_month, timestamp_day, timestamp_hour")
+                .contains("timestamp_year, timestamp_quarter, timestamp_month, timestamp_day, timestamp_hour")
                 .contains("timestamp is not groupable")
                 .contains("day/ngày=>timestamp_day");
     }
@@ -43,5 +43,31 @@ class IqlSystemPromptBuilderTest {
                 .contains("Infer equivalent natural phrasing from context".toLowerCase())
                 .contains("Vietnamese request => Vietnamese question")
                 .contains("schema names in tool arguments");
+    }
+
+    @Test
+    void plansDependentDualIntentsAsNestedSelectButEmitsOneValidToolCall() {
+        String prompt = new IqlSystemPromptBuilder(new ObjectMapper()).systemPrompt(List.of());
+
+        assertThat(prompt)
+                .contains("Nested SELECT planning DSL (reasoning only)")
+                .contains("SELECT <outer result>")
+                .contains("schema-valid search_events call")
+                .contains("A single call cannot")
+                .contains("Never emit a fictional nested query")
+                .contains("documented $ref object");
+    }
+
+    @Test
+    void preventsExamplesFromSupplyingMissingTimeConstraints() {
+        String prompt = new IqlSystemPromptBuilder(new ObjectMapper()).systemPrompt(List.of());
+
+        assertThat(prompt)
+                .contains("examples illustrate structure only")
+                .contains("When the request has no time scope, omit time_range")
+                .contains("query has no time filter")
+                .contains("Never borrow a month or year from examples")
+                .doesNotContain("2025-07-01T00:00:00Z")
+                .doesNotContain("2025-08-01T00:00:00Z");
     }
 }

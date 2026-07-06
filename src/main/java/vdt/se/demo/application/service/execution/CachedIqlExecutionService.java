@@ -59,7 +59,8 @@ public final class CachedIqlExecutionService {
         catch (RuntimeException e) { throw new vdt.se.demo.domain.exception.BadQueryException("searchAfter must be valid JSON", e); }
     }
     private IqlQuery withPageAfter(IqlQuery q, Map<String,JsonNode> after) {
-        return new IqlQuery(q.select(),q.filters(),q.filterLogic(),q.timeRange(),q.groupBy(),q.metrics(),q.orderBy(),q.sort(),q.size(),after);
+        return new IqlQuery(q.select(), q.filters(), q.filterLogic(), q.timeRange(), q.groupBy(), q.metrics(),
+                q.orderBy(), q.sort(), q.size(), after, q.windows(), q.having(), q.derivedMetrics());
     }
     public record Executed(String cacheKey,JsonNode dsl,ExecutionResult result,boolean cacheHit){}
 }

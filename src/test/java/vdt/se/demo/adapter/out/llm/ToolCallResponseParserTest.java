@@ -40,6 +40,18 @@ class ToolCallResponseParserTest {
         assertThat(orderBy.path("properties").path("target").path("enum").toString()).contains("metric", "key");
     }
 
+    @Test
+    void toolSchemaDefinesWindowHavingAndDerivedMetricContracts() {
+        JsonNode schema = new vdt.se.demo.application.service.llm.LlmToolDefinitions(new ObjectMapper())
+                .searchEvents().path("input_schema").path("properties");
+
+        assertThat(schema.path("windows").isObject()).isTrue();
+        assertThat(schema.path("having").path("items").path("properties").path("metric").path("enum").toString())
+                .contains("count");
+        assertThat(schema.path("derived_metrics").path("items").path("properties").path("type").path("enum").toString())
+                .contains("percent", "ratio");
+    }
+
 
     private final ToolCallResponseParser parser = new ToolCallResponseParser(new ObjectMapper());
 
@@ -69,6 +81,37 @@ class ToolCallResponseParserTest {
     }
 
     @Test
+    void parsesGroupSampleHits() {
+        ToolCallResult.SearchEvents call = (ToolCallResult.SearchEvents) parser.parse("""
+                {"name":"search_events","arguments":{"mode":"new","group_by":[{"field":"host","size":5,
+                "sample_hits":{"size":3,"sort":[{"field":"timestamp","order":"desc"}]}}]}}
+                """);
+
+        IqlQuery.SampleHits samples = call.query().groupBy().getFirst().sampleHits();
+        assertThat(samples.effectiveSize()).isEqualTo(3);
+        assertThat(samples.sort().getFirst().field()).isEqualTo("timestamp");
+    }
+
+    @Test
+    void parsesWindowsHavingAndDerivedMetrics() {
+        ToolCallResult.SearchEvents call = (ToolCallResult.SearchEvents) parser.parse("""
+                {"name":"search_events","arguments":{"mode":"new",
+                "group_by":[{"field":"severity","size":1000}],
+                "metrics":[{"type":"count"}],
+                "windows":[{"name":"today","time_range":{"field":"timestamp","from":"now-1d","to":"now"}}],
+                "having":[{"metric":"count","window":"today","op":"gt","value":0}],
+                "derived_metrics":[{"name":"today_percent","type":"percent",
+                  "numerator":{"metric":"count","window":"today"},"denominator":{"metric":"count"}}],
+                "order_by":{"target":"derived_metric","metric_index":0,"direction":"desc"}}}
+                """);
+
+        assertThat(call.query().windows().getFirst().name()).isEqualTo("today");
+        assertThat(call.query().having().getFirst().op()).isEqualTo(IqlQuery.ComparisonOp.GT);
+        assertThat(call.query().derivedMetrics().getFirst().type()).isEqualTo(IqlQuery.DerivedMetricType.PERCENT);
+        assertThat(call.query().orderBy().target()).isEqualTo(IqlQuery.OrderTarget.DERIVED_METRIC);
+    }
+
+    @Test
     void rejectsLegacyNestedQueryInsteadOfSilentlyUsingDefaults() {
         ToolCallResponseParser parser = new ToolCallResponseParser(new ObjectMapper());
         assertThatThrownBy(() -> parser.parse("""
@@ -76,5 +119,29 @@ class ToolCallResponseParserTest {
                 """))
                 .isInstanceOf(vdt.se.demo.domain.exception.LlmException.class)
                 .hasMessageContaining("arguments.query");
+    }
+
+    @Test
+    void parsesNativeFilterValuesWithoutJsonEncodedStrings() {
+        ToolCallResult.SearchEvents call = (ToolCallResult.SearchEvents) parser.parse("""
+                {"name":"search_events","arguments":{"mode":"new","filters":[
+                  {"id":"failed","field":"action","op":"eq","values":["failed"]},
+                  {"id":"days","field":"timestamp_day","op":"not_in","values":["10","20"]}],
+                  "group_by":[{"field":"timestamp_day","size":5}]}}
+                """);
+
+        assertThat(call.query().filters().getFirst().value().asString()).isEqualTo("failed");
+        assertThat(call.query().filters().get(1).value()).hasSize(2);
+        assertThat(call.query().groupBy().getFirst().effectiveSize()).isEqualTo(5);
+    }
+
+    @Test
+    void rejectsScalarOperatorWithStructuralFragmentsAsMultipleValues() {
+        assertThatThrownBy(() -> parser.parse("""
+                {"name":"search_events","arguments":{"mode":"new","filters":[
+                  {"id":"bad","field":"action","op":"eq","values":["failed","}],group_by"]}]}}
+                """))
+                .isInstanceOf(vdt.se.demo.domain.exception.LlmException.class)
+                .hasMessageContaining("requires exactly one");
     }
 }

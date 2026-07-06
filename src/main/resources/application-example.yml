@@ -27,7 +27,7 @@ app:
   user:
     default-id: ${APP_DEFAULT_USER_ID:soc-analyst-demo}
   elasticsearch:
-    events-index: ${APP_EVENTS_INDEX:soc-events-v7}
+    events-index: ${APP_EVENTS_INDEX:soc-events-v8}
     initialize-index: ${APP_ELASTICSEARCH_INITIALIZE_INDEX:true}
   ingest:
     spool-root: ${APP_INGEST_SPOOL_ROOT:data/ingest}
@@ -44,7 +44,9 @@ app:
       window-seconds: ${APP_LLM_429_WINDOW_SECONDS:60}
       cooldown-seconds: ${APP_LLM_429_COOLDOWN_SECONDS:60}
     gemini:
-      model: ${GEMINI_MODEL:gemini-2.5-flash}
+      model: ${GEMINI_MODEL:gemini-3.1-flash-lite}
+      complex-model: ${GEMINI_COMPLEX_MODEL:gemini-2.5-flash}
+      complex-query-length: ${GEMINI_COMPLEX_QUERY_LENGTH:300}
       api-key: ${GEMINI_API_KEY:${GOOGLE_API_KEY:}}
     groq:
       model: ${GROQ_MODEL:llama-3.3-70b-versatile}
@@ -60,6 +62,6 @@ app:
       base-url: ${OPENROUTER_BASE_URL:https://openrouter.ai/api/v1/chat/completions}
       credentials-file: ${OPENROUTER_CREDENTIALS_FILE:.claude/settings.json}
   search:
-    schema-version: ${APP_SCHEMA_VERSION:v7}
+    schema-version: ${APP_SCHEMA_VERSION:v8}
     cache-ttl-seconds: ${APP_QUERY_CACHE_TTL_SECONDS:3600}
     session-ttl-seconds: ${APP_SESSION_TTL_SECONDS:1800}

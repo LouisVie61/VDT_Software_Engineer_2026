@@ -1,0 +1,3351 @@
+{
+  "base_url": "http://localhost:8080",
+  "cache_regime": "cold",
+  "cases": 28,
+  "data_snapshot": "soc-events-fixed",
+  "evaluation_fingerprint": "84a3146ecb2accbd60ad2aa669e6ea2ed310863bd5061e18f2de8bffc8b143c3",
+  "min_pass_rate": 0.9,
+  "provider_config": "current-model-config",
+  "repeat": 1,
+  "request_fingerprint": "4b78e1053d2e30d997558e7079cd19e5b6297824320b202a8de5d272657dda8d",
+  "results": [
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "soc-001",
+      "category": "soc_nl2plan",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"severity\":\"high\"",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_any_contains:['\"event_type\":\"auth\"', 'auth']",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from soc-001",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "severity": "high"
+                }
+              },
+              {
+                "term": {
+                  "event_type": "auth"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2026-07-03T20:44:46.229012500Z",
+                    "lt": "2026-07-04T20:44:46.229012500Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc",
+              "unmapped_type": "date"
+            }
+          },
+          {
+            "event_id": {
+              "order": "asc",
+              "unmapped_type": "keyword"
+            }
+          }
+        ],
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 1329.4304000010015,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:1",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "soc-002",
+      "category": "soc_nl2plan",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:alice",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:host-1",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from soc-002",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "user": "alice"
+                }
+              },
+              {
+                "term": {
+                  "host": "host-1"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2026-07-03T20:44:47.262067800Z",
+                    "lt": "2026-07-04T20:44:47.262067800Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 25,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc",
+              "unmapped_type": "date"
+            }
+          },
+          {
+            "event_id": {
+              "order": "asc",
+              "unmapped_type": "keyword"
+            }
+          }
+        ],
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 1019.5796999996674,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:2",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "soc-003",
+      "category": "api_contract",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from soc-003",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2026-07-03T20:44:48.103544700Z",
+                    "lt": "2026-07-04T20:44:48.103544700Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc",
+              "unmapped_type": "date"
+            }
+          },
+          {
+            "event_id": {
+              "order": "asc",
+              "unmapped_type": "keyword"
+            }
+          }
+        ],
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 895.3376999998,
+      "passed": true,
+      "result_count": 50,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:3",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 109949
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "soc-004",
+      "category": "api_contract",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:endpoint",
+          "passed": false
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"severity\":\"critical\"",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from soc-004",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "severity": "critical"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2026-07-03T20:44:49.308127100Z",
+                    "lt": "2026-07-04T20:44:49.308127100Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 30,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc",
+              "unmapped_type": "date"
+            }
+          },
+          {
+            "event_id": {
+              "order": "asc",
+              "unmapped_type": "keyword"
+            }
+          }
+        ],
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 1171.778699999777,
+      "passed": false,
+      "result_count": 30,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:4",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 15490
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "soc-005",
+      "category": "api_contract",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:alice",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from soc-005",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 20,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "user": "alice"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2026-07-03T20:44:50.332954700Z",
+                    "lt": "2026-07-04T20:44:50.332954700Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 10,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc",
+              "unmapped_type": "date"
+            }
+          },
+          {
+            "event_id": {
+              "order": "asc",
+              "unmapped_type": "keyword"
+            }
+          }
+        ],
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 1019.0027999997255,
+      "passed": true,
+      "result_count": 10,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:5",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 6597
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "soc-006",
+      "category": "api_contract",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:10.0.0.1",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from soc-006",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "ip": "10.0.0.1"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2026-07-03T20:44:51.356466500Z",
+                    "lt": "2026-07-04T20:44:51.356466500Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc",
+              "unmapped_type": "date"
+            }
+          },
+          {
+            "event_id": {
+              "order": "asc",
+              "unmapped_type": "keyword"
+            }
+          }
+        ],
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 1003.6055000000488,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:6",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "amb-001",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:\"script\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:delete",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:update_by_query",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from amb-001",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2026-07-03T20:44:52.174850800Z",
+                    "lt": "2026-07-04T20:44:52.174850800Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc",
+              "unmapped_type": "date"
+            }
+          },
+          {
+            "event_id": {
+              "order": "asc",
+              "unmapped_type": "keyword"
+            }
+          }
+        ],
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 867.8502000002482,
+      "passed": true,
+      "result_count": 50,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:7",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 109949
+    },
+    {
+      "aggregation_count": 10,
+      "cache_hit": false,
+      "case_id": "amb-002",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"terms\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"field\":\"ip\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"size\":10",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from amb-002",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "aggs": {
+          "events": {
+            "aggs": {},
+            "terms": {
+              "field": "ip",
+              "order": {
+                "_count": "desc"
+              },
+              "size": 10
+            }
+          }
+        },
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2026-07-03T20:44:53.199388600Z",
+                    "lt": "2026-07-04T20:44:53.199388600Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 0,
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 1000.5413999988377,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:8",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 109949
+    },
+    {
+      "aggregation_count": 9,
+      "cache_hit": false,
+      "case_id": "amb-003",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"terms\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"field\":\"event_type\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"size\":10",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from amb-003",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "aggs": {
+          "events": {
+            "aggs": {},
+            "terms": {
+              "field": "event_type",
+              "order": {
+                "_count": "desc"
+              },
+              "size": 10
+            }
+          }
+        },
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2026-07-03T20:44:54.224010200Z",
+                    "lt": "2026-07-04T20:44:54.224010200Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 0,
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 1016.1229000004823,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:9",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 109949
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "amb-004",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:\"script\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:delete",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:update_by_query",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from amb-004",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "severity": "error"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2025-04-01T00:00:00Z",
+                    "lt": "2025-07-01T00:00:00Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc",
+              "unmapped_type": "date"
+            }
+          },
+          {
+            "event_id": {
+              "order": "asc",
+              "unmapped_type": "keyword"
+            }
+          }
+        ],
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 1122.773799999777,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:10",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "amb-005",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"date_histogram\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"calendar_interval\":\"quarter\"",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from amb-005",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "aggs": {
+          "events": {
+            "aggs": {},
+            "date_histogram": {
+              "calendar_interval": "quarter",
+              "field": "timestamp"
+            }
+          }
+        },
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "event_type": "error"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2026-07-03T20:44:56.265912800Z",
+                    "lt": "2026-07-04T20:44:56.265912800Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 0,
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 897.5442999999359,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:11",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 5,
+      "cache_hit": false,
+      "case_id": "amb-006",
+      "category": "perception_prefilter",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"terms\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"field\":\"user\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"size\":5",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from amb-006",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "aggs": {
+          "events": {
+            "aggs": {},
+            "terms": {
+              "field": "user",
+              "order": {
+                "_count": "desc"
+              },
+              "size": 5
+            }
+          }
+        },
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2026-07-03T20:44:57.192577100Z",
+                    "lt": "2026-07-04T20:44:57.192577100Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 0,
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 938.1120999987616,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:12",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 109949
+    },
+    {
+      "aggregation_count": 6,
+      "cache_hit": false,
+      "case_id": "amb-007",
+      "category": "perception_prefilter",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"terms\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"field\":\"source\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"size\":10",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from amb-007",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "aggs": {
+          "events": {
+            "aggs": {},
+            "terms": {
+              "field": "source",
+              "order": {
+                "_count": "desc"
+              },
+              "size": 10
+            }
+          }
+        },
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2026-07-03T20:44:58.116755400Z",
+                    "lt": "2026-07-04T20:44:58.116755400Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 0,
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 941.9952999996895,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:13",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 109949
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "amb-008",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"terms\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"field\":\"event_type\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"size\":10",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from amb-008",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "aggs": {
+          "events": {
+            "aggs": {},
+            "terms": {
+              "field": "event_type",
+              "order": {
+                "_count": "desc"
+              },
+              "size": 10
+            }
+          }
+        },
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "severity": "error"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2026-07-03T20:44:59.141520300Z",
+                    "lt": "2026-07-04T20:44:59.141520300Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 0,
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 1034.6781999996892,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:14",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "amb-009",
+      "category": "ambiguity",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"severity\":\"critical\"",
+          "passed": false
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:\"script\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:delete",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:update_by_query",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from amb-009",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "severity": "&#34;critical&#34;"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2026-07-03T20:45:12.555062600Z",
+                    "lt": "2026-07-04T20:45:12.555062600Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc",
+              "unmapped_type": "date"
+            }
+          },
+          {
+            "event_id": {
+              "order": "asc",
+              "unmapped_type": "keyword"
+            }
+          }
+        ],
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 13370.987099999184,
+      "passed": false,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:15",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "llm-001",
+      "category": "llm_language",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"range\":{\"timestamp\"",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_any_contains:['\"event_type\":\"auth\"', '\"event_type\":\"failed_login\"']",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_any_contains:['failed', 'failure']",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from llm-001",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "event_type": "failed_login"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2026-07-03T20:45:13.577159800Z",
+                    "lt": "2026-07-04T20:45:13.577159800Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc",
+              "unmapped_type": "date"
+            }
+          },
+          {
+            "event_id": {
+              "order": "asc",
+              "unmapped_type": "keyword"
+            }
+          }
+        ],
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 1018.3266999993066,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:16",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "llm-002",
+      "category": "llm_language",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"terms\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"field\":\"host\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"size\":3",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_any_contains:['error', 'failure']",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from llm-002",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "aggs": {
+          "events": {
+            "aggs": {},
+            "terms": {
+              "field": "host",
+              "order": {
+                "_count": "desc"
+              },
+              "size": 3
+            }
+          }
+        },
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "terms": {
+                  "event_type": [
+                    "error",
+                    "failure"
+                  ]
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2026-07-03T20:45:14.601733900Z",
+                    "lt": "2026-07-04T20:45:14.601733900Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 0,
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 1026.8443999993906,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:17",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 1,
+      "cache_hit": false,
+      "case_id": "llm-003",
+      "category": "llm_language",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"date_histogram\"",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_any_contains:['\"fixed_interval\":\"1d\"', '\"calendar_interval\":\"1d\"', '\"calendar_interval\":\"day\"']",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from llm-003",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "aggs": {
+          "events": {
+            "aggs": {},
+            "date_histogram": {
+              "calendar_interval": "day",
+              "field": "timestamp",
+              "order": {
+                "_key": "asc"
+              }
+            }
+          }
+        },
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "now/M",
+                    "lt": "2026-07-04T20:45:15.525855100Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 0,
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 923.4860000015033,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:18",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 109949
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "llm-004",
+      "category": "llm_language",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:connection timeout error",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:\"script\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:delete",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:update_by_query",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from llm-004",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "match_phrase": {
+                  "message": "connection timeout error"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2026-07-03T20:45:16.443687Z",
+                    "lt": "2026-07-04T20:45:16.443687Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc",
+              "unmapped_type": "date"
+            }
+          },
+          {
+            "event_id": {
+              "order": "asc",
+              "unmapped_type": "keyword"
+            }
+          }
+        ],
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 952.9036000003543,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:19",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "llm-005",
+      "category": "llm_language",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:lateral movement",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:\"script\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:delete",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:update_by_query",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from llm-005",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "match_phrase": {
+                  "message": "lateral movement"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2026-07-03T20:45:17.364913500Z",
+                    "lt": "2026-07-04T20:45:17.364913500Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc",
+              "unmapped_type": "date"
+            }
+          },
+          {
+            "event_id": {
+              "order": "asc",
+              "unmapped_type": "keyword"
+            }
+          }
+        ],
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 875.2002999990509,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:20",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "llm-006",
+      "category": "llm_language",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"severity\":\"critical\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"event_type\":\"auth\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment was found",
+          "metric_group": "Safety / Guardrail",
+          "name": "dsl_not_contains:\"severity\":\"low\"",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from llm-006",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "severity": "critical"
+                }
+              },
+              {
+                "term": {
+                  "event_type": "auth"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2026-07-03T20:45:18.288082600Z",
+                    "lt": "2026-07-04T20:45:18.288082600Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc",
+              "unmapped_type": "date"
+            }
+          },
+          {
+            "event_id": {
+              "order": "asc",
+              "unmapped_type": "keyword"
+            }
+          }
+        ],
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 930.2523999995174,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:21",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 0
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "tmp-001",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"range\":{\"timestamp\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:2025-06-01",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_any_contains:['2025-06-15', '2025-06-16']",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from tmp-001",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2025-06-01T00:00:00Z",
+                    "lt": "2025-06-15T23:59:59Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc",
+              "unmapped_type": "date"
+            }
+          },
+          {
+            "event_id": {
+              "order": "asc",
+              "unmapped_type": "keyword"
+            }
+          }
+        ],
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 971.0925999988831,
+      "passed": true,
+      "result_count": 50,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:22",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 7878
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "tmp-002",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"severity\":\"high\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"range\":{\"timestamp\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:2025-06-01",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_any_contains:['2025-06-07', '2025-06-08']",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from tmp-002",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "severity": "high"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2025-06-01T00:00:00Z",
+                    "lt": "2025-06-07T23:59:59Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc",
+              "unmapped_type": "date"
+            }
+          },
+          {
+            "event_id": {
+              "order": "asc",
+              "unmapped_type": "keyword"
+            }
+          }
+        ],
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 1118.7178999989555,
+      "passed": true,
+      "result_count": 50,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:23",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 744
+    },
+    {
+      "aggregation_count": 15,
+      "cache_hit": false,
+      "case_id": "tmp-003",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"date_histogram\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"range\":{\"timestamp\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:2025-06-01",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_any_contains:['\"event_type\":\"auth\"', 'auth']",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_any_contains:['2025-06-15', '2025-06-16']",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from tmp-003",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "aggs": {
+          "events": {
+            "aggs": {},
+            "date_histogram": {
+              "calendar_interval": "day",
+              "field": "timestamp"
+            }
+          }
+        },
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "event_type": "auth"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2025-06-01T00:00:00Z",
+                    "lt": "2025-06-15T23:59:59Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 0,
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 1093.577899999218,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:24",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 980
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "tmp-004",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:endpoint",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"range\":{\"timestamp\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:2025-06-01",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from tmp-004",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "event_type": "endpoint"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2025-06-01T00:00:00Z",
+                    "lt": "2026-07-04T20:45:22.484625500Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 50,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc",
+              "unmapped_type": "date"
+            }
+          },
+          {
+            "event_id": {
+              "order": "asc",
+              "unmapped_type": "keyword"
+            }
+          }
+        ],
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 1041.7971999995643,
+      "passed": true,
+      "result_count": 50,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:25",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 28518
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "tmp-005",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "DSL Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "DSL Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:firewall",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:\"range\":{\"timestamp\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "DSL Correctness",
+          "name": "dsl_contains:2025-06",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from tmp-005",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "from": 15,
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "event_type": "firewall"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2025-06-01T00:00:00Z",
+                    "lt": "2025-06-30T23:59:59Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 15,
+        "sort": [
+          {
+            "timestamp": {
+              "order": "desc",
+              "unmapped_type": "date"
+            }
+          },
+          {
+            "event_id": {
+              "order": "asc",
+              "unmapped_type": "keyword"
+            }
+          }
+        ],
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 931.4326999992772,
+      "passed": true,
+      "result_count": 15,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:26",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 1937
+    },
+    {
+      "aggregation_count": 15,
+      "cache_hit": false,
+      "case_id": "tmp-006",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"date_histogram\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"range\":{\"timestamp\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:2025-06-01",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_any_contains:['\"fixed_interval\":\"1d\"', '\"calendar_interval\":\"1d\"', '\"calendar_interval\":\"day\"']",
+          "passed": true
+        },
+        {
+          "detail": "no alternative fragment found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_any_contains:['2025-06-15', '2025-06-16']",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from tmp-006",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "aggs": {
+          "events": {
+            "aggs": {},
+            "date_histogram": {
+              "calendar_interval": "day",
+              "field": "timestamp"
+            }
+          }
+        },
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2025-06-01T00:00:00Z",
+                    "lt": "2025-06-15T23:59:59Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 0,
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 952.2359000002325,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:27",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 7878
+    },
+    {
+      "aggregation_count": 0,
+      "cache_hit": false,
+      "case_id": "tmp-007",
+      "category": "temporal",
+      "checks": [
+        {
+          "detail": "expected=200, actual=200",
+          "metric_group": "Result Quality",
+          "name": "http_status",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Aggregation Correctness",
+          "name": "field:generatedDsl",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:totalCount",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:results",
+          "passed": true
+        },
+        {
+          "detail": "missing field",
+          "metric_group": "Result Quality",
+          "name": "field:aggregations",
+          "passed": true
+        },
+        {
+          "detail": "missing path",
+          "metric_group": "Aggregation Correctness",
+          "name": "generatedDsl_path_exists:query",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"date_histogram\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:\"calendar_interval\":\"quarter\"",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:2023-01-01",
+          "passed": true
+        },
+        {
+          "detail": "fragment not found",
+          "metric_group": "Aggregation Correctness",
+          "name": "dsl_contains:2024-01-01",
+          "passed": true
+        },
+        {
+          "detail": "matched branch 1",
+          "metric_group": "Result Quality",
+          "name": "any_of",
+          "passed": true
+        }
+      ],
+      "description": "Direct IQL workflow case derived from tmp-007",
+      "error": "",
+      "expected_status": 200,
+      "final_execution": true,
+      "generated_dsl": {
+        "aggs": {
+          "events": {
+            "aggs": {},
+            "date_histogram": {
+              "calendar_interval": "quarter",
+              "field": "timestamp"
+            }
+          }
+        },
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "term": {
+                  "event_type": "error"
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": "2023-01-01T00:00:00Z",
+                    "lt": "2024-01-01T00:00:00Z"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 0,
+        "track_total_hits": true
+      },
+      "iteration": 1,
+      "latency_ms": 934.250799999063,
+      "passed": true,
+      "result_count": 0,
+      "selected_template": "IQL",
+      "source": "v3_cases.jsonl:28",
+      "status": 200,
+      "summary_status": "PENDING",
+      "tags": [
+        "v3",
+        "direct_iql"
+      ],
+      "total_count": 0
+    }
+  ],
+  "summary": {
+    "cache_hit_rate": 0.0,
+    "cache_hits": 0,
+    "category_counts": {
+      "ambiguity": 7,
+      "api_contract": 4,
+      "llm_language": 6,
+      "perception_prefilter": 2,
+      "soc_nl2plan": 2,
+      "temporal": 7
+    },
+    "category_latency_p95_ms": {
+      "ambiguity": 9696.523109999353,
+      "api_contract": 1148.8623149997693,
+      "llm_language": 1024.7149749993696,
+      "perception_prefilter": 941.801139999643,
+      "soc_nl2plan": 1313.9378650009348,
+      "temporal": 1111.1758999990343
+    },
+    "category_pass_rates": {
+      "ambiguity": 0.8571428571428571,
+      "api_contract": 0.75,
+      "llm_language": 1.0,
+      "perception_prefilter": 1.0,
+      "soc_nl2plan": 1.0,
+      "temporal": 1.0
+    },
+    "evaluation_fingerprint": "84a3146ecb2accbd60ad2aa669e6ea2ed310863bd5061e18f2de8bffc8b143c3",
+    "executed_runs": 28,
+    "execution_target_met": true,
+    "failed": 2,
+    "latency_max_ms": 13370.987099999184,
+    "latency_median_ms": 1002.0734499994433,
+    "latency_min_ms": 867.8502000002482,
+    "latency_p95_ms": 1274.2523050005727,
+    "metric_group_check_counts": {
+      "Aggregation Correctness": 59,
+      "DSL Correctness": 63,
+      "Result Quality": 123,
+      "Safety / Guardrail": 16
+    },
+    "metric_group_check_pass_rates": {
+      "Aggregation Correctness": 1.0,
+      "DSL Correctness": 0.9682539682539683,
+      "Result Quality": 1.0,
+      "Safety / Guardrail": 1.0
+    },
+    "metric_group_latency_p95_ms": {
+      "Aggregation Correctness": 1064.1280499994537,
+      "DSL Correctness": 3737.7417400006293,
+      "Result Quality": 1274.2523050005727,
+      "Safety / Guardrail": 10308.933774999332
+    },
+    "metric_group_run_counts": {
+      "Aggregation Correctness": 11,
+      "DSL Correctness": 17,
+      "Result Quality": 28,
+      "Safety / Guardrail": 6
+    },
+    "metric_group_run_pass_rates": {
+      "Aggregation Correctness": 1.0,
+      "DSL Correctness": 0.8823529411764706,
+      "Result Quality": 1.0,
+      "Safety / Guardrail": 1.0
+    },
+    "pass_rate": 0.9285714285714286,
+    "passed": 26,
+    "request_fingerprint": "4b78e1053d2e30d997558e7079cd19e5b6297824320b202a8de5d272657dda8d",
+    "required_executions": 28,
+    "status_error_rate": 0.0,
+    "template_counts": {
+      "IQL": 28
+    },
+    "total": 28,
+    "variant": "workflow-v3",
+    "zero_result_rate": 0.4642857142857143,
+    "zero_result_runs": 13
+  },
+  "variant": "workflow-v3",
+  "warmup": 0
+}

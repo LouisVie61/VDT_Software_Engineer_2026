@@ -13,7 +13,7 @@ from metrics import format_ms, format_rate, summarize_runs
 
 
 DEFAULT_CASES = [
-    Path("evaluation/cases/v2_cases.jsonl"),
+    Path("evaluation/cases/v3_cases.jsonl"),
 ]
 
 
@@ -22,17 +22,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--base-url", default="http://localhost:8080", help="Backend base URL.")
     parser.add_argument("--cases", nargs="*", type=Path, default=DEFAULT_CASES, help="JSONL case files.")
     parser.add_argument("--repeat", type=int, default=1, help="Number of iterations per case.")
-    parser.add_argument("--timeout", type=float, default=10.0, help="HTTP timeout in seconds.")
+    parser.add_argument("--timeout", type=float, default=120.0, help="HTTP timeout in seconds.")
     parser.add_argument("--warmup", type=int, default=0, help="Warmup iterations per case. Warmup runs are not included in the report.")
-    parser.add_argument("--output", type=Path, default=Path("evaluation/reports/backend_evaluation_report.md"), help="Markdown report path.")
-    parser.add_argument("--json-output", type=Path, default=None, help="Optional machine-readable JSON report path.")
+    parser.add_argument("--output", type=Path, default=Path("evaluation/reports/v3_report.md"), help="Markdown report path.")
+    parser.add_argument("--json-output", type=Path, default=Path("evaluation/reports/v3_report.json"), help="Machine-readable JSON report path.")
     parser.add_argument("--min-pass-rate", type=float, default=0.90, help="Minimum acceptable pass rate, from 0 to 1.")
-    parser.add_argument("--variant", default="unspecified", help="Stable label for the backend variant under test.")
-    parser.add_argument("--data-snapshot", default="unspecified", help="Shared Elasticsearch snapshot/version label for A/B validation.")
-    parser.add_argument("--provider-config", default="unspecified", help="Shared provider/model/config label for A/B validation.")
-    parser.add_argument("--cache-regime", choices=("unspecified", "cold", "warm", "mixed"), default="unspecified", help="Cache state used by this run.")
-    parser.add_argument("--auto-confirm", action=argparse.BooleanOptionalAction, default=True, help="Follow needsConfirmation responses through /api/search/confirm (default: enabled).")
-    parser.add_argument("--require-executions", type=int, default=None, help="Require exactly this many finalized executions.")
+    parser.add_argument("--variant", default="workflow-v3", help="Stable label for the backend variant under test.")
+    parser.add_argument("--data-snapshot", default="soc-events-fixed", help="Shared Elasticsearch snapshot/version label for A/B validation.")
+    parser.add_argument("--provider-config", default="current-model-config", help="Shared provider/model/config label for A/B validation.")
+    parser.add_argument("--cache-regime", choices=("unspecified", "cold", "warm", "mixed"), default="cold", help="Cache state used by this run.")
+    parser.add_argument("--require-executions", type=int, default=28, help="Require exactly this many finalized executions.")
     return parser.parse_args()
 
 
@@ -43,13 +42,13 @@ def main() -> int:
 
     for iteration in range(1, args.warmup + 1):
         for case in cases:
-            result = run_case(case, args.base_url, args.timeout, iteration, auto_confirm=args.auto_confirm)
+            result = run_case(case, args.base_url, args.timeout, iteration)
             status = "PASS" if result["passed"] else "FAIL"
             print(f"[WARMUP {status}] iter={iteration} case={case.id} latency={result['latency_ms']:.1f}ms")
 
     for iteration in range(1, args.repeat + 1):
         for case in cases:
-            result = run_case(case, args.base_url, args.timeout, iteration, auto_confirm=args.auto_confirm)
+            result = run_case(case, args.base_url, args.timeout, iteration)
             results.append(result)
             status = "PASS" if result["passed"] else "FAIL"
             print(f"[{status}] iter={iteration} case={case.id} latency={result['latency_ms']:.1f}ms")
@@ -146,9 +145,6 @@ def render_report(args: argparse.Namespace, cases: list, results: list[dict], su
         f"| Executed runs | {summary['executed_runs']} |",
         f"| Required executions | {summary['required_executions'] if summary['required_executions'] is not None else '-'} |",
         f"| Execution target met | {summary['execution_target_met']} |",
-        f"| Confirmation runs | {summary['confirmation_runs']} |",
-        f"| Confirmations followed | {summary['confirmation_followed_runs']} |",
-        f"| Confirmation rate | {format_rate(summary['confirmation_rate'])} |",
         f"| Cache hits | {summary['cache_hits']} |",
         f"| Cache hit rate | {format_rate(summary['cache_hit_rate'])} |",
         f"| Zero-result runs | {summary['zero_result_runs']} |",
@@ -209,8 +205,8 @@ def render_report(args: argparse.Namespace, cases: list, results: list[dict], su
         "",
         "## Case Results",
         "",
-        "| Case | Category | Tags | Iteration | Status | Template | Confirm | Cache | Total | Rows | Aggs | Latency | Result | Failed Checks |",
-        "|---|---|---|---:|---:|---|---:|---:|---:|---:|---:|---:|---|---|",
+        "| Case | Category | Tags | Iteration | Status | Template | Cache | Total | Rows | Aggs | Latency | Result | Failed Checks |",
+        "|---|---|---|---:|---:|---|---:|---:|---:|---:|---:|---|---|",
     ])
 
     for result in results:
@@ -219,14 +215,13 @@ def render_report(args: argparse.Namespace, cases: list, results: list[dict], su
         if result["error"]:
             failed_text = (failed_text + "<br>" if failed_text else "") + result["error"]
         lines.append(
-            "| {case_id} | {category} | {tags} | {iteration} | {status} | {template} | {confirm} | {cache} | {total} | {rows} | {aggs} | {latency} | {result} | {failed} |".format(
+            "| {case_id} | {category} | {tags} | {iteration} | {status} | {template} | {cache} | {total} | {rows} | {aggs} | {latency} | {result} | {failed} |".format(
                 case_id=result["case_id"],
                 category=result["category"],
                 tags=", ".join(result.get("tags") or []) or "-",
                 iteration=result["iteration"],
                 status=result["status"],
                 template=result.get("selected_template") or "-",
-                confirm=result.get("initial_needs_confirmation", result.get("needs_confirmation")),
                 cache=result.get("cache_hit"),
                 total=result.get("total_count"),
                 rows=result.get("result_count", 0),

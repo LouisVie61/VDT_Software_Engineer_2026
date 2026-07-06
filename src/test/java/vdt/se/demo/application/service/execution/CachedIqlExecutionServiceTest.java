@@ -42,4 +42,35 @@ class CachedIqlExecutionServiceTest {
         assertThat(executed.get().path("size").asInt()).isEqualTo(10);
         assertThat(cached.get().has("from")).isFalse();
     }
+
+    @Test
+    void preservesWindowAndHavingAggregationsWhenPreparingBaseDslForCache() {
+        ObjectMapper mapper = new ObjectMapper();
+        AtomicReference<JsonNode> executed = new AtomicReference<>();
+        var service = new CachedIqlExecutionService(new IqlCacheKeyService(mapper, "v1"), new BaseDslCachePort() {
+            public Optional<JsonNode> findBaseDsl(String key) { return Optional.empty(); }
+            public void saveBaseDsl(String key, JsonNode dsl) {}
+        }, new DslCompiler(mapper), dsl -> {
+            executed.set(dsl);
+            return new ExecutionResult(List.of(), List.of(), 0);
+        }, mapper);
+        IqlQuery query = new IqlQuery(List.of(), List.of(), null,
+                new IqlQuery.TimeRange("timestamp", "2026-07-04T00:00:00Z", "2026-07-06T00:00:00Z"),
+                List.of(new IqlQuery.GroupBy("severity", 1000)),
+                List.of(new IqlQuery.Metric(IqlQuery.MetricType.COUNT, null)), null, List.of(), 50, null,
+                List.of(
+                        new IqlQuery.Window("today", new IqlQuery.TimeRange("timestamp", "2026-07-05T00:00:00Z", "2026-07-06T00:00:00Z"), List.of()),
+                        new IqlQuery.Window("yesterday", new IqlQuery.TimeRange("timestamp", "2026-07-04T00:00:00Z", "2026-07-05T00:00:00Z"), List.of())),
+                List.of(
+                        new IqlQuery.HavingCondition("count", "today", IqlQuery.ComparisonOp.GT, 0.0),
+                        new IqlQuery.HavingCondition("count", "yesterday", IqlQuery.ComparisonOp.EQ, 0.0)),
+                List.of());
+
+        service.execute(query);
+
+        assertThat(executed.get().at("/aggs/events/aggs/today/filter/range/timestamp/gte").asString())
+                .isEqualTo("2026-07-05T00:00:00Z");
+        assertThat(executed.get().at("/aggs/events/aggs/having/bucket_selector/script/source").asString())
+                .isEqualTo("params.p0 > 0.0 && params.p1 == 0.0");
+    }
 }

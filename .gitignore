@@ -29,8 +29,10 @@ evaluation/__pycache__/
 data/ingest/archive/
 data/ingest/incoming/
 *.jsonl
+!evaluation/cases/v3_cases.jsonl
 
 # Docker volumes / local runtime
 fluentd-buffer/
 fluentd-pos/
 HELP.md
+scripts/
