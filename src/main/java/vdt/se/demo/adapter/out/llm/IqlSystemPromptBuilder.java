@@ -57,7 +57,7 @@ final class IqlSystemPromptBuilder {
                 {
                   "mode": "new",
                   "select": ["field"],
-                  "filters": [{"id":"stable_unique_id","field":"field","op":"eq","value":"JSON-encoded value"}],
+                  "filters": [{"id":"stable_unique_id","field":"field","op":"eq","values":["value"]}],
                   "time_range": {"field":"timestamp","from":"now-24h","to":"now"},
                   "group_by": [{"field":"source","size":10}],
                   "metrics": [{"type":"count"}],
@@ -140,14 +140,16 @@ final class IqlSystemPromptBuilder {
                 raw, message, metadata, and advanced_metadata are not groupable.
 
                 ## 6. Filter schema and semantics
-                Filter = {"id":string,"field":string,"op":operator,"value":string}.
+                Filter = {"id":string,"field":string,"op":operator,"values":string[]}.
                 - Operators: eq, neq, in, not_in, gt, gte, lt, lte, exists, contains.
-                - value is JSON encoded inside a string, not a native JSON scalar/array. Examples:
-                  eq critical => "\\\"critical\\\""; in two severities => "[\\\"high\\\",\\\"critical\\\"]".
-                - exists is the only operator that may omit a meaningful value.
+                - values is always a native JSON array of plain strings. Never encode JSON or query syntax in an item.
+                  Examples: eq critical => ["critical"]; in two severities => ["high","critical"];
+                  not_in days 10 and 20 => ["10","20"].
+                - Scalar operators require exactly one item. in/not_in require one or more items. exists uses [].
                 - contains is only for message. Use exact operators for every other filterable field.
                 - Filter ids must be non-blank and unique. Use short semantic ids such as severity_1 or source_1.
-                - A prior-result reference is encoded as the value string "{\\\"$ref\\\":\\\"...\\\"}".
+                - Do not place structural text such as `}],group_by` inside a filter value.
+                - "failed events" alone => action=failed only. Add event_type only when the analyst explicitly names one.
 
                 ## 7. Grouping and aggregation
                 - “group by X”, “break down by X”, “distribution by X”, “top X”, and “count per X” require group_by on X.
@@ -168,6 +170,9 @@ final class IqlSystemPromptBuilder {
                 - For ratios/percentages, emit derived_metrics with type percent or ratio using count refs.
                   Use derived_metrics only with group_by. For a top-level percent, emit named window/filter counts
                   in one query and let the answer use totalMatches plus the returned aggregation counts.
+                - For "highest/lowest rate" by a group: emit a numerator window, a ratio/percent derived_metric,
+                  order_by target derived_metric with metric_index pointing into derived_metrics, direction desc/asc,
+                  and set the group_by size to the requested result count (use 1 for a singular highest/lowest request).
                 - Never emit script text. having and derived_metrics are structured only; application code creates
                   bucket_selector and bucket_script from whitelisted templates.
                 - Multiple dimensions become multiple group_by entries in the analyst's stated order.

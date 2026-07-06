@@ -95,7 +95,7 @@ public record IqlQuery(List<String> select, List<FilterCondition> filters, Filte
     public record OrderBy(OrderTarget target, Integer metricIndex, Direction direction) {}
 
     public enum OrderTarget {
-        METRIC, KEY, COUNT;
+        METRIC, DERIVED_METRIC, KEY, COUNT;
 
         @JsonCreator
         public static OrderTarget fromJson(String value) {

@@ -19,11 +19,11 @@ public final class LlmToolDefinitions {
                   "mode":{"type":"string","enum":["new","patch"],"description":"EN: new request or refinement of previous query. VI: yêu cầu mới hoặc điều chỉnh truy vấn trước."},
                   "select":{"type":"array","description":"EN: Fields returned for event rows. VI: Các trường trả về cho từng sự kiện.","items":{"type":"string"}},
 
-                  "filters":{"type":"array","items":{"type":"object","required":["id","field","op","value"],"properties":{
+                  "filters":{"type":"array","items":{"type":"object","required":["id","field","op","values"],"properties":{
                     "id":{"type":"string"},
                     "field":{"type":"string","description":"EN: Canonical schema field. VI: Tên trường schema chuẩn bằng tiếng Anh."},
                     "op":{"type":"string","enum":["eq","neq","in","not_in","gt","gte","lt","lte","exists","contains"]},
-                    "value":{"type":"string","description":"JSON-encoded scalar, array, or prior-result reference object"}
+                    "values":{"type":"array","items":{"type":"string"},"description":"Typed filter operands. Use one item for scalar operators and all items for in/not_in."}
                   }}},
 
                   "time_range":{"type":"object","description":"EN: Event time window. VI: Khoảng thời gian sự kiện.","required":["field"],"properties":{
@@ -51,9 +51,9 @@ public final class LlmToolDefinitions {
                   "windows":{"type":"array","description":"Named filter/time sub-aggregations used for one-query comparisons.","items":{"type":"object","required":["name","time_range"],"properties":{
                     "name":{"type":"string","pattern":"^[A-Za-z][A-Za-z0-9_]{0,63}$"},
                     "time_range":{"type":"object","required":["field"],"properties":{"field":{"type":"string"},"from":{"type":"string"},"to":{"type":"string"}}},
-                    "filters":{"type":"array","items":{"type":"object","required":["id","field","op","value"],"properties":{
+                    "filters":{"type":"array","items":{"type":"object","required":["id","field","op","values"],"properties":{
                       "id":{"type":"string"},"field":{"type":"string"},"op":{"type":"string","enum":["eq","neq","in","not_in","gt","gte","lt","lte","exists","contains"]},
-                      "value":{"type":"string","description":"JSON-encoded scalar, array, or prior-result reference object"}
+                      "values":{"type":"array","items":{"type":"string"},"description":"Use one item for scalar operators and all items for in/not_in."}
                     }}}
                   }}},
 
@@ -72,8 +72,8 @@ public final class LlmToolDefinitions {
                   }}},
 
                   "order_by":{"type":"object","required":["target","direction"],"properties":{
-                    "target":{"type":"string","enum":["metric","key","count"]},
-                    "metric_index":{"type":"integer","minimum":0},
+                    "target":{"type":"string","enum":["metric","derived_metric","key","count"]},
+                    "metric_index":{"type":"integer","minimum":0,"description":"Index into metrics for target=metric or derived_metrics for target=derived_metric."},
                     "direction":{"type":"string","enum":["asc","desc"]}
                   }},
 

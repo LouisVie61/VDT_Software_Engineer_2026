@@ -154,7 +154,7 @@ public final class DslCompiler {
                 ObjectNode histogram = bucket.putObject("date_histogram");
                 histogram.put("field", SocEventSchema.TIMESTAMP);
                 histogram.put("calendar_interval", calendarInterval);
-                if (query.orderBy() != null) {
+                if (query.orderBy() != null && query.orderBy().target() != IqlQuery.OrderTarget.DERIVED_METRIC) {
                     histogram.putObject("order").put(
                             query.orderBy().target() == IqlQuery.OrderTarget.KEY ? "_key" : "_count",
                             direction(query.orderBy().direction()));
@@ -171,6 +171,8 @@ public final class DslCompiler {
         addMetrics(subAggs, query);
         addDerivedMetrics(subAggs, query);
         addHaving(subAggs, query);
+        addSingleTemporalBucketLimit(subAggs, query);
+        addDerivedMetricOrder(subAggs, query);
         query.groupBy().stream().map(IqlQuery.GroupBy::sampleHits).filter(java.util.Objects::nonNull)
                 .findFirst().ifPresent(sample -> addSampleHits(subAggs, sample));
         if (composite && query.orderBy() != null && query.orderBy().target() == IqlQuery.OrderTarget.METRIC) {
@@ -238,7 +240,7 @@ public final class DslCompiler {
     }
 
     private void addTermsOrder(ObjectNode terms, IqlQuery query) {
-        if (query.orderBy() == null) {
+        if (query.orderBy() == null || query.orderBy().target() == IqlQuery.OrderTarget.DERIVED_METRIC) {
             return;
         }
 
@@ -259,7 +261,28 @@ public final class DslCompiler {
             case KEY -> "_key";
             case COUNT -> "_count";
             case METRIC -> resolveMetricOrderTarget(query, orderBy.metricIndex());
+            case DERIVED_METRIC -> throw new BadQueryException("Derived metrics require bucket_sort ordering");
         };
+    }
+
+    private void addDerivedMetricOrder(ObjectNode aggs, IqlQuery query) {
+        if (query.orderBy() == null || query.orderBy().target() != IqlQuery.OrderTarget.DERIVED_METRIC) return;
+        int index = query.orderBy().metricIndex() == null ? -1 : query.orderBy().metricIndex();
+        if (index < 0 || index >= query.derivedMetrics().size()) {
+            throw new BadQueryException("derived metric_index is out of range");
+        }
+        ObjectNode sort = aggs.putObject("ordered_buckets").putObject("bucket_sort");
+        sort.putArray("sort").addObject().putObject(query.derivedMetrics().get(index).name())
+                .put("order", direction(query.orderBy().direction()));
+        sort.put("size", query.groupBy().getFirst().effectiveSize());
+    }
+
+    private void addSingleTemporalBucketLimit(ObjectNode aggs, IqlQuery query) {
+        if (query.groupBy().size() != 1
+                || !CALENDAR_INTERVAL_BY_GROUP.containsKey(query.groupBy().getFirst().field())
+                || query.orderBy() != null && query.orderBy().target() == IqlQuery.OrderTarget.DERIVED_METRIC) return;
+        IqlQuery.GroupBy group = query.groupBy().getFirst();
+        aggs.putObject("limit_" + group.field()).putObject("bucket_sort").put("size", group.effectiveSize());
     }
 
     private String resolveMetricOrderTarget(IqlQuery query, Integer metricIndex) {

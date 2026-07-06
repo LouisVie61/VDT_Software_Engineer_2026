@@ -39,6 +39,7 @@ public final class SchemaRegistry {
         query.metrics().forEach(metric -> validateMetric(metric, errors));
         validateWindows(query, errors, warnings);
         validatePipelineAggregations(query, errors);
+        validateOrderBy(query, errors);
         if (query.size() > MAX_RESULT_SIZE) errors.add("Result size exceeds " + MAX_RESULT_SIZE);
         validateTimeRange(query.timeRange(), errors, warnings);
         if (query.pageAfter() != null && query.groupBy().isEmpty()) errors.add("page_after requires group_by");
@@ -47,6 +48,22 @@ public final class SchemaRegistry {
             errors.add("Composite pagination with metric bucket ordering is not supported");
         if (!query.groupBy().isEmpty() && !query.sort().isEmpty()) warnings.add("hits sort is ignored when group_by is present");
         return new ValidationResult(errors, warnings);
+    }
+
+    private void validateOrderBy(IqlQuery query, List<String> errors) {
+        if (query.orderBy() == null || query.orderBy().target() == null) return;
+        Integer index = query.orderBy().metricIndex();
+        if (query.orderBy().target() == IqlQuery.OrderTarget.METRIC
+                && (index == null || index < 0 || index >= query.metrics().size())) {
+            errors.add("order_by metric_index must reference metrics");
+        }
+        if (query.orderBy().target() == IqlQuery.OrderTarget.DERIVED_METRIC
+                && (index == null || index < 0 || index >= query.derivedMetrics().size())) {
+            errors.add("order_by metric_index must reference derived_metrics");
+        }
+        if (query.orderBy().target() == IqlQuery.OrderTarget.DERIVED_METRIC && query.groupBy().size() != 1) {
+            errors.add("derived metric ordering currently requires exactly one group_by field");
+        }
     }
 
     private void validateWindows(IqlQuery query, List<String> errors, List<String> warnings) {

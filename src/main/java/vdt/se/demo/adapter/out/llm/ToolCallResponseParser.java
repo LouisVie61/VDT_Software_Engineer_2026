@@ -48,7 +48,7 @@ final class ToolCallResponseParser {
     private IqlQuery query(JsonNode node) {
         List<IqlQuery.FilterCondition> filters = new ArrayList<>();
         node.path("filters").forEach(item -> filters.add(new IqlQuery.FilterCondition(requiredText(item,"id"),
-                requiredText(item,"field"), enumValue(IqlQuery.Operator.class, requiredText(item,"op")), decodedValue(item.get("value")))));
+                requiredText(item,"field"), enumValue(IqlQuery.Operator.class, requiredText(item,"op")), filterValue(item))));
         List<IqlQuery.GroupBy> groups = new ArrayList<>();
         node.path("group_by").forEach(item -> groups.add(new IqlQuery.GroupBy(requiredText(item,"field"), integer(item,"size"), sampleHits(item.path("sample_hits")))));
         List<IqlQuery.Metric> metrics = new ArrayList<>();
@@ -89,6 +89,22 @@ final class ToolCallResponseParser {
         try{return mapper.readTree(raw);}catch(RuntimeException ignored){return value;}
     }
 
+    private JsonNode filterValue(JsonNode filter) {
+        IqlQuery.Operator operator = enumValue(IqlQuery.Operator.class, requiredText(filter, "op"));
+        if (!filter.has("values")) return decodedValue(filter.get("value")); // backward-compatible provider output
+        JsonNode values = filter.path("values");
+        if (!values.isArray()) throw new LlmException("filter values must be an array");
+        if (operator == IqlQuery.Operator.EXISTS) return null;
+        if (operator == IqlQuery.Operator.IN || operator == IqlQuery.Operator.NOT_IN) {
+            if (values.isEmpty()) throw new LlmException(operator.toJson() + " requires at least one filter value");
+            return values.deepCopy();
+        }
+        if (values.size() != 1 || !values.get(0).isString()) {
+            throw new LlmException(operator.toJson() + " requires exactly one string filter value");
+        }
+        return values.get(0);
+    }
+
     private List<IqlQuery.Window> windows(JsonNode array) {
         List<IqlQuery.Window> result = new ArrayList<>();
         if (!array.isArray()) return result;
@@ -97,7 +113,7 @@ final class ToolCallResponseParser {
             List<IqlQuery.FilterCondition> filters = new ArrayList<>();
             item.path("filters").forEach(filter -> filters.add(new IqlQuery.FilterCondition(requiredText(filter, "id"),
                     requiredText(filter, "field"), enumValue(IqlQuery.Operator.class, requiredText(filter, "op")),
-                    decodedValue(filter.get("value")))));
+                    filterValue(filter))));
             result.add(new IqlQuery.Window(requiredText(item, "name"),
                     new IqlQuery.TimeRange(text(time, "field"), text(time, "from"), text(time, "to")), filters));
         });

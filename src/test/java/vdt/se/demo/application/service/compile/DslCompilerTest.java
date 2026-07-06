@@ -165,4 +165,42 @@ class DslCompilerTest {
         assertThat(dsl.at("/aggs/events/aggs/critical_events/filter/bool/filter/1/term/severity").asString())
                 .isEqualTo("critical");
     }
+
+    @Test
+    void ordersAndLimitsDateBucketsByDerivedMetric() {
+        IqlQuery.Window failed = new IqlQuery.Window("failed_auth",
+                new IqlQuery.TimeRange("timestamp", "2025-07-01T00:00:00Z", "2025-08-01T00:00:00Z"),
+                List.of(new IqlQuery.FilterCondition("failed", "action", IqlQuery.Operator.EQ,
+                        mapper.valueToTree("failed"))));
+        IqlQuery query = new IqlQuery(List.of(), List.of(), null,
+                new IqlQuery.TimeRange("timestamp", "2025-07-01T00:00:00Z", "2025-08-01T00:00:00Z"),
+                List.of(new IqlQuery.GroupBy("timestamp_day", 1)),
+                List.of(new IqlQuery.Metric(IqlQuery.MetricType.COUNT, null)),
+                new IqlQuery.OrderBy(IqlQuery.OrderTarget.DERIVED_METRIC, 0, IqlQuery.Direction.DESC),
+                List.of(), 50, null, List.of(failed),
+                List.of(new IqlQuery.HavingCondition("count", null, IqlQuery.ComparisonOp.GTE, 20.0)),
+                List.of(new IqlQuery.DerivedMetric("failed_rate", IqlQuery.DerivedMetricType.RATIO,
+                        new IqlQuery.MetricRef("count", "failed_auth"), new IqlQuery.MetricRef("count", null))));
+
+        ObjectNode dsl = compiler.compile(query);
+
+        assertThat(dsl.at("/aggs/events/date_histogram/order").isMissingNode()).isTrue();
+        assertThat(dsl.at("/aggs/events/aggs/ordered_buckets/bucket_sort/sort/0/failed_rate/order").asString())
+                .isEqualTo("desc");
+        assertThat(dsl.at("/aggs/events/aggs/ordered_buckets/bucket_sort/size").asInt()).isEqualTo(1);
+    }
+
+    @Test
+    void enforcesTopCountLimitForSingleDateHistogram() {
+        IqlQuery query = new IqlQuery(List.of(), List.of(), null, null,
+                List.of(new IqlQuery.GroupBy("timestamp_day", 1)),
+                List.of(new IqlQuery.Metric(IqlQuery.MetricType.COUNT, null)),
+                new IqlQuery.OrderBy(IqlQuery.OrderTarget.COUNT, null, IqlQuery.Direction.DESC),
+                List.of(), 50, null);
+
+        ObjectNode dsl = compiler.compile(query);
+
+        assertThat(dsl.at("/aggs/events/date_histogram/order/_count").asString()).isEqualTo("desc");
+        assertThat(dsl.at("/aggs/events/aggs/limit_timestamp_day/bucket_sort/size").asInt()).isEqualTo(1);
+    }
 }
