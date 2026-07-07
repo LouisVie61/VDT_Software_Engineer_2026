@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tools.jackson.databind.ObjectMapper;
 import vdt.se.demo.application.port.inboundPort.QueryUseCase;
+import vdt.se.demo.application.port.outboundPort.audit.AuditLogPort;
 import vdt.se.demo.application.port.outboundPort.execution.QueryExecutorPort;
 import vdt.se.demo.application.port.outboundPort.cache.BaseDslCachePort;
 import vdt.se.demo.application.port.outboundPort.history.QueryHistoryPort;
@@ -24,8 +25,9 @@ public class QueryApplicationConfig {
     private static final String DSL_COMPILER_CACHE_VERSION = "dsl-v2-nested-groups";
 
     @Bean QueryUseCase queryUseCase(IqlSearchWorkflow workflow, QueryCsvExportService csv,
-                                    QueryHistoryPort history, QuerySummaryService summary, AppProperties properties) {
-        return new QueryUseCaseService(workflow, csv, history, summary, properties.getUser().getDefaultId());
+                                    QueryHistoryPort history, AuditLogPort audit, QuerySummaryService summary,
+                                    AppProperties properties) {
+        return new QueryUseCaseService(workflow, csv, history, audit, summary, properties.getUser().getDefaultId());
     }
     @Bean IqlSearchWorkflow iqlSearchWorkflow(SessionStateStore states, IqlQueryPreparationService preparation,
             CachedIqlExecutionService execution, ResultSummaryBuilder summaries) {
