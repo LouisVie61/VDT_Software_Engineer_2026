@@ -124,7 +124,6 @@ public class AppProperties {
         private final Gemini gemini1 = new Gemini();
         private final Gemini gemini2 = new Gemini();
         private final Groq groq = new Groq();
-        private final Gpt gpt = new Gpt();
         private final OpenRouter openrouter = new OpenRouter();
         private final CircuitBreaker circuitBreaker = new CircuitBreaker();
 
