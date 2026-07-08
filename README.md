@@ -212,7 +212,30 @@ sequenceDiagram
     U-->>C: QueryResult with summaryStatus=PENDING
     C-->>A: 200 SearchResponse
 ```
+## Ingest forward FluentD flowchart
 
+```mermaid
+flowchart LR
+    subgraph Sources["N nguồn log / site / agent"]
+        S1["Sender 1<br/>parse JSONL/CSV"]
+        S2["Sender 2<br/>parse syslog/app log"]
+        SN["Sender N"]
+    end
+
+    subgraph Receiver["Central Fluentd receiver"]
+        Forward["forward input :24224"]
+        Tags["tag soc.events.jsonl / soc.events.csv"]
+        Transform["record_transformer<br/>canonical schema + enrichment"]
+        Buffer[("persistent file buffer")]
+    end
+
+    ES[("Elasticsearch cluster/index")]
+
+    S1 -->|"Fluent forward protocol"| Forward
+    S2 -->|"Fluent forward protocol"| Forward
+    SN -->|"Fluent forward protocol"| Forward
+    Forward --> Tags --> Transform --> Buffer -->|"batch + retry"| ES
+```
 
 ## Key Features
 
