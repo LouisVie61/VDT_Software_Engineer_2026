@@ -160,6 +160,83 @@ demo/
 |-- README.md                     # Short setup and demo guide
 ```
 
+## AI search end-2-end flowchart
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor A as SOC Analyst
+    participant C as QueryController
+    participant U as QueryUseCaseService
+    participant W as IqlSearchWorkflow
+    participant R as Redis Session
+    participant P as IQL Preparation
+    participant L as LLM Provider Chain
+    participant N as Constraint Normalizer
+    participant X as DSL Cache/Compiler
+    participant E as Elasticsearch
+    participant S as Async Summary
+    participant G as Async Audit
+
+    A->>C: POST /api/search {question, filters, page, sessionId}
+    C->>U: search(SearchRequest)
+    U->>W: search(request)
+    W->>R: load(iql:session:{sessionId})
+    R-->>W: previous SessionState hoặc empty
+    W->>P: prepare(question, previous, authoritative constraints)
+    P->>L: LLM input: question + constraints hint + session + tool schema + correction errors
+    L-->>P: LLM output: search_events NEW/PATCH hoặc ask_clarification
+    P->>P: parse output + apply PATCH + resolve references
+    P->>N: candidate IQL + authoritative SearchConstraints
+    N-->>P: normalized IQL với request constraints đã override
+    P->>P: validate schema + preflight compile
+    P-->>W: validated IqlQuery
+    W->>X: execute(IQL, page, pageSize, searchAfter)
+    X->>X: key = normalized IQL + schema/compiler version
+    alt Base DSL cache hit
+        X->>R: GET iql:dsl:{key}
+        R-->>X: base DSL
+    else Cache miss
+        X->>X: compile deterministic base DSL
+        X->>R: SET base DSL with TTL
+    end
+    X->>X: deep copy + apply pagination/cursor
+    X->>E: POST /{index}/_search
+    E-->>X: hits + aggregations + total + shard status
+    X-->>W: ExecutionResult + generated DSL + cacheHit
+    W->>W: build compact ResultSummary
+    W->>R: save SessionState(lastQuery, lastResultSummary)
+    W-->>U: QueryResult
+    U->>S: schedule(queryId, result metadata)
+    U->>G: saveAsync(auditLog)
+    U-->>C: QueryResult with summaryStatus=PENDING
+    C-->>A: 200 SearchResponse
+```
+## Ingest forward FluentD flowchart
+
+```mermaid
+flowchart LR
+    subgraph Sources["N nguồn log / site / agent"]
+        S1["Sender 1<br/>parse JSONL/CSV"]
+        S2["Sender 2<br/>parse syslog/app log"]
+        SN["Sender N"]
+    end
+
+    subgraph Receiver["Central Fluentd receiver"]
+        Forward["forward input :24224"]
+        Tags["tag soc.events.jsonl / soc.events.csv"]
+        Transform["record_transformer<br/>canonical schema + enrichment"]
+        Buffer[("persistent file buffer")]
+    end
+
+    ES[("Elasticsearch cluster/index")]
+
+    S1 -->|"Fluent forward protocol"| Forward
+    S2 -->|"Fluent forward protocol"| Forward
+    SN -->|"Fluent forward protocol"| Forward
+    Forward --> Tags --> Transform --> Buffer -->|"batch + retry"| ES
+```
+
 ## Key Features
 
 - Natural-language SOC search through `POST /api/search`
